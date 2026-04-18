@@ -276,11 +276,11 @@ export function CityClient({
                 </button>
               </header>
               <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden overscroll-contain">
-                <div className="mx-auto flex w-full max-w-md flex-col gap-5 px-4 py-4 sm:gap-6 sm:px-5 sm:py-5">
+                <div className="mx-auto flex w-full max-w-md flex-col gap-3 px-4 py-3 sm:gap-4 sm:px-5 sm:py-4">
                   <section className="min-w-0" aria-labelledby="add-modal-city-label">
                     <h3
                       id="add-modal-city-label"
-                      className="mb-2 text-[11px] font-extrabold uppercase tracking-wide text-indigo-900/45"
+                      className="mb-1.5 text-[11px] font-extrabold uppercase tracking-wide text-indigo-900/45"
                     >
                       Stad
                     </h3>
@@ -309,12 +309,12 @@ export function CityClient({
                     />
                   </section>
                   <section
-                    className="min-w-0 border-t border-indigo-100/65 pt-5 sm:pt-6"
+                    className="min-w-0 border-t border-indigo-100/65 pt-3 sm:pt-4"
                     aria-labelledby="add-modal-spot-label"
                   >
                     <h3
                       id="add-modal-spot-label"
-                      className="mb-2 text-[11px] font-extrabold uppercase tracking-wide text-indigo-900/45"
+                      className="mb-1.5 text-[11px] font-extrabold uppercase tracking-wide text-indigo-900/45"
                     >
                       Plats & kategori
                     </h3>

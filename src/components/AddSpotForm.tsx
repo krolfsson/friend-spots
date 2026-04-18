@@ -150,17 +150,17 @@ export function AddSpotForm({
 
   const inner = (
     <>
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-x-1 gap-y-1.5">
         {CATEGORIES.map((c) => (
           <button
             key={c.id}
             type="button"
             onClick={() => setCategory(c.id)}
-            className={`rounded-full px-3 py-2 text-sm font-extrabold tracking-tight transition active:scale-95 ${
+            className={`rounded-full px-2.5 py-1.5 text-xs font-extrabold tracking-tight transition active:scale-95 sm:px-3 sm:py-2 sm:text-sm ${
               category === c.id ? "y2k-chip-active" : "y2k-chip text-indigo-950 hover:-translate-y-0.5"
             }`}
           >
-            <span className="mr-1">{c.emoji}</span>
+            <span className="mr-0.5 sm:mr-1">{c.emoji}</span>
             {c.label}
           </button>
         ))}
@@ -214,12 +214,12 @@ export function AddSpotForm({
         />
       </div>
 
-      <div className="mt-4 flex flex-wrap items-center gap-3">
+      <div className="mt-3 flex flex-wrap items-center gap-2 sm:gap-3">
         <button
           type="button"
           disabled={!canSave || saving}
           onClick={() => void save()}
-          className="rounded-full bg-gradient-to-r from-fuchsia-500 to-violet-600 px-6 py-2.5 text-sm font-extrabold text-white transition enabled:hover:brightness-110 enabled:active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40"
+          className="rounded-full bg-gradient-to-r from-fuchsia-500 to-violet-600 px-5 py-2 text-sm font-extrabold text-white transition enabled:hover:brightness-110 enabled:active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 sm:px-6 sm:py-2.5"
         >
           {saving ? "Sparar…" : "Spara"}
         </button>
@@ -230,7 +230,7 @@ export function AddSpotForm({
 
   if (embeddedInModal) {
     return (
-      <div id="add-tip" className="min-w-0 space-y-4">
+      <div id="add-tip" className="min-w-0 space-y-3">
         {inner}
       </div>
     );

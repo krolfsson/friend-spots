@@ -19,33 +19,31 @@ export function CityPickOrCreate({
   /** Ingen egen kort-ram — används inuti gemensam modal-panel. */
   embedded?: boolean;
 }) {
-  const [query, setQuery] = useState("");
+  const [newCityName, setNewCityName] = useState("");
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
 
+  const ordered = useMemo(
+    () => [...cities].sort((a, b) => a.name.localeCompare(b.name, "sv")),
+    [cities],
+  );
+
+  const selectValue = ordered.some((c) => c.slug === selectedSlug)
+    ? selectedSlug
+    : (ordered[0]?.slug ?? "");
+
   useEffect(() => {
-    const t = window.setTimeout(() => document.getElementById("city-modal-search")?.focus(), 40);
+    if (ordered.length === 0) return;
+    const t = window.setTimeout(() => document.getElementById("city-modal-select")?.focus(), 40);
     return () => window.clearTimeout(t);
-  }, []);
+  }, [ordered.length]);
 
-  const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (!q) return cities.slice(0, 10);
-    return cities
-      .filter((c) => c.name.toLowerCase().includes(q) || c.slug.toLowerCase().includes(q))
-      .slice(0, 12);
-  }, [cities, query]);
-
-  const exactMatch = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (!q) return null;
-    return cities.find((c) => c.name.toLowerCase() === q) ?? null;
-  }, [cities, query]);
-
-  const canCreate = query.trim().length >= 2 && !exactMatch;
+  const canCreate =
+    newCityName.trim().length >= 2 &&
+    !ordered.some((c) => c.name.toLowerCase() === newCityName.trim().toLowerCase());
 
   async function createCity() {
-    const name = query.trim();
+    const name = newCityName.trim();
     if (name.length < 2) return;
     setBusy(true);
     setErr(null);
@@ -60,6 +58,7 @@ export function CityPickOrCreate({
       const created = data.city;
       if (!created?.slug) throw new Error("Saknar stad");
       onCityCreated(created);
+      setNewCityName("");
     } catch (e) {
       setErr(e instanceof Error ? e.message : "Okänt fel");
     } finally {
@@ -71,66 +70,87 @@ export function CityPickOrCreate({
     ? "min-w-0 max-w-full space-y-2"
     : "mb-4 min-w-0 max-w-full rounded-2xl border border-fuchsia-200/60 bg-white/75 px-3 py-3 sm:px-4";
 
+  if (ordered.length === 0) {
+    return (
+      <div className={shell}>
+        <p className="text-xs font-bold text-indigo-900/55">Inga städer än — skapa den första.</p>
+        <div className="mt-2 flex flex-wrap items-stretch gap-2">
+          <input
+            value={newCityName}
+            onChange={(e) => {
+              setNewCityName(e.target.value);
+              setErr(null);
+            }}
+            placeholder="Stadens namn"
+            aria-label="Ny stads namn"
+            className="min-h-10 min-w-0 flex-1 rounded-xl border border-fuchsia-200/70 bg-white/90 px-3 py-2 text-sm font-semibold text-indigo-950 outline-none focus:ring-2 focus:ring-fuchsia-300/50"
+          />
+          <button
+            type="button"
+            disabled={busy || newCityName.trim().length < 2}
+            onClick={() => void createCity()}
+            className="shrink-0 rounded-full bg-gradient-to-r from-emerald-400 to-teal-500 px-4 py-2 text-xs font-extrabold text-white disabled:opacity-40"
+          >
+            {busy ? "…" : "Skapa"}
+          </button>
+        </div>
+        {err ? <p className="mt-2 text-xs font-bold text-rose-600">{err}</p> : null}
+      </div>
+    );
+  }
+
   return (
     <div className={shell}>
-      <input
-        id="city-modal-search"
-        value={query}
+      <label htmlFor="city-modal-select" className="sr-only">
+        Välj stad
+      </label>
+      <select
+        id="city-modal-select"
+        value={selectValue}
         onChange={(e) => {
-          setQuery(e.target.value);
           setErr(null);
+          const c = ordered.find((x) => x.slug === e.target.value);
+          if (c) onSelectCity(c);
         }}
-        placeholder="Sök bland städer eller skriv ny…"
-        aria-label="Sök eller välj stad för tipset"
-        className="w-full min-w-0 max-w-full rounded-xl border border-fuchsia-200/70 bg-white/90 px-3 py-2 text-sm font-semibold text-indigo-950 outline-none ring-0 focus:border-fuchsia-400 focus:ring-2 focus:ring-fuchsia-300/50 sm:rounded-2xl sm:py-2.5"
-        autoComplete="off"
-      />
+        className="h-10 w-full max-w-full cursor-pointer rounded-xl border border-fuchsia-200/70 bg-white/90 px-3 text-sm font-semibold text-indigo-950 outline-none ring-0 focus:border-fuchsia-400 focus:ring-2 focus:ring-fuchsia-300/50 sm:h-11 sm:rounded-2xl"
+      >
+        {ordered.map((c) => (
+          <option key={c.id} value={c.slug}>
+            {c.name}
+            {c._count != null ? ` (${c._count.spots})` : ""}
+          </option>
+        ))}
+      </select>
 
-      {err ? (
-        <p className="mt-2 text-xs font-bold text-rose-600">{err}</p>
-      ) : (
-        <>
-          {filtered.length > 0 ? (
-            <ul className="mt-2 max-h-40 space-y-0.5 overflow-y-auto rounded-xl border border-indigo-100/80 bg-white/90 p-1">
-              {filtered.map((c) => (
-                <li key={c.id}>
-                  <button
-                    type="button"
-                    className={`flex w-full min-w-0 items-center justify-between gap-2 rounded-lg px-2.5 py-2 text-left text-sm font-bold text-indigo-950 hover:bg-fuchsia-50/90 ${
-                      c.slug === selectedSlug ? "bg-fuchsia-100/90 ring-1 ring-fuchsia-300/60" : ""
-                    }`}
-                    onClick={() => {
-                      onSelectCity(c);
-                    }}
-                  >
-                    <span className="truncate">{c.name}</span>
-                    {c._count != null ? (
-                      <span className="shrink-0 text-[11px] font-black tabular-nums text-indigo-900/40">
-                        {c._count.spots}
-                      </span>
-                    ) : null}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          ) : query.trim() ? (
-            <p className="mt-2 text-xs font-bold text-indigo-900/45">Ingen stad matchar sökningen.</p>
-          ) : (
-            <p className="mt-2 text-xs font-bold text-indigo-900/45">Inga städer än — använd knappen nedan.</p>
-          )}
-
+      <details className="group rounded-lg pt-0.5 [&_summary::-webkit-details-marker]:hidden">
+        <summary className="cursor-pointer list-none py-1 text-[11px] font-extrabold tracking-wide text-indigo-800/75 hover:text-indigo-950">
+          + Ny stad (valfritt)
+        </summary>
+        <div className="mt-1.5 flex flex-wrap items-stretch gap-2 pb-0.5">
+          <input
+            value={newCityName}
+            onChange={(e) => {
+              setNewCityName(e.target.value);
+              setErr(null);
+            }}
+            placeholder="Namn på ny stad"
+            aria-label="Namn på ny stad"
+            className="min-h-9 min-w-0 flex-1 rounded-lg border border-indigo-200/70 bg-white/90 px-2.5 py-1.5 text-xs font-semibold text-indigo-950 outline-none focus:ring-2 focus:ring-fuchsia-300/45"
+          />
           {canCreate ? (
             <button
               type="button"
               disabled={busy}
               onClick={() => void createCity()}
-              className="mt-3 w-full rounded-full border border-emerald-300/80 bg-gradient-to-r from-emerald-400 to-teal-500 py-2.5 text-sm font-extrabold text-white transition enabled:hover:brightness-105 enabled:active:scale-[0.99] disabled:opacity-45"
+              className="shrink-0 rounded-full border border-emerald-300/80 bg-gradient-to-r from-emerald-400 to-teal-500 px-3 py-1.5 text-[11px] font-extrabold text-white disabled:opacity-45"
             >
-              {busy ? "Skapar…" : `Lägg till ny plats: "${query.trim()}"`}
+              {busy ? "…" : "Lägg till"}
             </button>
           ) : null}
-        </>
-      )}
+        </div>
+      </details>
+
+      {err ? <p className="text-xs font-bold text-rose-600">{err}</p> : null}
     </div>
   );
 }
