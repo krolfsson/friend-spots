@@ -6,7 +6,7 @@ function secret(): string {
   return process.env.ROOM_TOKEN_SECRET?.trim() || "dev-room-token-secret-change-me";
 }
 
-/** 90 dagars åtkomstbevis (httpOnly-cookie). */
+/** 90-day room access token (httpOnly cookie). */
 export function signRoomAccessToken(roomId: string, roomSlug: string): string {
   const exp = Math.floor(Date.now() / 1000) + 90 * 24 * 60 * 60;
   const payloadObj = { roomId, slug: roomSlug, exp };
@@ -15,7 +15,8 @@ export function signRoomAccessToken(roomId: string, roomSlug: string): string {
   return `${payload}.${sig}`;
 }
 
-export function verifyRoomAccessToken(token: string, expectedSlug: string): { roomId: string } | null {
+/** Verify signature and expiry. Room is matched via DB room.id + URL slug (works after slug rename). */
+export function verifyRoomAccessToken(token: string): { roomId: string } | null {
   try {
     const dot = token.lastIndexOf(".");
     if (dot <= 0) return null;
@@ -30,8 +31,8 @@ export function verifyRoomAccessToken(token: string, expectedSlug: string): { ro
       slug: string;
       exp: number;
     };
-    if (data.slug !== expectedSlug) return null;
     if (typeof data.exp !== "number" || data.exp < Math.floor(Date.now() / 1000)) return null;
+    if (typeof data.roomId !== "string" || !data.roomId) return null;
     return { roomId: data.roomId };
   } catch {
     return null;

@@ -1,4 +1,6 @@
 import { CreateRoomLandingForm } from "@/components/CreateRoomLandingForm";
+import { MapsEverCounter } from "@/components/MapsEverCounter";
+import { getTotalRoomsCount } from "@/lib/mapStats";
 import { SITE_DESCRIPTION } from "@/lib/site";
 import type { Metadata } from "next";
 
@@ -9,12 +11,12 @@ export const metadata: Metadata = {
   description: SITE_DESCRIPTION,
 };
 
-/**
- * Startsidan (/) är alltid landning — kartvyn ligger under /[roomSlug], t.ex. /beta-2026.
- */
-export default function Home() {
+export default async function Home() {
+  const totalMaps = await getTotalRoomsCount();
+
   return (
     <div className="mx-auto flex min-h-dvh max-w-md flex-col justify-center px-4 py-12">
+      <MapsEverCounter total={totalMaps} />
       <div className="y2k-panel rounded-[1.75rem] p-6 sm:p-8">
         <h1 className="mb-1 text-xl font-extrabold tracking-tight text-indigo-950">Skapa ny karta</h1>
         <p className="mb-6 text-sm font-semibold text-indigo-900/60">

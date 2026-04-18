@@ -17,7 +17,7 @@ export async function getAuthorizedRoomFromRequest(
   }
 
   const token = req.cookies.get("fs_room")?.value;
-  const claims = token ? verifyRoomAccessToken(token, slug) : null;
+  const claims = token ? verifyRoomAccessToken(token) : null;
   if (!claims) {
     return {
       ok: false,

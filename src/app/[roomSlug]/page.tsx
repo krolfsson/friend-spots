@@ -49,7 +49,7 @@ export default async function RoomPage({ params }: { params: Promise<{ roomSlug:
 
   const jar = await cookies();
   const token = jar.get(ROOM_ACCESS_COOKIE)?.value;
-  const claims = token ? verifyRoomAccessToken(token, slug) : null;
+  const claims = token ? verifyRoomAccessToken(token) : null;
   const authed = Boolean(claims && claims.roomId === room.id);
 
   if (!authed) {

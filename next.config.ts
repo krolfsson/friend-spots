@@ -5,7 +5,12 @@ const nextConfig: NextConfig = {
     return [
       {
         source: "/beta-2026",
-        destination: "/Rolfsson",
+        destination: "/rolfsson",
+        permanent: true,
+      },
+      {
+        source: "/Rolfsson",
+        destination: "/rolfsson",
         permanent: true,
       },
       {
