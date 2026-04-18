@@ -786,39 +786,6 @@ function SpotCard({
               <span>{cat.emoji}</span>
               <span>{cat.label}</span>
             </span>
-            <div
-              className="inline-flex h-8 min-h-8 shrink-0 select-none items-stretch overflow-hidden rounded-full border border-indigo-300/55 bg-indigo-50/40 text-[11px] font-extrabold leading-none lg:h-7 lg:min-h-7 lg:text-[10px]"
-              role="group"
-              aria-label={
-                spot.viewerHasPlussed
-                  ? `Poäng ${displayScore}, tryck för att ta bort din +1`
-                  : `Poäng ${displayScore}, tryck +1 för att höja`
-              }
-            >
-              <div className="flex min-h-0 min-w-0 max-w-full flex-none items-center gap-0.5 border-r border-indigo-300/50 bg-indigo-50/95 px-2 text-indigo-950 tabular-nums lg:gap-0.5 lg:px-1.5">
-                <span aria-hidden className="shrink-0 leading-none">
-                  🙋
-                </span>
-                <span className="min-w-[0.65rem] shrink-0 tabular-nums">{displayScore}</span>
-              </div>
-              <button
-                type="button"
-                disabled={plusBusy}
-                aria-label={spot.viewerHasPlussed ? "Ta bort din +1" : "Lägg till +1 i poäng"}
-                className={`flex min-h-0 min-w-0 flex-none items-center border-l-0 px-2 transition active:scale-[0.98] disabled:cursor-wait disabled:opacity-60 lg:px-1.5 ${
-                  spot.viewerHasPlussed
-                    ? "bg-gradient-to-b from-indigo-300/75 to-violet-400/70 text-indigo-950 hover:brightness-95"
-                    : "bg-gradient-to-b from-indigo-400/65 to-violet-500/60 text-white hover:brightness-105"
-                }`}
-                onPointerDown={(e) => e.stopPropagation()}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  void togglePlus();
-                }}
-              >
-                {spot.viewerHasPlussed ? "✓" : "+1"}
-              </button>
-            </div>
             <a
               className="inline-flex h-8 min-h-8 shrink-0 select-none items-center rounded-full bg-gradient-to-r from-sky-400 to-cyan-400 px-2.5 text-[11px] font-extrabold leading-none text-indigo-950 shadow-sm shadow-cyan-500/20 ring-1 ring-white/60 hover:brightness-110 lg:h-7 lg:min-h-7 lg:px-2 lg:text-[10px]"
               href={mapsOpenForSpot(spot, { cityName: mapsCityName })}
@@ -829,6 +796,41 @@ function SpotCard({
             >
               Maps
             </a>
+          </div>
+        </div>
+        <div className="flex min-h-14 shrink-0 select-none items-center justify-end self-center">
+          <div
+            className="inline-flex h-8 min-h-8 shrink-0 select-none items-stretch overflow-hidden rounded-full border border-indigo-300/55 bg-indigo-50/40 text-[11px] font-extrabold leading-none lg:h-7 lg:min-h-7 lg:text-[10px]"
+            role="group"
+            aria-label={
+              spot.viewerHasPlussed
+                ? `Poäng ${displayScore}, tryck för att ta bort din +1`
+                : `Poäng ${displayScore}, tryck +1 för att höja`
+            }
+          >
+            <div className="flex min-h-0 min-w-0 max-w-full flex-none items-center gap-0.5 border-r border-indigo-300/50 bg-indigo-50/95 px-2 text-indigo-950 tabular-nums lg:gap-0.5 lg:px-1.5">
+              <span aria-hidden className="shrink-0 leading-none">
+                🙋
+              </span>
+              <span className="min-w-[0.65rem] shrink-0 tabular-nums">{displayScore}</span>
+            </div>
+            <button
+              type="button"
+              disabled={plusBusy}
+              aria-label={spot.viewerHasPlussed ? "Ta bort din +1" : "Lägg till +1 i poäng"}
+              className={`flex min-h-0 min-w-0 flex-none items-center border-l-0 px-2 transition active:scale-[0.98] disabled:cursor-wait disabled:opacity-60 lg:px-1.5 ${
+                spot.viewerHasPlussed
+                  ? "bg-gradient-to-b from-indigo-300/75 to-violet-400/70 text-indigo-950 hover:brightness-95"
+                  : "bg-gradient-to-b from-indigo-400/65 to-violet-500/60 text-white hover:brightness-105"
+              }`}
+              onPointerDown={(e) => e.stopPropagation()}
+              onClick={(e) => {
+                e.stopPropagation();
+                void togglePlus();
+              }}
+            >
+              {spot.viewerHasPlussed ? "✓" : "+1"}
+            </button>
           </div>
         </div>
       </article>
