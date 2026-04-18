@@ -800,7 +800,7 @@ function SpotCard({
         </div>
         <div className="flex min-h-14 shrink-0 select-none items-center justify-end self-center">
           <div
-            className="inline-flex h-8 min-h-8 shrink-0 select-none items-stretch overflow-hidden rounded-full border border-indigo-300/55 bg-indigo-50/40 text-[11px] font-extrabold leading-none lg:h-7 lg:min-h-7 lg:text-[10px]"
+            className="flex h-14 w-10 shrink-0 flex-col overflow-hidden rounded-2xl border border-indigo-300/55 bg-indigo-50/40 text-[11px] font-extrabold leading-none lg:h-12 lg:w-9 lg:text-[10px]"
             role="group"
             aria-label={
               spot.viewerHasPlussed
@@ -808,17 +808,11 @@ function SpotCard({
                 : `Poäng ${displayScore}, tryck +1 för att höja`
             }
           >
-            <div className="flex min-h-0 min-w-0 max-w-full flex-none items-center gap-0.5 border-r border-indigo-300/50 bg-indigo-50/95 px-2 text-indigo-950 tabular-nums lg:gap-0.5 lg:px-1.5">
-              <span aria-hidden className="shrink-0 leading-none">
-                🙋
-              </span>
-              <span className="min-w-[0.65rem] shrink-0 tabular-nums">{displayScore}</span>
-            </div>
             <button
               type="button"
               disabled={plusBusy}
               aria-label={spot.viewerHasPlussed ? "Ta bort din +1" : "Lägg till +1 i poäng"}
-              className={`flex min-h-0 min-w-0 flex-none items-center border-l-0 px-2 transition active:scale-[0.98] disabled:cursor-wait disabled:opacity-60 lg:px-1.5 ${
+              className={`flex flex-1 items-center justify-center transition active:scale-[0.98] disabled:cursor-wait disabled:opacity-60 ${
                 spot.viewerHasPlussed
                   ? "bg-gradient-to-b from-indigo-300/75 to-violet-400/70 text-indigo-950 hover:brightness-95"
                   : "bg-gradient-to-b from-indigo-400/65 to-violet-500/60 text-white hover:brightness-105"
@@ -831,6 +825,12 @@ function SpotCard({
             >
               {spot.viewerHasPlussed ? "✓" : "+1"}
             </button>
+            <div className="flex h-7 items-center justify-center gap-0.5 border-t border-indigo-300/50 bg-indigo-50/95 px-1 text-indigo-950 tabular-nums lg:h-6">
+              <span aria-hidden className="leading-none">
+                🙋
+              </span>
+              <span className="tabular-nums">{displayScore}</span>
+            </div>
           </div>
         </div>
       </article>
