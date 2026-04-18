@@ -1,6 +1,6 @@
 /**
- * Removes all anonymous +1 votes (SpotPlus). Displayed score becomes 1 everywhere.
- * Requires DATABASE_URL. Run: npm run db:reset-plusses
+ * Tar bort alla anonym +1 (SpotPlus). Visad poäng blir 1 överallt (bas utan extra röster).
+ * Kräver DATABASE_URL. Kör: npm run db:reset-plusses
  */
 const { PrismaClient } = require("@prisma/client");
 

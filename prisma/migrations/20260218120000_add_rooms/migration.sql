@@ -11,7 +11,7 @@ CREATE TABLE "Room" (
 
 CREATE UNIQUE INDEX "Room_slug_key" ON "Room"("slug");
 
--- Seed: /beta-2026 med pinkod 1234 (scrypt s1, fast salt -- matchar src/lib/pin.ts)
+-- Seed: /beta-2026 med pinkod 1234 (scrypt s1, fast salt — matchar src/lib/pin.ts)
 INSERT INTO "Room" ("id", "slug", "pinHash", "name", "createdAt")
 VALUES (
     'clroombeta20260001',

@@ -2,7 +2,7 @@
 
 const LS = "friend_spots_voter";
 
-/** Anonymous device token (same browser). Created on first visit. */
+/** Anonym enhets-token (samma webbläsare). Skapas vid första besök. */
 export function getOrCreateVoterToken(): string {
   if (typeof window === "undefined") return "";
   try {

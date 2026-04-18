@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
     const token = req.headers.get("x-voter-token");
     if (!isValidVoterToken(token)) {
       return NextResponse.json(
-        { error: "Missing or invalid X-Voter-Token" },
+        { error: "Saknar eller ogiltig X-Voter-Token (anonym enhets-ID)" },
         { status: 400 },
       );
     }
@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
     const body = (await req.json()) as { spotId?: string };
     const spotId = body.spotId?.trim();
     if (!spotId) {
-      return NextResponse.json({ error: "spotId missing" }, { status: 400 });
+      return NextResponse.json({ error: "spotId saknas" }, { status: 400 });
     }
 
     const spot = await prisma.spot.findFirst({
@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
       select: { id: true },
     });
     if (!spot) {
-      return NextResponse.json({ error: "Spot not found" }, { status: 404 });
+      return NextResponse.json({ error: "Tipset finns inte" }, { status: 404 });
     }
 
     const voterKey = makeVoterKey(token, getRequestClientIp(req));
@@ -59,7 +59,7 @@ export async function POST(req: NextRequest) {
       viewerHasPlussed: true,
     });
   } catch (e) {
-    const message = e instanceof Error ? e.message : "Unknown error";
+    const message = e instanceof Error ? e.message : "Okänt fel";
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }
@@ -72,14 +72,14 @@ export async function DELETE(req: NextRequest) {
     const token = req.headers.get("x-voter-token");
     if (!isValidVoterToken(token)) {
       return NextResponse.json(
-        { error: "Missing or invalid X-Voter-Token" },
+        { error: "Saknar eller ogiltig X-Voter-Token (anonym enhets-ID)" },
         { status: 400 },
       );
     }
 
     const spotId = new URL(req.url).searchParams.get("spotId")?.trim();
     if (!spotId) {
-      return NextResponse.json({ error: "spotId missing" }, { status: 400 });
+      return NextResponse.json({ error: "spotId saknas" }, { status: 400 });
     }
 
     const spot = await prisma.spot.findFirst({
@@ -87,7 +87,7 @@ export async function DELETE(req: NextRequest) {
       select: { id: true },
     });
     if (!spot) {
-      return NextResponse.json({ error: "Spot not found" }, { status: 404 });
+      return NextResponse.json({ error: "Tipset finns inte" }, { status: 404 });
     }
 
     const voterKey = makeVoterKey(token, getRequestClientIp(req));
@@ -104,7 +104,7 @@ export async function DELETE(req: NextRequest) {
       viewerHasPlussed: false,
     });
   } catch (e) {
-    const message = e instanceof Error ? e.message : "Unknown error";
+    const message = e instanceof Error ? e.message : "Okänt fel";
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }
