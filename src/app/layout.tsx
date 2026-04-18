@@ -9,7 +9,30 @@ const y2k = M_PLUS_Rounded_1c({
 });
 
 export const metadata: Metadata = {
-  title: "Tips",
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL?.trim() || "https://friend-spots.vercel.app",
+  ),
+  title: {
+    default: "Tips",
+    template: "%s · Tips",
+  },
+  description: "Samla tips på karta — stad för stad.",
+  openGraph: {
+    title: "Tips",
+    description: "Samla tips på karta — stad för stad.",
+    siteName: "Tips",
+    locale: "sv_SE",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Tips",
+    description: "Samla tips på karta — stad för stad.",
+  },
+  appleWebApp: {
+    title: "Tips",
+    capable: true,
+  },
 };
 
 export const viewport: Viewport = {
