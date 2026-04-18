@@ -1,21 +1,11 @@
 import { CityClient } from "@/components/CityClient";
 import { CreateCityForm } from "@/components/CreateCityForm";
-import { prisma } from "@/lib/prisma";
+import { getDashboardData } from "@/lib/getDashboard";
 
 export const dynamic = "force-dynamic";
 
-type Search = { city?: string | string[] };
-
-function firstSlug(q: string | string[] | undefined) {
-  if (!q) return undefined;
-  return typeof q === "string" ? q : q[0];
-}
-
-export default async function Home({ searchParams }: { searchParams: Promise<Search> }) {
-  const cities = await prisma.city.findMany({
-    orderBy: { name: "asc" },
-    include: { _count: { select: { spots: true } } },
-  });
+export default async function Home() {
+  const { cities, bySlug } = await getDashboardData();
 
   if (!cities.length) {
     return (
@@ -25,20 +15,12 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
     );
   }
 
-  const sp = await searchParams;
-  const requested = firstSlug(sp.city)?.trim();
-
   let city = cities[0];
-  if (requested) {
-    const hit = cities.find((c) => c.slug === requested);
-    if (hit) city = hit;
-  } else {
-    const fromEnv = process.env.DEFAULT_CITY_SLUG?.trim();
-    if (fromEnv) {
-      const envHit = cities.find((c) => c.slug === fromEnv);
-      if (envHit) city = envHit;
-    }
+  const fromEnv = process.env.DEFAULT_CITY_SLUG?.trim();
+  if (fromEnv) {
+    const envHit = cities.find((c) => c.slug === fromEnv);
+    if (envHit) city = envHit;
   }
 
-  return <CityClient cities={cities} city={city} />;
+  return <CityClient cities={cities} city={city} dashboard={bySlug} />;
 }

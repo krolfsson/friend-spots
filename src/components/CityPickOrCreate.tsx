@@ -6,14 +6,15 @@ export type CityLite = { id: string; name: string; slug: string; _count?: { spot
 
 export function CityPickOrCreate({
   cities,
-  onClose,
   onSelectCity,
   onCityCreated,
+  selectedSlug,
 }: {
   cities: CityLite[];
-  onClose: () => void;
   onSelectCity: (c: CityLite) => void;
   onCityCreated: (c: CityLite) => void;
+  /** Vilken stad tipset sparas under (synkas med vald rad i listan och huvudfliken). */
+  selectedSlug: string;
 }) {
   const [query, setQuery] = useState("");
   const [busy, setBusy] = useState(false);
@@ -56,7 +57,6 @@ export function CityPickOrCreate({
       const created = data.city;
       if (!created?.slug) throw new Error("Saknar stad");
       onCityCreated(created);
-      onClose();
     } catch (e) {
       setErr(e instanceof Error ? e.message : "Okänt fel");
     } finally {
@@ -65,10 +65,7 @@ export function CityPickOrCreate({
   }
 
   return (
-    <div className="mb-4 rounded-2xl border border-fuchsia-200/60 bg-white/75 px-3 py-3 sm:px-4">
-      <label className="block text-[11px] font-extrabold uppercase tracking-wide text-indigo-900/55" htmlFor="city-modal-search">
-        Stad
-      </label>
+    <div className="mb-4 min-w-0 max-w-full rounded-2xl border border-fuchsia-200/60 bg-white/75 px-3 py-3 sm:px-4">
       <input
         id="city-modal-search"
         value={query}
@@ -77,7 +74,8 @@ export function CityPickOrCreate({
           setErr(null);
         }}
         placeholder="Sök bland städer eller skriv ny…"
-        className="mt-1.5 w-full rounded-2xl border border-fuchsia-200/70 bg-white/90 px-3 py-2.5 text-sm font-semibold text-indigo-950 outline-none ring-0 focus:border-fuchsia-400 focus:ring-2 focus:ring-fuchsia-300/50"
+        aria-label="Sök eller välj stad för tipset"
+        className="w-full min-w-0 max-w-full rounded-2xl border border-fuchsia-200/70 bg-white/90 px-3 py-2.5 text-sm font-semibold text-indigo-950 outline-none ring-0 focus:border-fuchsia-400 focus:ring-2 focus:ring-fuchsia-300/50"
         autoComplete="off"
       />
 
@@ -91,10 +89,11 @@ export function CityPickOrCreate({
                 <li key={c.id}>
                   <button
                     type="button"
-                    className="flex w-full items-center justify-between gap-2 rounded-lg px-2.5 py-2 text-left text-sm font-bold text-indigo-950 hover:bg-fuchsia-50/90"
+                    className={`flex w-full min-w-0 items-center justify-between gap-2 rounded-lg px-2.5 py-2 text-left text-sm font-bold text-indigo-950 hover:bg-fuchsia-50/90 ${
+                      c.slug === selectedSlug ? "bg-fuchsia-100/90 ring-1 ring-fuchsia-300/60" : ""
+                    }`}
                     onClick={() => {
                       onSelectCity(c);
-                      onClose();
                     }}
                   >
                     <span className="truncate">{c.name}</span>
@@ -120,7 +119,7 @@ export function CityPickOrCreate({
               onClick={() => void createCity()}
               className="mt-3 w-full rounded-full border border-emerald-300/80 bg-gradient-to-r from-emerald-400 to-teal-500 py-2.5 text-sm font-extrabold text-white transition enabled:hover:brightness-105 enabled:active:scale-[0.99] disabled:opacity-45"
             >
-              {busy ? "Skapar…" : `Lägg till ny plats: “${query.trim()}”`}
+              {busy ? "Skapar…" : `Lägg till ny plats: "${query.trim()}"`}
             </button>
           ) : null}
         </>

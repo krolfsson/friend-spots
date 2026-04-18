@@ -22,12 +22,7 @@ export function CreateCityForm() {
       const data = (await res.json()) as { city?: { slug: string }; error?: string };
       if (!res.ok) throw new Error(data.error ?? "Kunde inte skapa stad");
       setName("");
-      const slug = data.city?.slug;
-      if (slug) {
-        router.replace(`/?city=${encodeURIComponent(slug)}`);
-      } else {
-        router.replace("/");
-      }
+      router.replace("/");
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Okänt fel");
