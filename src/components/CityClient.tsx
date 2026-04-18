@@ -1,7 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { AddSpotForm } from "@/components/AddSpotForm";
 import { CityPickOrCreate } from "@/components/CityPickOrCreate";
 import { CATEGORIES, categoryMeta, type CategoryId } from "@/lib/categories";
@@ -22,7 +21,7 @@ type Spot = {
   recommendations: Recommendation[];
 };
 
-type City = { id: string; name: string; slug: string };
+type City = { id: string; name: string; slug: string; _count?: { spots: number } };
 
 function ChipScroller({ children }: { children: React.ReactNode }) {
   return (
@@ -35,7 +34,8 @@ function ChipScroller({ children }: { children: React.ReactNode }) {
 }
 
 export function CityClient({ cities, city }: { cities: City[]; city: City }) {
-  const router = useRouter();
+  const [cityList, setCityList] = useState<City[]>(cities);
+  const [activeCity, setActiveCity] = useState<City>(city);
   const [addOpen, setAddOpen] = useState(false);
   const [category, setCategory] = useState<"alla" | CategoryId>("alla");
   const [neighborhood, setNeighborhood] = useState<string>("alla");
@@ -44,13 +44,24 @@ export function CityClient({ cities, city }: { cities: City[]; city: City }) {
   const [categoryCounts, setCategoryCounts] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const firstFetch = useRef(true);
+  const prevCitySlug = useRef(activeCity.slug);
+
+  useEffect(() => {
+    setCityList(cities);
+  }, [cities]);
 
   const load = useCallback(async () => {
-    setLoading(true);
+    const cityChanged = prevCitySlug.current !== activeCity.slug;
+    if (firstFetch.current) {
+      setLoading(true);
+    } else if (cityChanged) {
+      setSpots([]);
+    }
     setError(null);
     try {
       const params = new URLSearchParams({
-        citySlug: city.slug,
+        citySlug: activeCity.slug,
         category,
         neighborhood,
       });
@@ -69,8 +80,10 @@ export function CityClient({ cities, city }: { cities: City[]; city: City }) {
       setError(e instanceof Error ? e.message : "Okänt fel");
     } finally {
       setLoading(false);
+      firstFetch.current = false;
+      prevCitySlug.current = activeCity.slug;
     }
-  }, [city.slug, category, neighborhood]);
+  }, [activeCity.slug, category, neighborhood]);
 
   useEffect(() => {
     void load();
@@ -110,15 +123,15 @@ export function CityClient({ cities, city }: { cities: City[]; city: City }) {
         </button>
         <div className="-mx-1 min-w-0 flex-1 px-1">
           <div className="flex gap-2 overflow-x-auto py-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            {cities.map((c) => {
-              const active = c.slug === city.slug;
+            {cityList.map((c) => {
+              const active = c.slug === activeCity.slug;
               return (
                 <button
                   key={c.id}
                   type="button"
                   onClick={() => {
-                    router.replace(`/?city=${encodeURIComponent(c.slug)}`);
-                    router.refresh();
+                    setActiveCity(c);
+                    window.history.replaceState(null, "", `/?city=${encodeURIComponent(c.slug)}`);
                   }}
                   className={`inline-flex h-9 min-h-9 shrink-0 items-center justify-center gap-1.5 rounded-full px-3.5 text-sm font-extrabold leading-none tracking-tight transition active:scale-95 ${
                     active ? "y2k-chip-active text-white" : "y2k-chip text-indigo-950 hover:-translate-y-0.5"
@@ -208,9 +221,26 @@ export function CityClient({ cities, city }: { cities: City[]; city: City }) {
           }}
         >
           <div className="max-h-[min(92dvh,720px)] w-full max-w-lg space-y-0 overflow-y-auto overscroll-contain pb-[env(safe-area-inset-bottom)]">
-            <CityPickOrCreate onClose={() => setAddOpen(false)} />
+            <CityPickOrCreate
+              cities={cityList}
+              onClose={() => setAddOpen(false)}
+              onSelectCity={(c) => {
+                setActiveCity(c);
+                window.history.replaceState(null, "", `/?city=${encodeURIComponent(c.slug)}`);
+              }}
+              onCityCreated={(c) => {
+                const next = { ...c, _count: c._count ?? { spots: 0 } };
+                setCityList((prev) =>
+                  [...prev.filter((x) => x.id !== next.id), next].sort((a, b) =>
+                    a.name.localeCompare(b.name, "sv"),
+                  ),
+                );
+                setActiveCity(next);
+                window.history.replaceState(null, "", `/?city=${encodeURIComponent(next.slug)}`);
+              }}
+            />
             <AddSpotForm
-              citySlug={city.slug}
+              citySlug={activeCity.slug}
               onSaved={() => {
                 void load();
                 window.setTimeout(() => setAddOpen(false), 500);

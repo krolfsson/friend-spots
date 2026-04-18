@@ -23,10 +23,28 @@ export async function GET(req: Request) {
     ...(category !== "alla" && isCategoryId(category) ? { category } : {}),
   };
 
-  const spotsForNeighborhoods = await prisma.spot.findMany({
-    where: baseWhere,
-    select: { neighborhood: true },
-  });
+  const spotWhere =
+    neighborhood !== "alla"
+      ? neighborhood === "ovrigt"
+        ? { ...baseWhere, OR: [{ neighborhood: null }, { neighborhood: "" }] }
+        : { ...baseWhere, neighborhood }
+      : baseWhere;
+
+  const [spotsForNeighborhoods, spots, categoryStats] = await Promise.all([
+    prisma.spot.findMany({
+      where: baseWhere,
+      select: { neighborhood: true },
+    }),
+    prisma.spot.findMany({
+      where: spotWhere,
+      include: { recommendations: { orderBy: { createdAt: "asc" } } },
+    }),
+    prisma.spot.groupBy({
+      by: ["category"],
+      where: { cityId: city.id },
+      _count: { _all: true },
+    }),
+  ]);
 
   const neighborhoods = Array.from(
     new Set(
@@ -36,25 +54,7 @@ export async function GET(req: Request) {
     ),
   ).sort((a, b) => a.localeCompare(b, "sv"));
 
-  const spots = await prisma.spot.findMany({
-    where: {
-      ...baseWhere,
-      ...(neighborhood !== "alla"
-        ? neighborhood === "ovrigt"
-          ? { OR: [{ neighborhood: null }, { neighborhood: "" }] }
-          : { neighborhood }
-        : {}),
-    },
-    include: { recommendations: { orderBy: { createdAt: "asc" } } },
-  });
-
   spots.sort((a, b) => b.recommendations.length - a.recommendations.length);
-
-  const categoryStats = await prisma.spot.groupBy({
-    by: ["category"],
-    where: { cityId: city.id },
-    _count: { _all: true },
-  });
 
   const categoryCounts = Object.fromEntries(
     categoryStats.map((c) => [c.category, c._count._all]),

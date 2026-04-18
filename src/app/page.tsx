@@ -12,7 +12,10 @@ function firstSlug(q: string | string[] | undefined) {
 }
 
 export default async function Home({ searchParams }: { searchParams: Promise<Search> }) {
-  const cities = await prisma.city.findMany({ orderBy: { name: "asc" } });
+  const cities = await prisma.city.findMany({
+    orderBy: { name: "asc" },
+    include: { _count: { select: { spots: true } } },
+  });
 
   if (!cities.length) {
     return (

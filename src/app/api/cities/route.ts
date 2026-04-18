@@ -26,7 +26,14 @@ export async function POST(req: Request) {
       slug = `${slug}-${Math.random().toString(36).slice(2, 6)}`;
     }
 
-    const city = await prisma.city.create({ data: { name, slug } });
+    const created = await prisma.city.create({ data: { name, slug } });
+    const city = await prisma.city.findUnique({
+      where: { id: created.id },
+      include: { _count: { select: { spots: true } } },
+    });
+    if (!city) {
+      return NextResponse.json({ error: "Kunde inte läsa skapad stad" }, { status: 500 });
+    }
     return NextResponse.json({ city });
   } catch (e) {
     const message = e instanceof Error ? e.message : "Okänt fel";

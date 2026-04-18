@@ -1,39 +1,27 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
-type CityRow = { id: string; name: string; slug: string; _count?: { spots: number } };
+export type CityLite = { id: string; name: string; slug: string; _count?: { spots: number } };
 
-export function CityPickOrCreate({ onClose }: { onClose: () => void }) {
-  const router = useRouter();
+export function CityPickOrCreate({
+  cities,
+  onClose,
+  onSelectCity,
+  onCityCreated,
+}: {
+  cities: CityLite[];
+  onClose: () => void;
+  onSelectCity: (c: CityLite) => void;
+  onCityCreated: (c: CityLite) => void;
+}) {
   const [query, setQuery] = useState("");
-  const [cities, setCities] = useState<CityRow[]>([]);
-  const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
 
   useEffect(() => {
-    window.setTimeout(() => document.getElementById("city-modal-search")?.focus(), 40);
-  }, []);
-
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      try {
-        const res = await fetch("/api/cities");
-        const data = (await res.json()) as { cities?: CityRow[]; error?: string };
-        if (!res.ok) throw new Error(data.error ?? "Kunde inte ladda städer");
-        if (!cancelled) setCities(data.cities ?? []);
-      } catch (e) {
-        if (!cancelled) setErr(e instanceof Error ? e.message : "Fel");
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
+    const t = window.setTimeout(() => document.getElementById("city-modal-search")?.focus(), 40);
+    return () => window.clearTimeout(t);
   }, []);
 
   const filtered = useMemo(() => {
@@ -52,15 +40,6 @@ export function CityPickOrCreate({ onClose }: { onClose: () => void }) {
 
   const canCreate = query.trim().length >= 2 && !exactMatch;
 
-  const goToCity = useCallback(
-    (slug: string) => {
-      onClose();
-      router.replace(`/?city=${encodeURIComponent(slug)}`);
-      router.refresh();
-    },
-    [onClose, router],
-  );
-
   async function createCity() {
     const name = query.trim();
     if (name.length < 2) return;
@@ -72,11 +51,12 @@ export function CityPickOrCreate({ onClose }: { onClose: () => void }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name }),
       });
-      const data = (await res.json()) as { city?: { slug: string }; error?: string };
+      const data = (await res.json()) as { city?: CityLite; error?: string };
       if (!res.ok) throw new Error(data.error ?? "Kunde inte skapa stad");
-      const slug = data.city?.slug;
-      if (!slug) throw new Error("Saknar slug");
-      goToCity(slug);
+      const created = data.city;
+      if (!created?.slug) throw new Error("Saknar stad");
+      onCityCreated(created);
+      onClose();
     } catch (e) {
       setErr(e instanceof Error ? e.message : "Okänt fel");
     } finally {
@@ -101,9 +81,7 @@ export function CityPickOrCreate({ onClose }: { onClose: () => void }) {
         autoComplete="off"
       />
 
-      {loading ? (
-        <p className="mt-2 text-xs font-bold text-indigo-900/50">Laddar städer…</p>
-      ) : err ? (
+      {err ? (
         <p className="mt-2 text-xs font-bold text-rose-600">{err}</p>
       ) : (
         <>
@@ -114,7 +92,10 @@ export function CityPickOrCreate({ onClose }: { onClose: () => void }) {
                   <button
                     type="button"
                     className="flex w-full items-center justify-between gap-2 rounded-lg px-2.5 py-2 text-left text-sm font-bold text-indigo-950 hover:bg-fuchsia-50/90"
-                    onClick={() => goToCity(c.slug)}
+                    onClick={() => {
+                      onSelectCity(c);
+                      onClose();
+                    }}
                   >
                     <span className="truncate">{c.name}</span>
                     {c._count != null ? (
