@@ -55,7 +55,7 @@ function FadingHorizontalChips({
         ref={scrollRef}
         className={`overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden ${rowClassName} ${fadeEnd ? "chip-row-fade-right" : ""}`}
       >
-        <div ref={trackRef} className="flex w-max gap-2">
+        <div ref={trackRef} className="flex w-max gap-2 pr-1">
           {children}
         </div>
       </div>
@@ -673,26 +673,37 @@ function SpotCard({
   /** 1 = nytt tips, varje anonym +1 höjer totalen. */
   const displayScore = 1 + spot.plusCount;
 
-  const plusSpot = useCallback(async () => {
+  const togglePlus = useCallback(async () => {
     const tok = getOrCreateVoterToken();
     if (!tok) return;
     setPlusBusy(true);
     try {
-      const res = await fetch("/api/spots/plus", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-Room-Slug": roomSlug,
-          "X-Voter-Token": tok,
-        },
-        body: JSON.stringify({ spotId: spot.id }),
-      });
-      if (!res.ok) return;
+      if (spot.viewerHasPlussed) {
+        const res = await fetch(`/api/spots/plus?spotId=${encodeURIComponent(spot.id)}`, {
+          method: "DELETE",
+          headers: {
+            "X-Room-Slug": roomSlug,
+            "X-Voter-Token": tok,
+          },
+        });
+        if (!res.ok) return;
+      } else {
+        const res = await fetch("/api/spots/plus", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Room-Slug": roomSlug,
+            "X-Voter-Token": tok,
+          },
+          body: JSON.stringify({ spotId: spot.id }),
+        });
+        if (!res.ok) return;
+      }
       onEdited();
     } finally {
       setPlusBusy(false);
     }
-  }, [onEdited, roomSlug, spot.id]);
+  }, [onEdited, roomSlug, spot.id, spot.viewerHasPlussed]);
 
   const saveEdit = useCallback(async () => {
     setSaving(true);
@@ -764,7 +775,7 @@ function SpotCard({
               role="group"
               aria-label={
                 spot.viewerHasPlussed
-                  ? `Poäng ${displayScore}, du har redan tryckt +1`
+                  ? `Poäng ${displayScore}, tryck för att ta bort din +1`
                   : `Poäng ${displayScore}, tryck +1 för att höja`
               }
             >
@@ -774,17 +785,17 @@ function SpotCard({
               </div>
               <button
                 type="button"
-                disabled={Boolean(spot.viewerHasPlussed) || plusBusy}
-                aria-label={spot.viewerHasPlussed ? "Du har redan röstat" : "Lägg till +1 i poäng"}
-                className={`flex h-full items-center border-l border-indigo-300/55 px-2 transition active:scale-[0.98] disabled:cursor-default lg:px-1.5 ${
+                disabled={plusBusy}
+                aria-label={spot.viewerHasPlussed ? "Ta bort din +1" : "Lägg till +1 i poäng"}
+                className={`flex h-full items-center border-l border-indigo-300/55 px-2 transition active:scale-[0.98] disabled:cursor-wait disabled:opacity-60 lg:px-1.5 ${
                   spot.viewerHasPlussed
-                    ? "bg-indigo-200/50 text-indigo-900/80"
-                    : "bg-gradient-to-b from-violet-500 to-fuchsia-600 text-white hover:brightness-110 disabled:opacity-50"
+                    ? "bg-gradient-to-b from-violet-300/85 to-fuchsia-400/75 text-indigo-950 hover:brightness-95"
+                    : "bg-gradient-to-b from-violet-400/80 to-fuchsia-500/72 text-white shadow-sm hover:brightness-105"
                 }`}
                 onPointerDown={(e) => e.stopPropagation()}
                 onClick={(e) => {
                   e.stopPropagation();
-                  void plusSpot();
+                  void togglePlus();
                 }}
               >
                 {spot.viewerHasPlussed ? "✓" : "+1"}
