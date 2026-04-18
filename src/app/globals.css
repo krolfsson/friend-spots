@@ -1,0 +1,77 @@
+@import "tailwindcss";
+
+:root {
+  --y2k-lavender: #e9d5ff;
+  --y2k-pink: #fbcfe8;
+  --y2k-mint: #a7f3d0;
+  --y2k-sky: #bae6fd;
+  --y2k-ink: #1e1b4b;
+  --y2k-chrome: rgba(255, 255, 255, 0.55);
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  color: var(--y2k-ink);
+  background-color: #fdf4ff;
+  background-image:
+    radial-gradient(900px 500px at 10% 0%, rgba(233, 213, 255, 0.95), transparent 55%),
+    radial-gradient(800px 480px at 95% 10%, rgba(251, 207, 232, 0.9), transparent 50%),
+    radial-gradient(700px 500px at 50% 100%, rgba(167, 243, 208, 0.55), transparent 55%),
+    linear-gradient(180deg, #fff7fb 0%, #f5f3ff 45%, #ecfeff 100%);
+  background-attachment: fixed;
+}
+
+.y2k-card {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.72));
+  border: 1.5px solid rgba(255, 255, 255, 0.85);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.9) inset,
+    0 10px 30px rgba(99, 102, 241, 0.12),
+    0 2px 0 rgba(167, 139, 250, 0.25);
+  backdrop-filter: blur(8px);
+}
+
+.y2k-chip {
+  border: 1.5px solid rgba(255, 255, 255, 0.75);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.65));
+  /* Mindre blur så horisontell scroll inte “klipper” en tydlig gradient-linje */
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.85) inset, 0 4px 12px rgba(99, 102, 241, 0.07);
+}
+
+.y2k-chip-active {
+  border-color: rgba(255, 255, 255, 0.35);
+  background: linear-gradient(135deg, #a855f7, #ec4899);
+  color: #fff;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.35) inset,
+    0 6px 16px rgba(236, 72, 153, 0.28);
+}
+
+.y2k-chip-active-muted {
+  border-color: rgba(255, 255, 255, 0.35);
+  background: linear-gradient(135deg, #334155, #0f172a);
+  color: #fff;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.2) inset, 0 6px 16px rgba(15, 23, 42, 0.22);
+}
+
+.y2k-panel {
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.68));
+  border: 1.5px solid rgba(255, 255, 255, 0.85);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.9) inset,
+    0 18px 50px rgba(99, 102, 241, 0.12);
+  backdrop-filter: blur(10px);
+}
+
+.y2k-fab {
+  background: radial-gradient(circle at 30% 25%, rgba(255, 255, 255, 0.55), transparent 42%),
+    linear-gradient(135deg, #34d399, #10b981);
+  border: 2px solid rgba(255, 255, 255, 0.65);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.55) inset,
+    0 16px 40px rgba(16, 185, 129, 0.35);
+}

@@ -1,0 +1,46 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model City {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
+  createdAt DateTime @default(now())
+  spots     Spot[]
+}
+
+model Spot {
+  id             String             @id @default(cuid())
+  cityId         String
+  city           City               @relation(fields: [cityId], references: [id], onDelete: Cascade)
+  googlePlaceId  String
+  name           String
+  neighborhood   String?
+  lat            Float?
+  lng            Float?
+  shortAddress   String?
+  category       String
+  emoji          String?
+  createdAt      DateTime           @default(now())
+  recommendations Recommendation[]
+
+  @@unique([cityId, googlePlaceId])
+  @@index([cityId, category])
+  @@index([cityId, neighborhood])
+}
+
+model Recommendation {
+  id              String   @id @default(cuid())
+  spotId          String
+  spot            Spot     @relation(fields: [spotId], references: [id], onDelete: Cascade)
+  contributorName String
+  createdAt       DateTime @default(now())
+
+  @@unique([spotId, contributorName])
+}

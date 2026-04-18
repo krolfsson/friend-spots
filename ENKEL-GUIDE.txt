@@ -1,0 +1,98 @@
+ENKEL GUIDE — friend-spots pa natet
+========================================
+
+Ord du ser (pa riktigt enkel svenska)
+-------------------------------------
+- GitHub = en plats pa internet dar din kod ligger, som en mapp i molnet.
+- Vercel = en tjanst som tar koden fran GitHub och visar din sajt for alla.
+- Neon = en databas i molnet (som ett Excel-ark som programmet skriver till).
+  Din app kan inte anvanda en fil pa din dator nar den kor pa Vercel,
+  darfor behovs Neon (eller liknande).
+
+Varfor kan inte AI:n gora ALLT at dig?
+---------------------------------------
+Ingen annan an du far logga in pa GitHub, Vercel och Neon med ditt konto.
+Det ar som bank-ID — det finns inget satt som ar bade sakert och "gor at mig"
+for nagon annan an du.
+
+Men du behover inte vara hacker. Gor bara stegen i ordning nedan.
+
+
+STEG 1 — Databas (Neon), ca 5 minuter
+-------------------------------------
+1. Oppna webblasaren och ga till: https://neon.tech
+2. Skapa konto (t.ex. med Google).
+3. Skapa ett nytt "project" / databas — valj namn du vill.
+4. Nar det ar klart: kopiera "Connection string" som borjar med postgresql://
+   (det finns en knapp "Copy" — anvand den.)
+
+5. Oppna filen .env i din friend-spots-mapp (samma mapp som package.json).
+   Andra raden DATABASE_URL till den du kopierade fran Neon.
+   Lagg INTE upp .env pa GitHub — den ska bara finnas pa din dator.
+
+6. Oppna programmet **Terminal** (Sok efter "Terminal" i Spotlight: Cmd+mellanslag).
+
+7. Klistra in detta, rad for rad, och tryck Enter efter varje:
+
+   cd ~/friend-spots
+   npx prisma migrate deploy
+
+   Om det star "Applied" eller liknande ar databasen klar.
+
+
+STEG 2 — Git och GitHub, ca 10 minuter
+--------------------------------------
+1. Ga till https://github.com/new i webblasaren.
+2. Repository name: friend-spots (eller annat namn du minns).
+3. Valj **Private** om du vill att bara du ser koden.
+4. Bocka INTE i "Add a README" — repot ska vara tomt.
+5. Klicka Create repository.
+
+6. I Terminal (samma fonster som forut), klistra in detta BLOCK i ett svep,
+   men BYT ut URL:en mot den GitHub visar under "…or push an existing repository"
+   (den borjar med https://github.com/DITT-NAMN/...)
+
+   cd ~/friend-spots
+   rm -rf .git
+   git init -b main
+   git add -A
+   git commit -m "Forsta version"
+   git remote add origin KLISTER-IN-DIN-GITHUB-URL-HAR.git
+   git push -u origin main
+
+7. Om "git init" ger fel om "Operation not permitted":
+   - Stang Cursor.
+   - Oppna **Terminal** (Apples app, inte Cursor).
+   - Kor samma rader darifran.
+
+8. Om "git push" fragar om login: folj instruktionerna i Terminal
+   (GitHub kan be dig logga in i webblasaren).
+
+
+STEG 3 — Vercel, ca 5 minuter
+-----------------------------
+1. Ga till https://vercel.com och skapa/logga in konto.
+2. Klicka "Add New..." -> "Project".
+3. "Import" ditt GitHub-repo friend-spots (koppla GitHub om det fragas).
+4. Innan du klickar Deploy: oppna "Environment Variables".
+
+   Lagg till tva variabler (samma namn som nedan):
+
+   Namn: DATABASE_URL
+   Varde: samma connection string som i Neon (postgresql://...)
+
+   Namn: GOOGLE_MAPS_API_KEY
+   Varde: din nyckel fran Google Cloud (samma som i din .env lokalt)
+
+5. Klicka Deploy / Save och vanta.
+
+6. Nar det ar klart far du en lank, t.ex. https://friend-spots-xxx.vercel.app
+   — det ar din sajt pa natet.
+
+
+Om nagot gar fel
+----------------
+Skriv ner exakt feltexten (kopiera fran Terminal eller Vercel) och fraga igen.
+Du behover inte forsta felet — bara visa texten.
+
+Lycka till!

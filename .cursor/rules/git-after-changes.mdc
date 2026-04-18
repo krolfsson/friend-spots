@@ -1,0 +1,17 @@
+---
+description: Avsluta kodändringar med git commit (och push om remote finns)
+alwaysApply: true
+---
+
+# Git efter ändringar
+
+När du har gjort **meningsfulla kodändringar** i det här repot (inte bara en rad i en config):
+
+1. `cd` till repots rot (`friend-spots`).
+2. Kör `git status` och se till att inget oavsiktligt ligger staged (t.ex. `.env` ska vara ignorerad).
+3. `git add` relevanta filer, sedan `git commit -m "…"` med en kort, tydlig beskrivning på svenska eller engelska.
+4. Om `git remote -v` visar `origin` och användaren arbetar mot ett fjärrrepo: kör `git push` (eller `git push -u origin <branch>` första gången).
+
+Om repot saknar `.git`, fråga om du ska köra `git init` innan du committar.
+
+Gör detta **i slutet av uppgiften**, innan du svarar användaren, så länge ändringar faktiskt gjorts.
