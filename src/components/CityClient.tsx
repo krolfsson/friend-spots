@@ -106,7 +106,7 @@ export function CityClient({ city }: { city: City }) {
             />
           </svg>
         </button>
-        <div className="y2k-chip-active inline-flex h-9 min-h-9 min-w-0 shrink items-center justify-center gap-2 rounded-full px-3.5 text-sm font-extrabold leading-none tracking-tight text-white">
+        <div className="y2k-chip-active inline-flex h-9 min-h-9 min-w-0 flex-1 items-center justify-center gap-2 rounded-full px-3.5 text-sm font-extrabold leading-none tracking-tight text-white sm:inline-flex sm:flex-initial">
           <span aria-hidden>🌃</span>
           <span className="truncate">{city.name}</span>
         </div>
