@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "postinstall": "prisma generate",
-    "db:push": "prisma db push"
+    "db:push": "prisma db push",
+    "db:reset-plusses": "node scripts/reset-spot-plusses.js"
   },
   "dependencies": {
     "@prisma/client": "^6.7.0",
