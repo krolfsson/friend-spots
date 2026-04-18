@@ -800,7 +800,7 @@ function SpotCard({
         </div>
         <div className="flex min-h-14 shrink-0 select-none items-center justify-end self-center">
           <div
-            className="flex h-14 w-10 shrink-0 flex-col overflow-hidden rounded-2xl border border-indigo-300/55 bg-indigo-50/40 text-[11px] font-extrabold leading-none lg:h-12 lg:w-9 lg:text-[10px]"
+            className="flex h-14 w-8 shrink-0 flex-col overflow-hidden rounded-full border border-indigo-300/55 bg-indigo-50/40 text-[11px] font-extrabold leading-none lg:h-12 lg:w-7 lg:text-[10px]"
             role="group"
             aria-label={
               spot.viewerHasPlussed
@@ -825,7 +825,7 @@ function SpotCard({
             >
               {spot.viewerHasPlussed ? "✓" : "+1"}
             </button>
-            <div className="flex h-7 items-center justify-center gap-0.5 border-t border-indigo-300/50 bg-indigo-50/95 px-1 text-indigo-950 tabular-nums lg:h-6">
+            <div className="flex h-7 items-center justify-center gap-0.5 border-t border-indigo-300/50 bg-indigo-50/95 px-0.5 text-indigo-950 tabular-nums lg:h-6">
               <span aria-hidden className="leading-none">
                 🙋
               </span>
