@@ -754,13 +754,13 @@ function SpotCard({
           }
         >
           <p className="truncate text-[0.95rem] font-extrabold tracking-tight text-indigo-950">{spot.name}</p>
-          <div className="mt-1.5 flex flex-wrap items-center gap-2">
-            <span className="inline-flex h-8 shrink-0 select-none items-center gap-1 rounded-full border border-fuchsia-200/70 bg-white/70 px-2.5 text-[11px] font-extrabold leading-none text-indigo-900/80">
+          <div className="mt-1.5 flex flex-wrap items-center gap-2 lg:flex-nowrap lg:gap-1.5">
+            <span className="inline-flex h-8 shrink-0 select-none items-center gap-1 rounded-full border border-fuchsia-200/70 bg-white/70 px-2.5 text-[11px] font-extrabold leading-none text-indigo-900/80 lg:h-7 lg:gap-0.5 lg:px-2 lg:text-[10px]">
               <span>{cat.emoji}</span>
               <span>{cat.label}</span>
             </span>
             <div
-              className="inline-flex h-8 min-h-8 shrink-0 select-none items-stretch overflow-hidden rounded-full border border-white/80 bg-white/40 text-[11px] font-extrabold leading-none shadow-[inset_0_1px_0_rgba(255,255,255,0.75)] backdrop-blur-md"
+              className="inline-flex h-8 min-h-8 shrink-0 select-none items-stretch overflow-hidden rounded-full border border-white/80 bg-white/40 text-[11px] font-extrabold leading-none shadow-[inset_0_1px_0_rgba(255,255,255,0.75)] backdrop-blur-md lg:h-7 lg:min-h-7 lg:text-[10px]"
               role="group"
               aria-label={
                 spot.viewerHasPlussed
@@ -768,7 +768,7 @@ function SpotCard({
                   : `Poäng ${displayScore}, tryck +1 för att höja`
               }
             >
-              <div className="flex h-full items-center gap-1 px-2.5 text-indigo-950 tabular-nums">
+              <div className="flex h-full items-center gap-0.5 bg-white/92 px-2 text-indigo-950 tabular-nums ring-1 ring-inset ring-indigo-400/45 lg:gap-0.5 lg:px-1.5 lg:ring-indigo-400/50">
                 <span aria-hidden>🙋</span>
                 <span>{displayScore}</span>
               </div>
@@ -776,7 +776,7 @@ function SpotCard({
                 type="button"
                 disabled={Boolean(spot.viewerHasPlussed) || plusBusy}
                 aria-label={spot.viewerHasPlussed ? "Du har redan röstat" : "Lägg till +1 i poäng"}
-                className={`flex h-full items-center border-l border-indigo-200/50 px-2.5 transition active:scale-[0.98] disabled:cursor-default ${
+                className={`flex h-full items-center border-l border-indigo-300/55 px-2 transition active:scale-[0.98] disabled:cursor-default lg:px-1.5 ${
                   spot.viewerHasPlussed
                     ? "bg-indigo-200/50 text-indigo-900/80"
                     : "bg-gradient-to-b from-violet-500 to-fuchsia-600 text-white hover:brightness-110 disabled:opacity-50"
@@ -791,7 +791,7 @@ function SpotCard({
               </button>
             </div>
             <a
-              className="inline-flex h-8 min-h-8 shrink-0 select-none items-center rounded-full bg-gradient-to-r from-sky-400 to-cyan-400 px-2.5 text-[11px] font-extrabold leading-none text-indigo-950 shadow-sm shadow-cyan-500/20 ring-1 ring-white/60 hover:brightness-110"
+              className="inline-flex h-8 min-h-8 shrink-0 select-none items-center rounded-full bg-gradient-to-r from-sky-400 to-cyan-400 px-2.5 text-[11px] font-extrabold leading-none text-indigo-950 shadow-sm shadow-cyan-500/20 ring-1 ring-white/60 hover:brightness-110 lg:h-7 lg:min-h-7 lg:px-2 lg:text-[10px]"
               href={mapsOpenForSpot(spot, { cityName: mapsCityName })}
               target="_blank"
               rel="noopener noreferrer"
