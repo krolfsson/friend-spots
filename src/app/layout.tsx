@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { M_PLUS_Rounded_1c } from "next/font/google";
+import { SITE_DESCRIPTION, SITE_TITLE } from "@/lib/site";
 import "./globals.css";
 
 const y2k = M_PLUS_Rounded_1c({
@@ -13,24 +14,25 @@ export const metadata: Metadata = {
     process.env.NEXT_PUBLIC_SITE_URL?.trim() || "https://friend-spots.vercel.app",
   ),
   title: {
-    default: "Tips",
-    template: "%s · Tips",
+    default: SITE_TITLE,
+    template: `%s · ${SITE_TITLE}`,
   },
-  description: "Samla tips på karta — stad för stad.",
+  description: SITE_DESCRIPTION,
+  applicationName: SITE_TITLE,
   openGraph: {
-    title: "Tips",
-    description: "Samla tips på karta — stad för stad.",
-    siteName: "Tips",
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
+    siteName: SITE_TITLE,
     locale: "sv_SE",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Tips",
-    description: "Samla tips på karta — stad för stad.",
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
   },
   appleWebApp: {
-    title: "Tips",
+    title: SITE_TITLE,
     capable: true,
   },
 };

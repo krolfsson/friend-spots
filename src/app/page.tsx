@@ -1,11 +1,12 @@
 import { CreateRoomLandingForm } from "@/components/CreateRoomLandingForm";
+import { SITE_DESCRIPTION } from "@/lib/site";
 import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Skapa karta",
-  description: "Skapa en ny tipskarta med pinkod.",
+  description: SITE_DESCRIPTION,
 };
 
 /**
