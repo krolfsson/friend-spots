@@ -38,24 +38,21 @@ body {
 .y2k-chip {
   border: 1.5px solid rgba(255, 255, 255, 0.75);
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.65));
-  /* Mindre blur så horisontell scroll inte “klipper” en tydlig gradient-linje */
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.85) inset, 0 4px 12px rgba(99, 102, 241, 0.07);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.85) inset;
 }
 
 .y2k-chip-active {
   border-color: rgba(255, 255, 255, 0.35);
   background: linear-gradient(135deg, #a855f7, #ec4899);
   color: #fff;
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.35) inset,
-    0 6px 16px rgba(236, 72, 153, 0.28);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.35) inset;
 }
 
 .y2k-chip-active-muted {
   border-color: rgba(255, 255, 255, 0.35);
   background: linear-gradient(135deg, #334155, #0f172a);
   color: #fff;
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.2) inset, 0 6px 16px rgba(15, 23, 42, 0.22);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.2) inset;
 }
 
 .y2k-panel {
@@ -74,4 +71,11 @@ body {
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.55) inset,
     0 16px 40px rgba(16, 185, 129, 0.35);
+}
+
+/* Kompakt plus-knapp (samma palett, utan kraftig färgad glow) */
+.y2k-fab-sm {
+  background: linear-gradient(135deg, #34d399, #10b981);
+  border: 1.5px solid rgba(255, 255, 255, 0.55);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.45) inset;
 }

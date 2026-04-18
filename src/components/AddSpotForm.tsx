@@ -42,10 +42,6 @@ export function AddSpotForm({
   const [searchError, setSearchError] = useState<string | null>(null);
 
   useEffect(() => {
-    window.setTimeout(() => document.getElementById("add-tip-search")?.focus(), 50);
-  }, []);
-
-  useEffect(() => {
     if (!query.trim() || query.trim().length < 2) {
       setSuggestions([]);
       setSearchError(null);
@@ -122,7 +118,10 @@ export function AddSpotForm({
   }
 
   return (
-    <section id="add-tip" className="y2k-panel rounded-[1.75rem] p-4 sm:p-5">
+    <section
+      id="add-tip"
+      className={`y2k-panel rounded-[1.75rem] p-4 sm:p-5 ${onRequestClose ? "mt-1 border-t border-indigo-100/70 pt-4" : ""}`}
+    >
       {onRequestClose ? (
         <div className="mb-4 flex items-center justify-between gap-3">
           <p className="text-sm font-extrabold tracking-tight text-indigo-950">Nytt tips</p>
@@ -202,7 +201,7 @@ export function AddSpotForm({
           type="button"
           disabled={!canSave || saving}
           onClick={() => void save()}
-          className="rounded-full bg-gradient-to-r from-fuchsia-500 to-violet-600 px-6 py-2.5 text-sm font-extrabold text-white shadow-lg shadow-fuchsia-500/30 transition enabled:hover:brightness-110 enabled:active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40"
+          className="rounded-full bg-gradient-to-r from-fuchsia-500 to-violet-600 px-6 py-2.5 text-sm font-extrabold text-white transition enabled:hover:brightness-110 enabled:active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40"
         >
           {saving ? "Sparar…" : "Spara"}
         </button>

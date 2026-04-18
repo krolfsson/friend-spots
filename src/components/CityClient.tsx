@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { AddSpotForm } from "@/components/AddSpotForm";
+import { CityPickOrCreate } from "@/components/CityPickOrCreate";
 import { CATEGORIES, categoryMeta, type CategoryId } from "@/lib/categories";
 import { mapsDirectionsUrl } from "@/lib/mapsUrl";
 
@@ -87,9 +88,25 @@ export function CityClient({ city }: { city: City }) {
   }, [addOpen]);
 
   return (
-    <div className="relative mx-auto max-w-5xl px-4 pb-28 pt-5">
-      <div className="mb-1.5">
-        <div className="y2k-chip-active inline-flex h-9 min-h-9 shrink-0 items-center justify-center gap-2 rounded-full px-3.5 text-sm font-extrabold leading-none tracking-tight text-white">
+    <div className="relative mx-auto max-w-5xl px-4 pb-14 pt-5">
+      <div className="mb-1.5 flex items-center gap-2">
+        <button
+          type="button"
+          aria-label="Öppna meny: stad och nytt tips"
+          onClick={() => setAddOpen(true)}
+          className="y2k-fab-sm grid h-9 w-9 shrink-0 place-items-center rounded-full text-white transition hover:brightness-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/80 active:scale-95"
+        >
+          <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden>
+            <path
+              d="M12 5v14M5 12h14"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.4"
+              strokeLinecap="round"
+            />
+          </svg>
+        </button>
+        <div className="y2k-chip-active inline-flex h-9 min-h-9 min-w-0 shrink items-center justify-center gap-2 rounded-full px-3.5 text-sm font-extrabold leading-none tracking-tight text-white">
           <span aria-hidden>🌃</span>
           <span className="truncate">{city.name}</span>
         </div>
@@ -161,15 +178,16 @@ export function CityClient({ city }: { city: City }) {
 
       {addOpen ? (
         <div
-          className="fixed inset-0 z-50 flex items-end justify-center bg-indigo-950/35 p-3 backdrop-blur-[2px] sm:items-center"
+          className="fixed inset-0 z-50 flex items-end justify-center bg-indigo-950/40 p-3 sm:items-center"
           role="dialog"
           aria-modal="true"
-          aria-label="Lägg till tips"
+          aria-label="Stad och nytt tips"
           onMouseDown={(e) => {
             if (e.target === e.currentTarget) setAddOpen(false);
           }}
         >
-          <div className="max-h-[min(92dvh,720px)] w-full max-w-lg overflow-y-auto overscroll-contain pb-[env(safe-area-inset-bottom)]">
+          <div className="max-h-[min(92dvh,720px)] w-full max-w-lg space-y-0 overflow-y-auto overscroll-contain pb-[env(safe-area-inset-bottom)]">
+            <CityPickOrCreate onClose={() => setAddOpen(false)} />
             <AddSpotForm
               citySlug={city.slug}
               onSaved={() => {
@@ -181,23 +199,6 @@ export function CityClient({ city }: { city: City }) {
           </div>
         </div>
       ) : null}
-
-      <button
-        type="button"
-        aria-label="Lägg till rekommendation"
-        onClick={() => setAddOpen(true)}
-        className="y2k-fab fixed bottom-5 right-5 z-40 grid h-[4.25rem] w-[4.25rem] place-items-center rounded-full text-white transition hover:scale-105 hover:brightness-110 focus:outline-none focus-visible:ring-4 focus-visible:ring-emerald-200/80 active:scale-95"
-      >
-        <svg viewBox="0 0 24 24" className="h-10 w-10" aria-hidden>
-          <path
-            d="M12 5v14M5 12h14"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2.6"
-            strokeLinecap="round"
-          />
-        </svg>
-      </button>
     </div>
   );
 }
