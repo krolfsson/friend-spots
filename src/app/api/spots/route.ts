@@ -1,9 +1,14 @@
+import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { isCategoryId } from "@/lib/categories";
 import { fetchPlaceEssentials } from "@/lib/google/placesServer";
 import { prisma } from "@/lib/prisma";
+import { getAuthorizedRoomFromRequest } from "@/lib/roomAuth";
 
-export async function GET(req: Request) {
+export async function GET(req: NextRequest) {
+  const auth = await getAuthorizedRoomFromRequest(req);
+  if (!auth.ok) return auth.response;
+
   const { searchParams } = new URL(req.url);
   const citySlug = searchParams.get("citySlug");
   const category = searchParams.get("category") ?? "alla";
@@ -13,7 +18,9 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "citySlug saknas" }, { status: 400 });
   }
 
-  const city = await prisma.city.findUnique({ where: { slug: citySlug } });
+  const city = await prisma.city.findUnique({
+    where: { roomId_slug: { roomId: auth.room.id, slug: citySlug } },
+  });
   if (!city) {
     return NextResponse.json({ error: "Staden finns inte" }, { status: 404 });
   }
@@ -63,8 +70,11 @@ export async function GET(req: Request) {
   return NextResponse.json({ city, spots, neighborhoods, categoryCounts });
 }
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
+    const auth = await getAuthorizedRoomFromRequest(req);
+    if (!auth.ok) return auth.response;
+
     const body = (await req.json()) as {
       citySlug?: string;
       googlePlaceId?: string;
@@ -86,7 +96,9 @@ export async function POST(req: Request) {
       );
     }
 
-    const city = await prisma.city.findUnique({ where: { slug: citySlug } });
+    const city = await prisma.city.findUnique({
+      where: { roomId_slug: { roomId: auth.room.id, slug: citySlug } },
+    });
     if (!city) {
       return NextResponse.json({ error: "Staden finns inte" }, { status: 404 });
     }
@@ -192,8 +204,11 @@ export async function POST(req: Request) {
   }
 }
 
-export async function PATCH(req: Request) {
+export async function PATCH(req: NextRequest) {
   try {
+    const auth = await getAuthorizedRoomFromRequest(req);
+    if (!auth.ok) return auth.response;
+
     const body = (await req.json()) as {
       spotId?: string;
       name?: string;
@@ -207,7 +222,9 @@ export async function PATCH(req: Request) {
       return NextResponse.json({ error: "spotId saknas" }, { status: 400 });
     }
 
-    const existing = await prisma.spot.findUnique({ where: { id: spotId } });
+    const existing = await prisma.spot.findFirst({
+      where: { id: spotId, city: { roomId: auth.room.id } },
+    });
     if (!existing) {
       return NextResponse.json({ error: "Tipset finns inte" }, { status: 404 });
     }
@@ -264,17 +281,24 @@ export async function PATCH(req: Request) {
   }
 }
 
-export async function DELETE(req: Request) {
+export async function DELETE(req: NextRequest) {
+  const auth = await getAuthorizedRoomFromRequest(req);
+  if (!auth.ok) return auth.response;
+
   const { searchParams } = new URL(req.url);
   const spotId = searchParams.get("spotId")?.trim();
   if (!spotId) {
     return NextResponse.json({ error: "spotId saknas" }, { status: 400 });
   }
 
-  const result = await prisma.spot.deleteMany({ where: { id: spotId } });
-  if (result.count === 0) {
+  const hit = await prisma.spot.findFirst({
+    where: { id: spotId, city: { roomId: auth.room.id } },
+    select: { id: true },
+  });
+  if (!hit) {
     return NextResponse.json({ error: "Tipset finns inte" }, { status: 404 });
   }
 
+  await prisma.spot.delete({ where: { id: spotId } });
   return NextResponse.json({ ok: true });
 }

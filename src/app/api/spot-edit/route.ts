@@ -1,10 +1,15 @@
+import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { isCategoryId } from "@/lib/categories";
 import { prisma } from "@/lib/prisma";
+import { getAuthorizedRoomFromRequest } from "@/lib/roomAuth";
 
 /** POST (i stället för PATCH) så uppdatering fungerar även där PATCH blockas. */
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
+    const auth = await getAuthorizedRoomFromRequest(req);
+    if (!auth.ok) return auth.response;
+
     const body = (await req.json()) as {
       spotId?: string;
       name?: string;
@@ -18,7 +23,9 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "spotId saknas" }, { status: 400 });
     }
 
-    const existing = await prisma.spot.findUnique({ where: { id: spotId } });
+    const existing = await prisma.spot.findFirst({
+      where: { id: spotId, city: { roomId: auth.room.id } },
+    });
     if (!existing) {
       return NextResponse.json({ error: "Tipset finns inte" }, { status: 404 });
     }

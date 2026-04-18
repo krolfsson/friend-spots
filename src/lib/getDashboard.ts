@@ -1,8 +1,9 @@
 import type { DashboardBySlug, DashboardSpot } from "@/lib/dashboardTypes";
 import { prisma } from "@/lib/prisma";
 
-export async function getDashboardData() {
+export async function getDashboardDataForRoom(roomId: string) {
   const cities = await prisma.city.findMany({
+    where: { roomId },
     orderBy: { name: "asc" },
     include: { _count: { select: { spots: true } } },
   });
@@ -11,7 +12,10 @@ export async function getDashboardData() {
     return { cities, bySlug: {} as DashboardBySlug };
   }
 
+  const cityIds = cities.map((c) => c.id);
+
   const allSpots = await prisma.spot.findMany({
+    where: { cityId: { in: cityIds } },
     include: {
       recommendations: { orderBy: { createdAt: "asc" } },
       city: { select: { slug: true } },

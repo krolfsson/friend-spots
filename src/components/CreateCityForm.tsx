@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-export function CreateCityForm() {
+export function CreateCityForm({ roomSlug }: { roomSlug: string }) {
   const router = useRouter();
   const [name, setName] = useState("");
   const [busy, setBusy] = useState(false);
@@ -16,13 +16,13 @@ export function CreateCityForm() {
     try {
       const res = await fetch("/api/cities", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "X-Room-Slug": roomSlug },
         body: JSON.stringify({ name }),
       });
       const data = (await res.json()) as { city?: { slug: string }; error?: string };
       if (!res.ok) throw new Error(data.error ?? "Kunde inte skapa stad");
       setName("");
-      router.replace("/");
+      router.replace(`/${roomSlug}`);
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Okänt fel");

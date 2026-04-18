@@ -63,10 +63,12 @@ function FadingHorizontalChips({
 }
 
 export function CityClient({
+  roomSlug,
   cities,
   city,
   dashboard,
 }: {
+  roomSlug: string;
   cities: City[];
   city: City;
   dashboard: DashboardBySlug;
@@ -133,7 +135,9 @@ export function CityClient({
         category: "alla",
         neighborhood: "alla",
       });
-      const res = await fetch(`/api/spots?${params.toString()}`);
+      const res = await fetch(`/api/spots?${params.toString()}`, {
+        headers: { "X-Room-Slug": roomSlug },
+      });
       const data = (await res.json()) as {
         spots?: DashboardSpot[];
         categoryCounts?: Record<string, number>;
@@ -149,7 +153,7 @@ export function CityClient({
     } catch (e) {
       setError(e instanceof Error ? e.message : "Okänt fel");
     }
-  }, []);
+  }, [roomSlug]);
 
   const removeSpot = useCallback((spotId: string, slug: string, spotCategory: string) => {
     setBundle((prev) => {
@@ -280,6 +284,7 @@ export function CityClient({
             {displaySpots.map((s) => (
               <SpotCard
                 key={s.id}
+                roomSlug={roomSlug}
                 spot={s}
                 mapsCityName={activeCity.name}
                 onPurge={() => removeSpot(s.id, activeCity.slug, s.category)}
@@ -327,6 +332,7 @@ export function CityClient({
                       Stad
                     </h3>
                     <CityPickOrCreate
+                      roomSlug={roomSlug}
                       embedded
                       cities={cityList}
                       selectedSlug={addTargetSlug}
@@ -361,6 +367,7 @@ export function CityClient({
                       Plats & kategori
                     </h3>
                     <AddSpotForm
+                      roomSlug={roomSlug}
                       embeddedInModal
                       citySlug={addTargetSlug}
                       placeSearchBiasName={addTargetCity.name}
@@ -418,11 +425,13 @@ function isInteractiveSpotTarget(el: EventTarget | null): boolean {
 }
 
 function SpotCard({
+  roomSlug,
   spot,
   mapsCityName,
   onPurge,
   onEdited,
 }: {
+  roomSlug: string;
   spot: DashboardSpot;
   mapsCityName: string;
   onPurge: () => void;
@@ -630,6 +639,7 @@ function SpotCard({
     try {
       const res = await fetch(`/api/spots?spotId=${encodeURIComponent(spot.id)}`, {
         method: "DELETE",
+        headers: { "X-Room-Slug": roomSlug },
       });
       if (!res.ok) {
         window.alert("Kunde inte ta bort tipset.");
@@ -639,7 +649,7 @@ function SpotCard({
     } catch {
       window.alert("Nätverksfel.");
     }
-  }, [onPurge, spot.id]);
+  }, [onPurge, roomSlug, spot.id]);
 
   const openEditor = useCallback(() => {
     setMenu(null);
@@ -657,7 +667,7 @@ function SpotCard({
     try {
       const res = await fetch("/api/spot-edit", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "X-Room-Slug": roomSlug },
         body: JSON.stringify({
           spotId: spot.id,
           name: editName.trim(),
@@ -675,7 +685,7 @@ function SpotCard({
     } finally {
       setSaving(false);
     }
-  }, [editCategory, editEmoji, editName, editNeighborhood, onEdited, spot.id]);
+  }, [editCategory, editEmoji, editName, editNeighborhood, onEdited, roomSlug, spot.id]);
 
   return (
     <>

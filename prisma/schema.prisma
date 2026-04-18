@@ -7,12 +7,25 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Room {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  pinHash   String
+  name      String?
+  createdAt DateTime @default(now())
+  cities    City[]
+}
+
 model City {
   id        String   @id @default(cuid())
+  roomId    String
+  room      Room     @relation(fields: [roomId], references: [id], onDelete: Cascade)
   name      String
-  slug      String   @unique
+  slug      String
   createdAt DateTime @default(now())
   spots     Spot[]
+
+  @@unique([roomId, slug])
 }
 
 model Spot {

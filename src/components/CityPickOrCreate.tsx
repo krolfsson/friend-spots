@@ -5,12 +5,14 @@ import { useEffect, useMemo, useState } from "react";
 export type CityLite = { id: string; name: string; slug: string; _count?: { spots: number } };
 
 export function CityPickOrCreate({
+  roomSlug,
   cities,
   onSelectCity,
   onCityCreated,
   selectedSlug,
   embedded = false,
 }: {
+  roomSlug: string;
   cities: CityLite[];
   onSelectCity: (c: CityLite) => void;
   onCityCreated: (c: CityLite) => void;
@@ -50,7 +52,7 @@ export function CityPickOrCreate({
     try {
       const res = await fetch("/api/cities", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "X-Room-Slug": roomSlug },
         body: JSON.stringify({ name }),
       });
       const data = (await res.json()) as { city?: CityLite; error?: string };

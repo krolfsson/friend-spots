@@ -30,12 +30,14 @@ function useGuestContributor() {
 }
 
 export function AddSpotForm({
+  roomSlug,
   citySlug,
   placeSearchBiasName,
   embeddedInModal = false,
   onSaved,
   onRequestClose,
 }: {
+  roomSlug: string;
   citySlug: string;
   /** Stad där tipset sparas — skickas med i platssök så förslag inte domineras av en annan ort. */
   placeSearchBiasName?: string;
@@ -117,7 +119,7 @@ export function AddSpotForm({
     try {
       const res = await fetch("/api/spots", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "X-Room-Slug": roomSlug },
         body: JSON.stringify({
           citySlug,
           googlePlaceId: selected.placeId,
