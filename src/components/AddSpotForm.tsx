@@ -5,6 +5,15 @@ import { CATEGORIES, type CategoryId, isCategoryId } from "@/lib/categories";
 
 type Suggestion = { placeId: string; label: string };
 
+/** Biasar sökning mot vald stad (samma beteende oavsett vilken stad som är aktiv). */
+function composePlacesAutocompleteInput(query: string, cityName?: string): string {
+  const q = query.trim();
+  const c = cityName?.trim();
+  if (!c) return q;
+  if (q.toLowerCase().includes(c.toLowerCase())) return q;
+  return `${q} ${c}`.trim();
+}
+
 const GUEST_LS = "friend_spots_guest";
 
 function useGuestContributor() {
@@ -22,10 +31,13 @@ function useGuestContributor() {
 
 export function AddSpotForm({
   citySlug,
+  placeSearchBiasName,
   onSaved,
   onRequestClose,
 }: {
   citySlug: string;
+  /** Stad där tipset sparas — skickas med i platssök så förslag inte domineras av en annan ort. */
+  placeSearchBiasName?: string;
   onSaved: () => void;
   onRequestClose?: () => void;
 }) {
@@ -42,6 +54,12 @@ export function AddSpotForm({
   const [searchError, setSearchError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (selected && query.trim() === selected.label.trim()) {
+      setSuggestions([]);
+      setSearchError(null);
+      setPickOpen(false);
+      return;
+    }
     if (!query.trim() || query.trim().length < 2) {
       setSuggestions([]);
       setSearchError(null);
@@ -50,17 +68,25 @@ export function AddSpotForm({
     const ctrl = new AbortController();
     const t = window.setTimeout(async () => {
       try {
+        const input = composePlacesAutocompleteInput(query, placeSearchBiasName);
         const res = await fetch("/api/places/autocomplete", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ input: query }),
+          body: JSON.stringify({ input }),
           signal: ctrl.signal,
         });
         const data = (await res.json()) as { suggestions?: Suggestion[]; error?: string };
         if (!res.ok) throw new Error(data.error ?? "Autocomplete fel");
-        setSuggestions(data.suggestions ?? []);
+        const raw = data.suggestions ?? [];
+        const seen = new Set<string>();
+        const deduped = raw.filter((s) => {
+          if (seen.has(s.placeId)) return false;
+          seen.add(s.placeId);
+          return true;
+        });
+        setSuggestions(deduped);
         setSearchError(null);
-        setPickOpen((data.suggestions?.length ?? 0) > 0);
+        setPickOpen(deduped.length > 0);
       } catch (e) {
         if ((e as Error).name === "AbortError") return;
         setSuggestions([]);
@@ -73,7 +99,7 @@ export function AddSpotForm({
       ctrl.abort();
       window.clearTimeout(t);
     };
-  }, [query]);
+  }, [query, selected, placeSearchBiasName]);
 
   const canSave = useMemo(() => {
     return Boolean(selected && category && contributorName.trim());
@@ -152,7 +178,7 @@ export function AddSpotForm({
         ))}
       </div>
 
-      <div className="mt-4 grid gap-3 sm:grid-cols-[1fr_92px] sm:items-end">
+      <div className="mt-2 grid gap-3 sm:grid-cols-[1fr_92px] sm:items-end">
         <div className="relative">
           <input
             id="add-tip-search"
@@ -161,8 +187,12 @@ export function AddSpotForm({
               setQuery(e.target.value);
               setSelected(null);
             }}
-            onFocus={() => suggestions.length && setPickOpen(true)}
-            placeholder="Sök ställe…"
+            onFocus={() => {
+              if (selected && query.trim() === selected.label.trim()) return;
+              if (suggestions.length) setPickOpen(true);
+            }}
+            placeholder=""
+            aria-label="Sök ställe"
             className="w-full rounded-2xl border border-fuchsia-200/70 bg-white/80 px-4 py-3 text-sm font-semibold text-indigo-950 shadow-inner shadow-fuchsia-100 outline-none ring-0 transition focus:border-transparent focus:ring-4 focus:ring-fuchsia-300/60"
           />
           {searchError ? <p className="mt-2 text-xs font-bold text-rose-600">{searchError}</p> : null}

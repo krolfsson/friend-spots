@@ -78,6 +78,11 @@ export function CityClient({
     return filteredByCategory.filter((s) => s.neighborhood === neighborhood);
   }, [filteredByCategory, neighborhood]);
 
+  const addTargetCity = useMemo(
+    () => cityList.find((c) => c.slug === addTargetSlug) ?? activeCity,
+    [cityList, addTargetSlug, activeCity],
+  );
+
   const refreshCity = useCallback(async (slug: string) => {
     setError(null);
     try {
@@ -253,7 +258,7 @@ export function CityClient({
             if (e.target === e.currentTarget) setAddOpen(false);
           }}
         >
-          <div className="max-h-[min(92dvh,720px)] w-full min-w-0 max-w-lg space-y-0 overflow-y-auto overflow-x-hidden overscroll-contain px-1 pb-[env(safe-area-inset-bottom)] pt-1 sm:px-0 sm:pt-0">
+          <div className="mb-2 max-h-[min(92dvh,720px)] w-full min-w-0 max-w-lg space-y-0 overflow-y-auto overflow-x-hidden overscroll-contain px-1 pb-[env(safe-area-inset-bottom)] pt-2 sm:mb-0 sm:px-0 sm:pt-0">
             <div className="mb-2 px-1 sm:px-0">
               <p className="text-sm font-extrabold tracking-tight text-indigo-950">Nytt tips</p>
               <p className="mt-0.5 text-xs font-bold text-indigo-900/65">
@@ -284,6 +289,7 @@ export function CityClient({
             />
             <AddSpotForm
               citySlug={addTargetSlug}
+              placeSearchBiasName={addTargetCity.name}
               onSaved={() => {
                 void refreshCity(addTargetSlug);
                 window.setTimeout(() => setAddOpen(false), 500);
