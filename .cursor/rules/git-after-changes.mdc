@@ -1,17 +1,18 @@
 ---
-description: Avsluta kodändringar med git commit (och push om remote finns)
+description: Avsluta med git commit, git push och Vercel-deploy
 alwaysApply: true
 ---
 
-# Git efter ändringar
+# Git och Vercel efter ändringar
 
 När du har gjort **meningsfulla kodändringar** i det här repot (inte bara en rad i en config):
 
 1. `cd` till repots rot (`friend-spots`).
-2. Kör `git status` och se till att inget oavsiktligt ligger staged (t.ex. `.env` ska vara ignorerad).
-3. `git add` relevanta filer, sedan `git commit -m "…"` med en kort, tydlig beskrivning på svenska eller engelska.
-4. Om `git remote -v` visar `origin` och användaren arbetar mot ett fjärrrepo: kör `git push` (eller `git push -u origin <branch>` första gången).
+2. `git status` — stage bara avsett innehåll (`.env` ska aldrig committas).
+3. `git add -A` (eller relevanta filer), sedan `git commit -m "…"` med kort beskrivning.
+4. Kör **`git push`** mot `origin` (t.ex. `main`). Om GitHub är kopplat till Vercel startar **produktion/deploy automatiskt** — ingen separat `vercel push` behövs om det redan är uppsatt så.
+5. Om användaren **inte** har Git→Vercel-koppling: efter push, kör `npx vercel deploy --prod` från repots rot (kräver inloggning första gången), annars påminn om att koppla repot i Vercel-dashboarden.
 
-Om repot saknar `.git`, fråga om du ska köra `git init` innan du committar.
+Om repot saknar `.git`, fråga om `git init` innan du committar.
 
-Gör detta **i slutet av uppgiften**, innan du svarar användaren, så länge ändringar faktiskt gjorts.
+Gör detta **i slutet av uppgiften**, innan du svarar användaren, när ändringar gjorts — om miljön tillåter `git`/`git push` (annars: skriv exakt vilka kommandon användaren ska köra lokalt).

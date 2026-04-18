@@ -25,7 +25,7 @@ type City = { id: string; name: string; slug: string };
 function ChipScroller({ children }: { children: React.ReactNode }) {
   return (
     <div className="-mx-1 px-1">
-      <div className="flex gap-2 overflow-x-auto py-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      <div className="flex gap-2 overflow-x-auto py-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {children}
       </div>
     </div>
@@ -88,16 +88,14 @@ export function CityClient({ city }: { city: City }) {
 
   return (
     <div className="relative mx-auto max-w-5xl px-4 pb-28 pt-5">
-      <div className="mb-3">
-        <div className="inline-flex items-center rounded-full px-4 py-2 text-sm font-extrabold tracking-tight text-white y2k-chip-active">
-          <span className="mr-2" aria-hidden>
-            🌃
-          </span>
-          {city.name}
+      <div className="mb-1.5">
+        <div className="y2k-chip-active inline-flex h-9 min-h-9 shrink-0 items-center justify-center gap-2 rounded-full px-3.5 text-sm font-extrabold leading-none tracking-tight text-white">
+          <span aria-hidden>🌃</span>
+          <span className="truncate">{city.name}</span>
         </div>
       </div>
 
-      <div className="mb-1">
+      <div className="mb-0.5">
         <ChipScroller>
           <Chip active={category === "alla"} onClick={() => setCategory("alla")} tone="violet">
             <span className="mr-1">✨</span>
@@ -113,7 +111,7 @@ export function CityClient({ city }: { city: City }) {
               <span className="mr-1">{c.emoji}</span>
               {c.label}
               <span
-                className={`ml-1 text-[11px] font-black tabular-nums ${
+                className={`ml-1 text-[11px] font-black leading-none tabular-nums ${
                   category === c.id ? "text-white/80" : "text-indigo-950/35"
                 }`}
               >
@@ -124,7 +122,7 @@ export function CityClient({ city }: { city: City }) {
         </ChipScroller>
       </div>
 
-      <div className="mb-6">
+      <div className="mb-3">
         <ChipScroller>
           <Chip active={neighborhood === "alla"} onClick={() => setNeighborhood("alla")} tone="violet">
             <span className="mr-1">🗺️</span>
@@ -226,7 +224,7 @@ function Chip({
     <button
       type="button"
       onClick={onClick}
-      className={`shrink-0 rounded-full px-3.5 py-2 text-sm font-extrabold tracking-tight transition active:scale-95 ${
+      className={`inline-flex h-9 min-h-9 shrink-0 items-center justify-center rounded-full px-3.5 text-sm font-extrabold leading-none tracking-tight transition active:scale-95 ${
         active ? activeClass : "y2k-chip text-indigo-950 hover:-translate-y-0.5"
       }`}
     >
