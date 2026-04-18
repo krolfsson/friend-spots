@@ -2,8 +2,7 @@ import { CreateCityForm } from "@/components/CreateCityForm";
 import { CityClient } from "@/components/CityClient";
 import { UnlockRoomForm } from "@/components/UnlockRoomForm";
 import { getDashboardDataForRoom } from "@/lib/getDashboard";
-import { prisma } from "@/lib/prisma";
-import { roomWhereSlugInsensitive } from "@/lib/roomLookup";
+import { findRoomBySlugInsensitive } from "@/lib/roomLookup";
 import { isReservedRoomSlug } from "@/lib/reservedSlugs";
 import { ROOM_ACCESS_COOKIE, verifyRoomAccessToken } from "@/lib/roomToken";
 import { SITE_DESCRIPTION } from "@/lib/site";
@@ -23,10 +22,7 @@ export async function generateMetadata({
   if (!slug || isReservedRoomSlug(slug)) {
     return { title: "Saknas" };
   }
-  const room = await prisma.room.findFirst({
-    where: roomWhereSlugInsensitive(slug),
-    select: { name: true, slug: true },
-  });
+  const room = await findRoomBySlugInsensitive(slug, { name: true, slug: true });
   if (!room) {
     return { title: "Saknas" };
   }
@@ -42,10 +38,7 @@ export default async function RoomPage({ params }: { params: Promise<{ roomSlug:
   const slug = roomSlug.trim();
   if (!slug || isReservedRoomSlug(slug)) notFound();
 
-  const room = await prisma.room.findFirst({
-    where: roomWhereSlugInsensitive(slug),
-    select: { id: true, slug: true, name: true },
-  });
+  const room = await findRoomBySlugInsensitive(slug, { id: true, slug: true, name: true });
   if (!room) notFound();
 
   const canonicalSlug = room.slug;

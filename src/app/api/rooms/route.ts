@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { hashPin } from "@/lib/pin";
 import { prisma } from "@/lib/prisma";
 import { isReservedRoomSlug } from "@/lib/reservedSlugs";
-import { roomWhereSlugInsensitive } from "@/lib/roomLookup";
+import { findRoomIdBySlugInsensitive } from "@/lib/roomLookup";
 import { ROOM_ACCESS_COOKIE, roomAccessCookieOptions, signRoomAccessToken } from "@/lib/roomToken";
 import { slugify } from "@/lib/slug";
 
@@ -41,11 +41,8 @@ export async function POST(req: NextRequest) {
 
     let slug = candidate;
     for (let i = 0; i < 12; i++) {
-      const taken = await prisma.room.findFirst({
-        where: roomWhereSlugInsensitive(slug),
-        select: { id: true },
-      });
-      if (!taken) break;
+      const takenId = await findRoomIdBySlugInsensitive(slug);
+      if (!takenId) break;
       slug = `${candidate}-${Math.random().toString(36).slice(2, 5)}`;
     }
 
