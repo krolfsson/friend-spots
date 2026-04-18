@@ -32,12 +32,15 @@ function useGuestContributor() {
 export function AddSpotForm({
   citySlug,
   placeSearchBiasName,
+  embeddedInModal = false,
   onSaved,
   onRequestClose,
 }: {
   citySlug: string;
   /** Stad där tipset sparas — skickas med i platssök så förslag inte domineras av en annan ort. */
   placeSearchBiasName?: string;
+  /** Ingen egen panel/stäng-knapp — ligger i gemensam modal (CityClient). */
+  embeddedInModal?: boolean;
   onSaved: () => void;
   onRequestClose?: () => void;
 }) {
@@ -143,25 +146,10 @@ export function AddSpotForm({
     }
   }
 
-  return (
-    <section
-      id="add-tip"
-      className={`y2k-panel rounded-[1.75rem] p-4 sm:p-5 ${onRequestClose ? "mt-1 border-t border-indigo-100/70 pt-4" : ""}`}
-    >
-      {onRequestClose ? (
-        <div className="mb-4 flex items-center justify-between gap-3">
-          <p className="text-sm font-extrabold tracking-tight text-indigo-950">Nytt tips</p>
-          <button
-            type="button"
-            onClick={() => onRequestClose()}
-            className="grid h-10 w-10 place-items-center rounded-full border border-white/70 bg-white/70 text-lg font-bold text-indigo-950 shadow-sm hover:bg-white"
-            aria-label="Stäng"
-          >
-            ×
-          </button>
-        </div>
-      ) : null}
+  const showLocalClose = Boolean(onRequestClose && !embeddedInModal);
 
+  const inner = (
+    <>
       <div className="flex flex-wrap gap-2">
         {CATEGORIES.map((c) => (
           <button
@@ -178,8 +166,8 @@ export function AddSpotForm({
         ))}
       </div>
 
-      <div className="mt-2 grid gap-3 sm:grid-cols-[1fr_92px] sm:items-end">
-        <div className="relative">
+      <div className="mt-2 flex min-w-0 max-w-full items-center gap-2">
+        <div className="relative min-w-0 flex-1">
           <input
             id="add-tip-search"
             value={query}
@@ -193,11 +181,11 @@ export function AddSpotForm({
             }}
             placeholder=""
             aria-label="Sök ställe"
-            className="w-full rounded-2xl border border-fuchsia-200/70 bg-white/80 px-4 py-3 text-sm font-semibold text-indigo-950 shadow-inner shadow-fuchsia-100 outline-none ring-0 transition focus:border-transparent focus:ring-4 focus:ring-fuchsia-300/60"
+            className="box-border h-10 w-full min-w-0 rounded-xl border border-fuchsia-200/70 bg-white/90 px-3 text-sm font-semibold text-indigo-950 shadow-inner shadow-fuchsia-100/80 outline-none ring-0 transition focus:border-transparent focus:ring-2 focus:ring-fuchsia-300/55 sm:h-11 sm:rounded-2xl sm:px-3.5"
           />
           {searchError ? <p className="mt-2 text-xs font-bold text-rose-600">{searchError}</p> : null}
           {pickOpen && suggestions.length ? (
-            <div className="y2k-card absolute z-30 mt-2 max-h-64 w-full overflow-auto rounded-2xl p-1">
+            <div className="y2k-card absolute left-0 right-0 z-30 mt-2 max-h-64 min-w-0 overflow-auto rounded-2xl p-1">
               {suggestions.map((s) => (
                 <button
                   key={s.placeId}
@@ -222,7 +210,7 @@ export function AddSpotForm({
           maxLength={8}
           placeholder="🌟"
           aria-label="Emoji"
-          className="rounded-2xl border border-sky-200/70 bg-white/80 py-3 text-center text-2xl leading-none shadow-inner shadow-sky-100 outline-none focus:ring-4 focus:ring-sky-300/60"
+          className="box-border h-10 w-10 shrink-0 rounded-xl border border-sky-200/70 bg-white/90 text-center text-lg leading-none shadow-inner shadow-sky-100/80 outline-none focus:ring-2 focus:ring-sky-300/55 sm:h-11 sm:w-11 sm:text-xl"
         />
       </div>
 
@@ -237,6 +225,35 @@ export function AddSpotForm({
         </button>
         {note ? <span className="text-sm font-bold text-indigo-900/70">{note}</span> : null}
       </div>
+    </>
+  );
+
+  if (embeddedInModal) {
+    return (
+      <div id="add-tip" className="min-w-0 space-y-4">
+        {inner}
+      </div>
+    );
+  }
+
+  return (
+    <section
+      id="add-tip"
+      className={`y2k-panel min-w-0 max-w-full rounded-[1.75rem] p-3 sm:p-5 ${onRequestClose ? "mt-1 border-t border-indigo-100/70 pt-3" : ""}`}
+    >
+      {showLocalClose ? (
+        <div className="mb-3 flex justify-end">
+          <button
+            type="button"
+            onClick={() => onRequestClose?.()}
+            className="grid h-10 w-10 place-items-center rounded-full border border-white/70 bg-white/70 text-lg font-bold text-indigo-950 shadow-sm hover:bg-white"
+            aria-label="Stäng lägg till"
+          >
+            ×
+          </button>
+        </div>
+      ) : null}
+      {inner}
     </section>
   );
 }

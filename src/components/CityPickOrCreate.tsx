@@ -9,12 +9,15 @@ export function CityPickOrCreate({
   onSelectCity,
   onCityCreated,
   selectedSlug,
+  embedded = false,
 }: {
   cities: CityLite[];
   onSelectCity: (c: CityLite) => void;
   onCityCreated: (c: CityLite) => void;
   /** Vilken stad tipset sparas under (synkas med vald rad i listan och huvudfliken). */
   selectedSlug: string;
+  /** Ingen egen kort-ram — används inuti gemensam modal-panel. */
+  embedded?: boolean;
 }) {
   const [query, setQuery] = useState("");
   const [busy, setBusy] = useState(false);
@@ -64,8 +67,12 @@ export function CityPickOrCreate({
     }
   }
 
+  const shell = embedded
+    ? "min-w-0 max-w-full space-y-2"
+    : "mb-4 min-w-0 max-w-full rounded-2xl border border-fuchsia-200/60 bg-white/75 px-3 py-3 sm:px-4";
+
   return (
-    <div className="mb-4 min-w-0 max-w-full rounded-2xl border border-fuchsia-200/60 bg-white/75 px-3 py-3 sm:px-4">
+    <div className={shell}>
       <input
         id="city-modal-search"
         value={query}
@@ -75,7 +82,7 @@ export function CityPickOrCreate({
         }}
         placeholder="Sök bland städer eller skriv ny…"
         aria-label="Sök eller välj stad för tipset"
-        className="w-full min-w-0 max-w-full rounded-2xl border border-fuchsia-200/70 bg-white/90 px-3 py-2.5 text-sm font-semibold text-indigo-950 outline-none ring-0 focus:border-fuchsia-400 focus:ring-2 focus:ring-fuchsia-300/50"
+        className="w-full min-w-0 max-w-full rounded-xl border border-fuchsia-200/70 bg-white/90 px-3 py-2 text-sm font-semibold text-indigo-950 outline-none ring-0 focus:border-fuchsia-400 focus:ring-2 focus:ring-fuchsia-300/50 sm:rounded-2xl sm:py-2.5"
         autoComplete="off"
       />
 

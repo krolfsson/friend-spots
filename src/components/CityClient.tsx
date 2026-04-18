@@ -258,44 +258,83 @@ export function CityClient({
             if (e.target === e.currentTarget) setAddOpen(false);
           }}
         >
-          <div className="mb-2 max-h-[min(92dvh,720px)] w-full min-w-0 max-w-lg space-y-0 overflow-y-auto overflow-x-hidden overscroll-contain px-1 pb-[env(safe-area-inset-bottom)] pt-2 sm:mb-0 sm:px-0 sm:pt-0">
-            <div className="mb-2 px-1 sm:px-0">
-              <p className="text-sm font-extrabold tracking-tight text-indigo-950">Nytt tips</p>
-              <p className="mt-0.5 text-xs font-bold text-indigo-900/65">
-                Välj stad nedan — den styr var tipset sparas (samma som flikarna).
-              </p>
-            </div>
-            <CityPickOrCreate
-              cities={cityList}
-              selectedSlug={addTargetSlug}
-              onSelectCity={(c) => {
-                setAddTargetSlug(c.slug);
-                setActiveCity(c);
-              }}
-              onCityCreated={(c) => {
-                const next = { ...c, _count: c._count ?? { spots: 0 } };
-                setCityList((prev) =>
-                  [...prev.filter((x) => x.id !== next.id), next].sort((a, b) =>
-                    a.name.localeCompare(b.name, "sv"),
-                  ),
-                );
-                setAddTargetSlug(next.slug);
-                setActiveCity(next);
-                setBundle((prev) => ({
-                  ...prev,
-                  [next.slug]: prev[next.slug] ?? { spots: [], categoryCounts: {} },
-                }));
-              }}
-            />
-            <AddSpotForm
-              citySlug={addTargetSlug}
-              placeSearchBiasName={addTargetCity.name}
-              onSaved={() => {
-                void refreshCity(addTargetSlug);
-                window.setTimeout(() => setAddOpen(false), 500);
-              }}
-              onRequestClose={() => setAddOpen(false)}
-            />
+          <div className="mb-2 flex w-full min-w-0 max-w-lg justify-center px-2 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-1 sm:mb-0 sm:px-3 sm:pb-4 sm:pt-2">
+            <article className="flex max-h-[min(90dvh,700px)] w-full min-w-0 flex-col overflow-hidden rounded-2xl border border-indigo-200/45 bg-gradient-to-b from-white to-indigo-50/35 shadow-2xl shadow-indigo-950/15 sm:rounded-[1.75rem]">
+              <header className="flex shrink-0 items-start justify-between gap-3 border-b border-indigo-100/70 bg-white/80 px-4 py-3 sm:px-5 sm:py-4">
+                <div className="min-w-0 flex-1 pr-1">
+                  <h2 className="text-[0.95rem] font-extrabold leading-tight tracking-tight text-indigo-950 sm:text-base">
+                    Nytt tips
+                  </h2>
+                  <p className="mt-1 text-[11px] font-semibold leading-snug text-indigo-900/60 sm:text-xs">
+                    Välj stad och fyll i plats nedan. Tipset sparas under den staden du markerar.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setAddOpen(false)}
+                  className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-indigo-200/60 bg-white text-lg font-bold leading-none text-indigo-950 shadow-sm transition hover:bg-indigo-50 sm:h-10 sm:w-10"
+                  aria-label="Stäng"
+                >
+                  ×
+                </button>
+              </header>
+              <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden overscroll-contain">
+                <div className="mx-auto flex w-full max-w-md flex-col gap-5 px-4 py-4 sm:gap-6 sm:px-5 sm:py-5">
+                  <section className="min-w-0" aria-labelledby="add-modal-city-label">
+                    <h3
+                      id="add-modal-city-label"
+                      className="mb-2 text-[11px] font-extrabold uppercase tracking-wide text-indigo-900/45"
+                    >
+                      Stad
+                    </h3>
+                    <CityPickOrCreate
+                      embedded
+                      cities={cityList}
+                      selectedSlug={addTargetSlug}
+                      onSelectCity={(c) => {
+                        setAddTargetSlug(c.slug);
+                        setActiveCity(c);
+                      }}
+                      onCityCreated={(c) => {
+                        const next = { ...c, _count: c._count ?? { spots: 0 } };
+                        setCityList((prev) =>
+                          [...prev.filter((x) => x.id !== next.id), next].sort((a, b) =>
+                            a.name.localeCompare(b.name, "sv"),
+                          ),
+                        );
+                        setAddTargetSlug(next.slug);
+                        setActiveCity(next);
+                        setBundle((prev) => ({
+                          ...prev,
+                          [next.slug]: prev[next.slug] ?? { spots: [], categoryCounts: {} },
+                        }));
+                      }}
+                    />
+                  </section>
+                  <section
+                    className="min-w-0 border-t border-indigo-100/65 pt-5 sm:pt-6"
+                    aria-labelledby="add-modal-spot-label"
+                  >
+                    <h3
+                      id="add-modal-spot-label"
+                      className="mb-2 text-[11px] font-extrabold uppercase tracking-wide text-indigo-900/45"
+                    >
+                      Plats & kategori
+                    </h3>
+                    <AddSpotForm
+                      embeddedInModal
+                      citySlug={addTargetSlug}
+                      placeSearchBiasName={addTargetCity.name}
+                      onSaved={() => {
+                        void refreshCity(addTargetSlug);
+                        window.setTimeout(() => setAddOpen(false), 500);
+                      }}
+                      onRequestClose={() => setAddOpen(false)}
+                    />
+                  </section>
+                </div>
+              </div>
+            </article>
           </div>
         </div>
       ) : null}
