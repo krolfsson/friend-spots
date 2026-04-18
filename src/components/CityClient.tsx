@@ -297,7 +297,7 @@ export function CityClient({
 
       {addOpen ? (
         <div
-          className="fixed inset-0 z-50 flex touch-manipulation items-end justify-center overflow-x-hidden bg-indigo-950/40 p-2 sm:items-center sm:p-3"
+          className="fixed inset-0 z-50 flex touch-manipulation items-end justify-center overflow-x-hidden bg-indigo-950/30 p-2 sm:items-center sm:p-3"
           role="dialog"
           aria-modal="true"
           aria-label="Lägg till tips"
@@ -306,8 +306,8 @@ export function CityClient({
           }}
         >
           <div className="mb-2 flex w-full min-w-0 max-w-lg justify-center px-2 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-1 sm:mb-0 sm:px-3 sm:pb-4 sm:pt-2">
-            <article className="flex max-h-[min(90dvh,700px)] w-full min-w-0 flex-col overflow-hidden rounded-2xl border border-indigo-200/80 bg-white/80 shadow-2xl shadow-indigo-950/20 backdrop-blur-xl sm:rounded-[1.75rem]">
-              <header className="flex shrink-0 items-center justify-between gap-3 border-b border-indigo-100/90 bg-white/55 px-4 py-2.5 backdrop-blur-md sm:px-5 sm:py-3">
+            <article className="y2k-add-modal-shell flex max-h-[min(90dvh,700px)] w-full min-w-0 flex-col overflow-hidden rounded-2xl border border-indigo-200/80 shadow-2xl shadow-indigo-950/20 sm:rounded-[1.75rem]">
+              <header className="flex shrink-0 items-center justify-between gap-3 border-b border-indigo-200/50 bg-white/35 px-4 py-2.5 backdrop-blur-sm sm:px-5 sm:py-3">
                 <div className="min-w-0 flex-1 pr-1">
                   <h2 className="text-[0.95rem] font-extrabold leading-tight tracking-tight text-indigo-950 sm:text-base">
                     Nytt tips
@@ -322,7 +322,7 @@ export function CityClient({
                   ×
                 </button>
               </header>
-              <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden overscroll-contain bg-white/40 backdrop-blur-sm">
+              <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden overscroll-contain">
                 <div className="mx-auto flex w-full max-w-md flex-col gap-3 px-4 py-3 sm:gap-4 sm:px-5 sm:py-4">
                   <section className="min-w-0" aria-labelledby="add-modal-city-label">
                     <h3
