@@ -571,7 +571,7 @@ function SpotCard({
     const onTouchStart = (e: TouchEvent) => {
       if (menu || editing) return;
       if (isInteractiveSpotTarget(e.target)) return;
-      if (e.cancelable) e.preventDefault();
+      /* Ingen preventDefault — annars kan man inte scrolla sidan när fingret börjar på kortet. */
       clearTouch();
       const t = e.touches[0];
       if (!t) return;
@@ -601,7 +601,7 @@ function SpotCard({
       clearTouch();
     };
 
-    el.addEventListener("touchstart", onTouchStart, { passive: false });
+    el.addEventListener("touchstart", onTouchStart, { passive: true });
     el.addEventListener("touchmove", onTouchMove, { passive: true });
     el.addEventListener("touchend", onTouchEnd);
     el.addEventListener("touchcancel", onTouchEnd);
@@ -691,10 +691,9 @@ function SpotCard({
     <>
       <article
         ref={articleRef}
-        className="y2k-card flex cursor-default touch-manipulation select-none items-center gap-3 rounded-2xl p-3 [-webkit-touch-callout:none] [&_*]:select-none"
+        className="y2k-card flex cursor-default touch-pan-y select-none items-center gap-3 rounded-2xl p-3 [-webkit-touch-callout:none] [&_*]:select-none"
         style={
           {
-            touchAction: "manipulation",
             WebkitUserSelect: "none",
             userSelect: "none",
             WebkitTouchCallout: "none",
