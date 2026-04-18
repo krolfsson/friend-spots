@@ -10,11 +10,53 @@ import { mapsOpenForSpot } from "@/lib/mapsUrl";
 
 type City = { id: string; name: string; slug: string; _count?: { spots: number } };
 
-function ChipScroller({ children }: { children: React.ReactNode }) {
+function FadingHorizontalChips({
+  children,
+  rowClassName = "py-2",
+}: {
+  children: React.ReactNode;
+  /** Vertikal padding kring chip-raden */
+  rowClassName?: string;
+}) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
+  const [fadeEnd, setFadeEnd] = useState(false);
+
+  const sync = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const maxScroll = el.scrollWidth - el.clientWidth;
+    const hasOverflow = maxScroll > 2;
+    const atEnd = hasOverflow && el.scrollLeft >= maxScroll - 2;
+    setFadeEnd(hasOverflow && !atEnd);
+  }, []);
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    const track = trackRef.current;
+    if (!el || !track) return;
+    el.addEventListener("scroll", sync, { passive: true });
+    const ro = new ResizeObserver(sync);
+    ro.observe(track);
+    ro.observe(el);
+    window.addEventListener("resize", sync);
+    sync();
+    return () => {
+      el.removeEventListener("scroll", sync);
+      ro.disconnect();
+      window.removeEventListener("resize", sync);
+    };
+  }, [sync]);
+
   return (
     <div className="-mx-1 px-1">
-      <div className="flex gap-2 overflow-x-auto py-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-        {children}
+      <div
+        ref={scrollRef}
+        className={`overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden ${rowClassName} ${fadeEnd ? "chip-row-fade-right" : ""}`}
+      >
+        <div ref={trackRef} className="flex w-max gap-2">
+          {children}
+        </div>
       </div>
     </div>
   );
@@ -160,8 +202,8 @@ export function CityClient({
             />
           </svg>
         </button>
-        <div className="-mx-1 min-w-0 flex-1 px-1">
-          <div className="flex gap-2 overflow-x-auto py-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <div className="min-w-0 flex-1">
+          <FadingHorizontalChips rowClassName="py-1">
             {cityList.map((c) => {
               const active = c.slug === activeCity.slug;
               return (
@@ -178,12 +220,12 @@ export function CityClient({
                 </button>
               );
             })}
-          </div>
+          </FadingHorizontalChips>
         </div>
       </div>
 
       <div className="mb-0.5">
-        <ChipScroller>
+        <FadingHorizontalChips>
           <Chip active={category === "alla"} onClick={() => setCategory("alla")} tone="violet">
             <span className="mr-1">✨</span>
             Alla
@@ -206,11 +248,11 @@ export function CityClient({
               </span>
             </Chip>
           ))}
-        </ChipScroller>
+        </FadingHorizontalChips>
       </div>
 
       <div className="mb-3">
-        <ChipScroller>
+        <FadingHorizontalChips>
           <Chip active={neighborhood === "alla"} onClick={() => setNeighborhood("alla")} tone="violet">
             <span className="mr-1">🗺️</span>
             Alla områden
@@ -223,7 +265,7 @@ export function CityClient({
           <Chip active={neighborhood === "ovrigt"} onClick={() => setNeighborhood("ovrigt")} tone="muted">
             Övrigt
           </Chip>
-        </ChipScroller>
+        </FadingHorizontalChips>
       </div>
 
       {error ? (
