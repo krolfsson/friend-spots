@@ -7,7 +7,7 @@ export type DashboardSpot = {
   emoji: string | null;
   lat?: number | null;
   lng?: number | null;
-  /** Anonym “plussa”; sorteras först i listan. */
+  /** Anonym “plussa”; listan sorteras efter detta (sedan namn). */
   plusCount: number;
   /** Sätts när klienten skickar X-Voter-Token (samma webbläsare har redan plussat). */
   viewerHasPlussed?: boolean;
