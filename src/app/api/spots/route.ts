@@ -1,9 +1,45 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { isCategoryId } from "@/lib/categories";
+import type { DashboardSpot } from "@/lib/dashboardTypes";
 import { fetchPlaceEssentials } from "@/lib/google/placesServer";
 import { prisma } from "@/lib/prisma";
 import { getAuthorizedRoomFromRequest } from "@/lib/roomAuth";
+import { sortSpotsForDisplay } from "@/lib/sortSpots";
+import { getRequestClientIp, isValidVoterToken, makeVoterKey } from "@/lib/voterKey";
+
+function toDashboardSpot(
+  s: {
+    id: string;
+    googlePlaceId: string;
+    name: string;
+    neighborhood: string | null;
+    category: string;
+    emoji: string | null;
+    lat: number | null;
+    lng: number | null;
+    recommendations: { id: string; contributorName: string }[];
+    _count: { plusses: number };
+  },
+  viewerHasPlussed?: boolean,
+): DashboardSpot {
+  return {
+    id: s.id,
+    googlePlaceId: s.googlePlaceId,
+    name: s.name,
+    neighborhood: s.neighborhood,
+    category: s.category,
+    emoji: s.emoji,
+    lat: s.lat,
+    lng: s.lng,
+    plusCount: s._count.plusses,
+    ...(viewerHasPlussed !== undefined ? { viewerHasPlussed } : {}),
+    recommendations: s.recommendations.map((r) => ({
+      id: r.id,
+      contributorName: r.contributorName,
+    })),
+  };
+}
 
 export async function GET(req: NextRequest) {
   const auth = await getAuthorizedRoomFromRequest(req);
@@ -44,7 +80,10 @@ export async function GET(req: NextRequest) {
     }),
     prisma.spot.findMany({
       where: spotWhere,
-      include: { recommendations: { orderBy: { createdAt: "asc" } } },
+      include: {
+        recommendations: { orderBy: { createdAt: "asc" } },
+        _count: { select: { plusses: true } },
+      },
     }),
     prisma.spot.groupBy({
       by: ["category"],
@@ -61,13 +100,32 @@ export async function GET(req: NextRequest) {
     ),
   ).sort((a, b) => a.localeCompare(b, "sv"));
 
-  spots.sort((a, b) => b.recommendations.length - a.recommendations.length);
+  const voterHeader = req.headers.get("x-voter-token");
+  const voterKey =
+    isValidVoterToken(voterHeader) ? makeVoterKey(voterHeader, getRequestClientIp(req)) : null;
+
+  let plussedSet: Set<string> | null = null;
+  if (voterKey && spots.length) {
+    const rows = await prisma.spotPlus.findMany({
+      where: {
+        voterKey,
+        spotId: { in: spots.map((s) => s.id) },
+      },
+      select: { spotId: true },
+    });
+    plussedSet = new Set(rows.map((r) => r.spotId));
+  }
+
+  const mapped: DashboardSpot[] = spots.map((s) =>
+    toDashboardSpot(s, plussedSet ? plussedSet.has(s.id) : undefined),
+  );
+  mapped.sort(sortSpotsForDisplay);
 
   const categoryCounts = Object.fromEntries(
     categoryStats.map((c) => [c.category, c._count._all]),
   ) as Record<string, number>;
 
-  return NextResponse.json({ city, spots, neighborhoods, categoryCounts });
+  return NextResponse.json({ city, spots: mapped, neighborhoods, categoryCounts });
 }
 
 export async function POST(req: NextRequest) {

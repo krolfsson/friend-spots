@@ -7,6 +7,7 @@ import { CityPickOrCreate } from "@/components/CityPickOrCreate";
 import { CATEGORIES, categoryMeta, isCategoryId, type CategoryId } from "@/lib/categories";
 import type { DashboardBySlug, DashboardSpot } from "@/lib/dashboardTypes";
 import { mapsOpenForSpot } from "@/lib/mapsUrl";
+import { getOrCreateVoterToken } from "@/lib/voterClient";
 
 type City = { id: string; name: string; slug: string; _count?: { spots: number } };
 
@@ -135,8 +136,11 @@ export function CityClient({
         category: "alla",
         neighborhood: "alla",
       });
+      const headers: Record<string, string> = { "X-Room-Slug": roomSlug };
+      const vt = getOrCreateVoterToken();
+      if (vt) headers["X-Voter-Token"] = vt;
       const res = await fetch(`/api/spots?${params.toString()}`, {
-        headers: { "X-Room-Slug": roomSlug },
+        headers,
       });
       const data = (await res.json()) as {
         spots?: DashboardSpot[];
@@ -154,6 +158,10 @@ export function CityClient({
       setError(e instanceof Error ? e.message : "Okänt fel");
     }
   }, [roomSlug]);
+
+  useEffect(() => {
+    void refreshCity(activeCity.slug);
+  }, [activeCity.slug, refreshCity]);
 
   const removeSpot = useCallback((spotId: string, slug: string, spotCategory: string) => {
     setBundle((prev) => {
@@ -449,6 +457,7 @@ function SpotCard({
   );
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [plusBusy, setPlusBusy] = useState(false);
   const [domReady, setDomReady] = useState(false);
 
   useEffect(() => {
@@ -661,6 +670,27 @@ function SpotCard({
     setEditing(true);
   }, [spot]);
 
+  const plusSpot = useCallback(async () => {
+    const tok = getOrCreateVoterToken();
+    if (!tok) return;
+    setPlusBusy(true);
+    try {
+      const res = await fetch("/api/spots/plus", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Room-Slug": roomSlug,
+          "X-Voter-Token": tok,
+        },
+        body: JSON.stringify({ spotId: spot.id }),
+      });
+      if (!res.ok) return;
+      onEdited();
+    } finally {
+      setPlusBusy(false);
+    }
+  }, [onEdited, roomSlug, spot.id]);
+
   const saveEdit = useCallback(async () => {
     setSaving(true);
     setSaveError(null);
@@ -726,6 +756,28 @@ function SpotCard({
               <span>{cat.emoji}</span>
               <span>{cat.label}</span>
             </span>
+            <button
+              type="button"
+              disabled={Boolean(spot.viewerHasPlussed) || plusBusy}
+              aria-label={
+                spot.viewerHasPlussed
+                  ? `Du har redan plussat (${spot.plusCount})`
+                  : `Plussa — ${spot.plusCount} plussar`
+              }
+              className={`inline-flex select-none items-center gap-0.5 rounded-full px-2.5 py-1 text-[11px] font-extrabold tabular-nums ring-1 transition ${
+                spot.viewerHasPlussed
+                  ? "cursor-default border-0 bg-indigo-100/90 text-indigo-800 ring-indigo-200/80"
+                  : "border-0 bg-gradient-to-r from-violet-400 to-fuchsia-500 text-white ring-white/50 hover:brightness-110 active:scale-[0.98] disabled:opacity-50"
+              }`}
+              onPointerDown={(e) => e.stopPropagation()}
+              onClick={(e) => {
+                e.stopPropagation();
+                void plusSpot();
+              }}
+            >
+              <span aria-hidden>{spot.viewerHasPlussed ? "✓" : "+"}</span>
+              <span>{spot.plusCount}</span>
+            </button>
             <a
               className="inline-flex select-none items-center rounded-full bg-gradient-to-r from-sky-400 to-cyan-400 px-2.5 py-1 text-[11px] font-extrabold text-indigo-950 shadow-sm shadow-cyan-500/20 ring-1 ring-white/60 hover:brightness-110"
               href={mapsOpenForSpot(spot, { cityName: mapsCityName })}

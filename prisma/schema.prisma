@@ -42,10 +42,23 @@ model Spot {
   emoji          String?
   createdAt      DateTime           @default(now())
   recommendations Recommendation[]
+  plusses        SpotPlus[]
 
   @@unique([cityId, googlePlaceId])
   @@index([cityId, category])
   @@index([cityId, neighborhood])
+}
+
+/** Anonym “plussa” — en rad per (spot, voterKey); voterKey är hash, ingen PII. */
+model SpotPlus {
+  id        String   @id @default(cuid())
+  spotId    String
+  spot      Spot     @relation(fields: [spotId], references: [id], onDelete: Cascade)
+  voterKey  String
+  createdAt DateTime @default(now())
+
+  @@unique([spotId, voterKey])
+  @@index([spotId])
 }
 
 model Recommendation {
