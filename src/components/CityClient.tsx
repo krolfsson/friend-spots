@@ -306,8 +306,8 @@ export function CityClient({
           }}
         >
           <div className="mb-2 flex w-full min-w-0 max-w-lg justify-center px-2 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-1 sm:mb-0 sm:px-3 sm:pb-4 sm:pt-2">
-            <article className="flex max-h-[min(90dvh,700px)] w-full min-w-0 flex-col overflow-hidden rounded-2xl border border-indigo-200/45 bg-gradient-to-b from-white to-indigo-50/35 shadow-2xl shadow-indigo-950/15 sm:rounded-[1.75rem]">
-              <header className="flex shrink-0 items-center justify-between gap-3 border-b border-indigo-100/70 bg-white/80 px-4 py-2.5 sm:px-5 sm:py-3">
+            <article className="flex max-h-[min(90dvh,700px)] w-full min-w-0 flex-col overflow-hidden rounded-2xl border border-indigo-200/80 bg-white shadow-2xl shadow-indigo-950/20 sm:rounded-[1.75rem]">
+              <header className="flex shrink-0 items-center justify-between gap-3 border-b border-indigo-100/90 bg-white px-4 py-2.5 sm:px-5 sm:py-3">
                 <div className="min-w-0 flex-1 pr-1">
                   <h2 className="text-[0.95rem] font-extrabold leading-tight tracking-tight text-indigo-950 sm:text-base">
                     Nytt tips
@@ -322,7 +322,7 @@ export function CityClient({
                   ×
                 </button>
               </header>
-              <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden overscroll-contain">
+              <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden overscroll-contain bg-white">
                 <div className="mx-auto flex w-full max-w-md flex-col gap-3 px-4 py-3 sm:gap-4 sm:px-5 sm:py-4">
                   <section className="min-w-0" aria-labelledby="add-modal-city-label">
                     <h3
