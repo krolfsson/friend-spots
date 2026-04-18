@@ -5,10 +5,36 @@ import { getDashboardDataForRoom } from "@/lib/getDashboard";
 import { prisma } from "@/lib/prisma";
 import { isReservedRoomSlug } from "@/lib/reservedSlugs";
 import { ROOM_ACCESS_COOKIE, verifyRoomAccessToken } from "@/lib/roomToken";
+import { SITE_DESCRIPTION } from "@/lib/site";
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ roomSlug: string }>;
+}): Promise<Metadata> {
+  const { roomSlug } = await params;
+  const slug = roomSlug.trim();
+  if (!slug || isReservedRoomSlug(slug)) {
+    return { title: "Saknas" };
+  }
+  const room = await prisma.room.findUnique({
+    where: { slug },
+    select: { name: true, slug: true },
+  });
+  if (!room) {
+    return { title: "Saknas" };
+  }
+  const label = room.name?.trim() || room.slug;
+  return {
+    title: label,
+    description: SITE_DESCRIPTION,
+  };
+}
 
 export default async function RoomPage({ params }: { params: Promise<{ roomSlug: string }> }) {
   const { roomSlug } = await params;
