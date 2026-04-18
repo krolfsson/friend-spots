@@ -21,15 +21,23 @@ function FadingHorizontalChips({
 }) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
-  const [fadeEnd, setFadeEnd] = useState(false);
+  const [fadeLeft, setFadeLeft] = useState(false);
+  const [fadeRight, setFadeRight] = useState(false);
 
   const sync = useCallback(() => {
     const el = scrollRef.current;
     if (!el) return;
     const maxScroll = el.scrollWidth - el.clientWidth;
     const hasOverflow = maxScroll > 2;
-    const atEnd = hasOverflow && el.scrollLeft >= maxScroll - 2;
-    setFadeEnd(hasOverflow && !atEnd);
+    if (!hasOverflow) {
+      setFadeLeft(false);
+      setFadeRight(false);
+      return;
+    }
+    const atStart = el.scrollLeft <= 2;
+    const atEnd = el.scrollLeft >= maxScroll - 2;
+    setFadeLeft(!atStart);
+    setFadeRight(!atEnd);
   }, []);
 
   useEffect(() => {
@@ -53,9 +61,17 @@ function FadingHorizontalChips({
     <div className="-mx-1 px-1">
       <div
         ref={scrollRef}
-        className={`overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden ${rowClassName} ${fadeEnd ? "chip-row-fade-right" : ""}`}
+        className={`overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden ${rowClassName} ${
+          fadeLeft && fadeRight
+            ? "chip-row-fade-both"
+            : fadeRight
+              ? "chip-row-fade-right"
+              : fadeLeft
+                ? "chip-row-fade-left"
+                : ""
+        }`}
       >
-        <div ref={trackRef} className="flex w-max gap-2 pr-1">
+        <div ref={trackRef} className="flex w-max gap-2 px-1">
           {children}
         </div>
       </div>

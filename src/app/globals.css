@@ -96,7 +96,7 @@ body {
   box-shadow: 0 1px 0 rgba(255, 255, 255, 0.45) inset;
 }
 
-/* Horisontell chip-rad: mjuk toning mot höger (inga hårda “steg” som ser konstiga ut vid kant) */
+/* Horisontell chip-rad: samma mjuka toning åt båda håll som vid högerkanten */
 .chip-row-fade-right {
   -webkit-mask-image: linear-gradient(
     90deg,
@@ -109,6 +109,54 @@ body {
   mask-image: linear-gradient(
     90deg,
     #000 0%,
+    #000 calc(100% - 3.25rem),
+    rgba(0, 0, 0, 0.55) calc(100% - 1.35rem),
+    rgba(0, 0, 0, 0.12) calc(100% - 0.35rem),
+    transparent 100%
+  );
+  mask-repeat: no-repeat;
+  mask-size: 100% 100%;
+}
+
+.chip-row-fade-left {
+  -webkit-mask-image: linear-gradient(
+    90deg,
+    transparent 0,
+    rgba(0, 0, 0, 0.12) 0.35rem,
+    rgba(0, 0, 0, 0.55) 1.35rem,
+    #000 3.25rem,
+    #000 100%
+  );
+  mask-image: linear-gradient(
+    90deg,
+    transparent 0,
+    rgba(0, 0, 0, 0.12) 0.35rem,
+    rgba(0, 0, 0, 0.55) 1.35rem,
+    #000 3.25rem,
+    #000 100%
+  );
+  mask-repeat: no-repeat;
+  mask-size: 100% 100%;
+}
+
+.chip-row-fade-both {
+  -webkit-mask-image: linear-gradient(
+    90deg,
+    transparent 0,
+    rgba(0, 0, 0, 0.12) 0.35rem,
+    rgba(0, 0, 0, 0.55) 1.35rem,
+    #000 3.25rem,
+    #000 calc(100% - 3.25rem),
+    rgba(0, 0, 0, 0.55) calc(100% - 1.35rem),
+    rgba(0, 0, 0, 0.12) calc(100% - 0.35rem),
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    90deg,
+    transparent 0,
+    rgba(0, 0, 0, 0.12) 0.35rem,
+    rgba(0, 0, 0, 0.55) 1.35rem,
+    #000 3.25rem,
     #000 calc(100% - 3.25rem),
     rgba(0, 0, 0, 0.55) calc(100% - 1.35rem),
     rgba(0, 0, 0, 0.12) calc(100% - 0.35rem),
