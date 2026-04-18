@@ -787,7 +787,7 @@ function SpotCard({
               <span>{cat.label}</span>
             </span>
             <div
-              className="inline-flex h-8 min-h-8 shrink-0 select-none items-stretch overflow-hidden rounded-full border border-indigo-300/55 bg-indigo-50/40 text-[11px] font-extrabold leading-none shadow-sm lg:h-7 lg:min-h-7 lg:text-[10px]"
+              className="inline-flex h-8 min-h-8 shrink-0 select-none items-stretch overflow-hidden rounded-full border border-indigo-300/55 bg-indigo-50/40 text-[11px] font-extrabold leading-none lg:h-7 lg:min-h-7 lg:text-[10px]"
               role="group"
               aria-label={
                 spot.viewerHasPlussed
