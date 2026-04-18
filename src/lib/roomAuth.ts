@@ -1,6 +1,7 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { roomWhereSlugInsensitive } from "@/lib/roomLookup";
 import { verifyRoomAccessToken } from "@/lib/roomToken";
 
 export type AuthorizedRoom = { id: string; slug: string; name: string | null };
@@ -25,8 +26,8 @@ export async function getAuthorizedRoomFromRequest(
     };
   }
 
-  const room = await prisma.room.findUnique({
-    where: { slug },
+  const room = await prisma.room.findFirst({
+    where: roomWhereSlugInsensitive(slug),
     select: { id: true, slug: true, name: true },
   });
 

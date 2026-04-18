@@ -2,6 +2,7 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { verifyPin } from "@/lib/pin";
 import { prisma } from "@/lib/prisma";
+import { roomWhereSlugInsensitive } from "@/lib/roomLookup";
 import { ROOM_ACCESS_COOKIE, roomAccessCookieOptions, signRoomAccessToken } from "@/lib/roomToken";
 
 export async function POST(req: NextRequest, ctx: { params: Promise<{ slug: string }> }) {
@@ -18,8 +19,8 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ slug: stri
       return NextResponse.json({ error: "Pinkod saknas" }, { status: 400 });
     }
 
-    const room = await prisma.room.findUnique({
-      where: { slug },
+    const room = await prisma.room.findFirst({
+      where: roomWhereSlugInsensitive(slug),
       select: { id: true, slug: true, pinHash: true },
     });
     if (!room) {

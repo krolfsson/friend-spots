@@ -3,6 +3,7 @@ import { CityClient } from "@/components/CityClient";
 import { UnlockRoomForm } from "@/components/UnlockRoomForm";
 import { getDashboardDataForRoom } from "@/lib/getDashboard";
 import { prisma } from "@/lib/prisma";
+import { roomWhereSlugInsensitive } from "@/lib/roomLookup";
 import { isReservedRoomSlug } from "@/lib/reservedSlugs";
 import { ROOM_ACCESS_COOKIE, verifyRoomAccessToken } from "@/lib/roomToken";
 import { SITE_DESCRIPTION } from "@/lib/site";
@@ -22,8 +23,8 @@ export async function generateMetadata({
   if (!slug || isReservedRoomSlug(slug)) {
     return { title: "Saknas" };
   }
-  const room = await prisma.room.findUnique({
-    where: { slug },
+  const room = await prisma.room.findFirst({
+    where: roomWhereSlugInsensitive(slug),
     select: { name: true, slug: true },
   });
   if (!room) {
@@ -41,11 +42,13 @@ export default async function RoomPage({ params }: { params: Promise<{ roomSlug:
   const slug = roomSlug.trim();
   if (!slug || isReservedRoomSlug(slug)) notFound();
 
-  const room = await prisma.room.findUnique({
-    where: { slug },
+  const room = await prisma.room.findFirst({
+    where: roomWhereSlugInsensitive(slug),
     select: { id: true, slug: true, name: true },
   });
   if (!room) notFound();
+
+  const canonicalSlug = room.slug;
 
   const jar = await cookies();
   const token = jar.get(ROOM_ACCESS_COOKIE)?.value;
@@ -53,7 +56,7 @@ export default async function RoomPage({ params }: { params: Promise<{ roomSlug:
   const authed = Boolean(claims && claims.roomId === room.id);
 
   if (!authed) {
-    return <UnlockRoomForm roomSlug={slug} title={room.name?.trim() || slug} />;
+    return <UnlockRoomForm roomSlug={canonicalSlug} title={room.name?.trim() || canonicalSlug} />;
   }
 
   const { cities, bySlug } = await getDashboardDataForRoom(room.id);
@@ -64,7 +67,7 @@ export default async function RoomPage({ params }: { params: Promise<{ roomSlug:
         <p className="mb-4 text-center text-sm font-bold text-indigo-900/60">
           Inga städer i den här kartan än — skapa den första.
         </p>
-        <CreateCityForm roomSlug={slug} />
+        <CreateCityForm roomSlug={canonicalSlug} />
       </div>
     );
   }
@@ -76,5 +79,5 @@ export default async function RoomPage({ params }: { params: Promise<{ roomSlug:
     if (envHit) city = envHit;
   }
 
-  return <CityClient roomSlug={slug} cities={cities} city={city} dashboard={bySlug} />;
+  return <CityClient roomSlug={canonicalSlug} cities={cities} city={city} dashboard={bySlug} />;
 }
