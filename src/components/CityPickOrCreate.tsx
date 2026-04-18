@@ -55,7 +55,7 @@ export function CityPickOrCreate({ onClose }: { onClose: () => void }) {
   const goToCity = useCallback(
     (slug: string) => {
       onClose();
-      router.push(`/c/${slug}`);
+      router.replace(`/?city=${encodeURIComponent(slug)}`);
       router.refresh();
     },
     [onClose, router],

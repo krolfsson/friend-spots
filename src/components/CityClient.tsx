@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { AddSpotForm } from "@/components/AddSpotForm";
 import { CityPickOrCreate } from "@/components/CityPickOrCreate";
@@ -33,7 +34,8 @@ function ChipScroller({ children }: { children: React.ReactNode }) {
   );
 }
 
-export function CityClient({ city }: { city: City }) {
+export function CityClient({ cities, city }: { cities: City[]; city: City }) {
+  const router = useRouter();
   const [addOpen, setAddOpen] = useState(false);
   const [category, setCategory] = useState<"alla" | CategoryId>("alla");
   const [neighborhood, setNeighborhood] = useState<string>("alla");
@@ -106,9 +108,28 @@ export function CityClient({ city }: { city: City }) {
             />
           </svg>
         </button>
-        <div className="y2k-chip-active inline-flex h-9 min-h-9 min-w-0 flex-1 items-center justify-center gap-2 rounded-full px-3.5 text-sm font-extrabold leading-none tracking-tight text-white sm:inline-flex sm:flex-initial">
-          <span aria-hidden>🌃</span>
-          <span className="truncate">{city.name}</span>
+        <div className="-mx-1 min-w-0 flex-1 px-1">
+          <div className="flex gap-2 overflow-x-auto py-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            {cities.map((c) => {
+              const active = c.slug === city.slug;
+              return (
+                <button
+                  key={c.id}
+                  type="button"
+                  onClick={() => {
+                    router.replace(`/?city=${encodeURIComponent(c.slug)}`);
+                    router.refresh();
+                  }}
+                  className={`inline-flex h-9 min-h-9 shrink-0 items-center justify-center gap-1.5 rounded-full px-3.5 text-sm font-extrabold leading-none tracking-tight transition active:scale-95 ${
+                    active ? "y2k-chip-active text-white" : "y2k-chip text-indigo-950 hover:-translate-y-0.5"
+                  }`}
+                >
+                  <span aria-hidden>🌃</span>
+                  <span className="max-w-[11rem] truncate">{c.name}</span>
+                </button>
+              );
+            })}
+          </div>
         </div>
       </div>
 
