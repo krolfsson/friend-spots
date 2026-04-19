@@ -99,7 +99,7 @@ export function CityClient({
   const [addTargetSlug, setAddTargetSlug] = useState(city.slug);
   const [category, setCategory] = useState<"alla" | CategoryId>("alla");
   const [neighborhood, setNeighborhood] = useState<string>("alla");
-  const [viewMode, setViewMode] = useState<"list" | "map">("list");
+  const [viewMode, setViewMode] = useState<"list" | "map">("map");
   const [error, setError] = useState<string | null>(null);
   const mapEnabled = isMapViewConfigured();
 
@@ -301,13 +301,13 @@ export function CityClient({
 
       {mapEnabled ? (
         <div className="mb-3 flex flex-wrap gap-2">
-          <Chip active={viewMode === "list"} onClick={() => setViewMode("list")} tone="violet">
-            <span className="mr-1">📋</span>
-            Lista
-          </Chip>
           <Chip active={viewMode === "map"} onClick={() => setViewMode("map")} tone="violet">
             <span className="mr-1">🗺️</span>
             Karta
+          </Chip>
+          <Chip active={viewMode === "list"} onClick={() => setViewMode("list")} tone="violet">
+            <span className="mr-1">📋</span>
+            Lista
           </Chip>
         </div>
       ) : null}
