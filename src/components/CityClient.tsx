@@ -8,6 +8,7 @@ import { CATEGORIES, categoryMeta, isCategoryId, type CategoryId } from "@/lib/c
 import type { DashboardBySlug, DashboardSpot } from "@/lib/dashboardTypes";
 import { mapsOpenForSpot } from "@/lib/mapsUrl";
 import { getOrCreateVoterToken } from "@/lib/voterClient";
+import { isMapViewConfigured, SpotsMap } from "@/components/SpotsMap";
 
 type City = { id: string; name: string; slug: string; _count?: { spots: number } };
 
@@ -98,7 +99,9 @@ export function CityClient({
   const [addTargetSlug, setAddTargetSlug] = useState(city.slug);
   const [category, setCategory] = useState<"alla" | CategoryId>("alla");
   const [neighborhood, setNeighborhood] = useState<string>("alla");
+  const [viewMode, setViewMode] = useState<"list" | "map">("list");
   const [error, setError] = useState<string | null>(null);
+  const mapEnabled = isMapViewConfigured();
 
   useEffect(() => {
     setCityList(cities);
@@ -296,6 +299,19 @@ export function CityClient({
         </FadingHorizontalChips>
       </div>
 
+      {mapEnabled ? (
+        <div className="mb-3 flex flex-wrap gap-2">
+          <Chip active={viewMode === "list"} onClick={() => setViewMode("list")} tone="violet">
+            <span className="mr-1">📋</span>
+            Lista
+          </Chip>
+          <Chip active={viewMode === "map"} onClick={() => setViewMode("map")} tone="violet">
+            <span className="mr-1">🗺️</span>
+            Karta
+          </Chip>
+        </div>
+      ) : null}
+
       {error ? (
         <p className="mb-4 rounded-2xl border border-rose-200/80 bg-rose-50/90 px-4 py-3 text-sm font-bold text-rose-800">
           {error}
@@ -303,7 +319,9 @@ export function CityClient({
       ) : null}
 
       <div className="mb-10 min-h-[100px]">
-        {displaySpots.length === 0 ? null : (
+        {mapEnabled && viewMode === "map" ? (
+          <SpotsMap spots={displaySpots} cityName={activeCity.name} />
+        ) : displaySpots.length === 0 ? null : (
           <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
             {displaySpots.map((s) => (
               <SpotCard

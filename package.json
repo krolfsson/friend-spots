@@ -12,6 +12,7 @@
     "db:reset-plusses": "node scripts/reset-spot-plusses.js"
   },
   "dependencies": {
+    "@googlemaps/js-api-loader": "^2.0.2",
     "@prisma/client": "^6.7.0",
     "next": "^15.5.15",
     "react": "^19.0.0",
@@ -20,6 +21,7 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
+    "@types/google.maps": "^3.64.0",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
