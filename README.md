@@ -48,8 +48,11 @@ SQLite-filer fungerar inte tillförlitligt på Vercel. Appen använder **Postgre
 
 ```env
 DATABASE_URL="postgresql://...?sslmode=require"
+DIRECT_URL="postgresql://...?sslmode=require"
 GOOGLE_MAPS_API_KEY="din-nyckel"
 ```
+
+På **Neon**: kopiera den **poolade** strängen till `DATABASE_URL` och den **direkta** (utan `-pooler` i värdnamnet) till `DIRECT_URL`. Utan `DIRECT_URL` kan `prisma migrate deploy` ge **P1002** (timeout på advisory lock) vid build.
 
 (Ta bort gammal `file:./dev.db` om du hade SQLite förut. Du kan radera `dev.db` lokalt.)
 
@@ -68,7 +71,8 @@ npx prisma migrate deploy
 2. **Import** ditt GitHub-repo `friend-spots`.
 3. Under **Environment Variables**, lägg minst:
 
-   - `DATABASE_URL` — samma Postgres-URL som ovan (Neon har ofta en pooled-URL som passar serverless bra).
+   - `DATABASE_URL` — Neon **poolad** connection string (passar serverless).
+   - `DIRECT_URL` — Neon **direkt** connection string (samma databas, utan pooler). Krävs så migreringar kan ta advisory lock; utan den riskerar Vercel-build **P1002**.
    - `GOOGLE_MAPS_API_KEY` — din Google Cloud-nyckel med Places API (New).
 
    Valfritt: `DEFAULT_CITY_SLUG` (slug som finns i databasen).
@@ -90,7 +94,7 @@ vercel --prod
 
 ```bash
 npm install
-# sätt DATABASE_URL + GOOGLE_MAPS_API_KEY i .env
+# sätt DATABASE_URL, DIRECT_URL (samma som DATABASE om du inte använder pooler) + GOOGLE_MAPS_API_KEY i .env
 npx prisma migrate deploy
 npm run dev
 ```
@@ -100,4 +104,5 @@ Appen: [http://localhost:3002](http://localhost:3002) (port satt i `package.json
 ## Felsökning
 
 - **Build faller på Prisma / DATABASE_URL**: Kontrollera att variabeln finns i Vercel *och* börjar med `postgresql://` eller `postgres://`.
+- **P1002 / advisory lock / timeout vid `migrate deploy`**: Lägg till `DIRECT_URL` i Vercel (Neons **direkta** Postgres-URL, inte poolern). Sätt samma värde som `DATABASE_URL` i `.env.local` om du kör utan pooler lokalt.
 - **Git hooks / Operation not permitted** (vissa miljöer): kör `git init` på din egen Mac-terminal i `~/friend-spots`, inte i sandlådor utan full filåtkomst.
