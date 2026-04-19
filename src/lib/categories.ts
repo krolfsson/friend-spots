@@ -8,6 +8,7 @@ export const CATEGORIES = [
   { id: "klubb", label: "Klubb", emoji: "💿" },
   { id: "sevardhet", label: "Sevärdhet", emoji: "🗼" },
   { id: "shopping", label: "Shopping", emoji: "🛍️" },
+  { id: "boende", label: "Boende", emoji: "🏨" },
   { id: "annat", label: "Annat", emoji: "✨" },
 ] as const;
 
