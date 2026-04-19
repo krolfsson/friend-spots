@@ -13,6 +13,23 @@ function hasCoords(s: DashboardSpot): boolean {
   );
 }
 
+function describeMapLoadError(err: unknown): string {
+  const msg = err instanceof Error ? err.message : String(err);
+  if (msg.includes("ApiNotActivatedMapError") || msg.includes("ApiNotActivated")) {
+    return "Maps JavaScript API är inte aktiverat för den här nyckeln. Aktivera det i Google Cloud → APIs → Maps JavaScript API.";
+  }
+  if (msg.includes("RefererNotAllowedMapError") || msg.includes("referer")) {
+    return "Nyckeln tillåter inte den här webbplatsen. I Google Cloud → Credentials → din nyckel → Application restrictions → HTTP referrers: lägg till https://friend-spots.vercel.app/* och ev. https://*.vercel.app/*";
+  }
+  if (msg.includes("InvalidKeyMapError") || msg.includes("InvalidKey")) {
+    return "Ogiltig API-nyckel. Kontrollera NEXT_PUBLIC_GOOGLE_MAPS_API_KEY i Vercel (om du just lade till den: gör en ny deploy så värdet följer med i bygget).";
+  }
+  if (msg.includes("BillingNotEnabled") || msg.includes("billing")) {
+    return "Fakturering är inte påslagen för Google Maps-projektet. Aktivera billing i Google Cloud.";
+  }
+  return msg || "Kunde inte ladda Google Maps.";
+}
+
 export function isMapViewConfigured(): boolean {
   return Boolean(process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY?.trim());
 }
@@ -26,6 +43,7 @@ export function SpotsMap({
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY?.trim() ?? "";
 
   const plotted = useMemo(() => spots.filter(hasCoords), [spots]);
@@ -33,7 +51,10 @@ export function SpotsMap({
 
   useEffect(() => {
     if (!apiKey) {
-      setLoadError("Sätt NEXT_PUBLIC_GOOGLE_MAPS_API_KEY (samma nyckel som kan ha Maps JavaScript API aktiverat).");
+      setLoadError(
+        "Sätt NEXT_PUBLIC_GOOGLE_MAPS_API_KEY (samma nyckel som kan ha Maps JavaScript API aktiverat).",
+      );
+      setLoading(false);
       return;
     }
 
@@ -42,9 +63,11 @@ export function SpotsMap({
     let map: google.maps.Map | null = null;
     let iw: google.maps.InfoWindow | null = null;
 
+    setLoading(true);
+    setLoadError(null);
+
     void (async () => {
       try {
-        setLoadError(null);
         setOptions({ key: apiKey, v: "weekly" });
         await importLibrary("maps");
         if (cancelled || !containerRef.current) return;
@@ -73,7 +96,8 @@ export function SpotsMap({
             const wrap = document.createElement("div");
             wrap.className = "p-2 max-w-[220px]";
             const titleEl = document.createElement("div");
-            titleEl.className = "mb-1.5 text-sm font-extrabold leading-snug text-indigo-950";
+            titleEl.className =
+              "mb-1.5 text-sm font-extrabold leading-snug text-indigo-950";
             titleEl.textContent = spot.name;
             const a = document.createElement("a");
             a.href = url;
@@ -101,10 +125,12 @@ export function SpotsMap({
             plotted.forEach((s) => bounds.extend({ lat: s.lat!, lng: s.lng! }));
             map.fitBounds(bounds, 64);
           }
+          if (!cancelled) setLoading(false);
         });
       } catch (e) {
         if (!cancelled) {
-          setLoadError(e instanceof Error ? e.message : "Kunde inte ladda kartan");
+          setLoadError(describeMapLoadError(e));
+          setLoading(false);
         }
       }
     })();
@@ -120,8 +146,10 @@ export function SpotsMap({
     return (
       <p className="rounded-2xl border border-amber-200/80 bg-amber-50/90 px-4 py-3 text-sm font-bold text-amber-950">
         Kartvy kräver{" "}
-        <code className="rounded bg-white/80 px-1 py-0.5 text-xs">NEXT_PUBLIC_GOOGLE_MAPS_API_KEY</code> i miljön
-        (aktivera Maps JavaScript API för nyckeln).
+        <code className="rounded bg-white/80 px-1 py-0.5 text-xs">
+          NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
+        </code>{" "}
+        i miljön (aktivera Maps JavaScript API för nyckeln).
       </p>
     );
   }
@@ -129,21 +157,29 @@ export function SpotsMap({
   return (
     <div className="space-y-2">
       {loadError ? (
-        <p className="rounded-2xl border border-rose-200/80 bg-rose-50/90 px-4 py-3 text-sm font-bold text-rose-800">
+        <p className="rounded-2xl border border-rose-200/80 bg-rose-50/90 px-4 py-3 text-sm font-bold text-rose-900">
           {loadError}
         </p>
       ) : null}
       {missingCount > 0 ? (
         <p className="text-xs font-bold text-indigo-900/55">
-          {missingCount} ställe{missingCount === 1 ? "" : "n"} saknar koordinat och visas inte på kartan.
+          {missingCount} ställe{missingCount === 1 ? "" : "n"} saknar koordinat och
+          visas inte på kartan.
         </p>
       ) : null}
-      <div
-        ref={containerRef}
-        className="h-[min(420px,55dvh)] w-full overflow-hidden rounded-2xl border border-indigo-200/70 bg-indigo-50/30 shadow-inner shadow-indigo-100/80"
-        role="application"
-        aria-label="Karta med tips"
-      />
+      <div className="relative h-[min(420px,55dvh)] w-full overflow-hidden rounded-2xl border border-indigo-200/70 bg-indigo-50/30 shadow-inner shadow-indigo-100/80">
+        {loading && !loadError ? (
+          <div className="absolute inset-0 z-10 flex items-center justify-center bg-indigo-50/80 text-sm font-bold text-indigo-900/70">
+            Laddar karta…
+          </div>
+        ) : null}
+        <div
+          ref={containerRef}
+          className="h-full w-full"
+          role="application"
+          aria-label="Karta med tips"
+        />
+      </div>
     </div>
   );
 }

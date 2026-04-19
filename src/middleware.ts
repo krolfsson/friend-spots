@@ -17,7 +17,10 @@ export function middleware(request: NextRequest) {
 
   if (pathname === "/") {
     const res = NextResponse.next();
-    res.headers.set("Cache-Control", "private, no-store, max-age=0, must-revalidate");
+    res.headers.set(
+      "Cache-Control",
+      "private, no-store, max-age=0, must-revalidate",
+    );
     return res;
   }
 
