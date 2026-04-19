@@ -38,7 +38,7 @@ function sanitizeMapsQuery(raw: string): string {
 export function mapsOpenForSpot(spot: SpotForMaps, ctx?: MapsContext): string {
   const city = ctx?.cityName?.trim();
   const joined = [spot.name.trim(), city].filter(Boolean).join(" ").trim() || spot.name.trim();
-  const query = sanitizeMapsQuery(joined) || sanitizeMapsQuery(spot.name) || "Google Maps";
+  const query = sanitizeMapsQuery(joined) || sanitizeMapsQuery(spot.name) || "Hitta";
   const encoded = encodeURIComponent(query);
   return `https://www.google.com/maps/search/?api=1&query=${encoded}`;
 }

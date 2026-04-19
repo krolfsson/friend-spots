@@ -812,7 +812,7 @@ function SpotCard({
               onPointerDown={(e) => e.stopPropagation()}
               onClick={(e) => e.stopPropagation()}
             >
-              Maps
+              Hitta
             </a>
           </div>
         </div>
