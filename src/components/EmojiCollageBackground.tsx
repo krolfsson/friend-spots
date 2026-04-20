@@ -7,22 +7,31 @@ type Item = {
   rotate: number;
   size: number;
   opacity: number;
-  blur: number;
 };
 
 const ITEMS: Item[] = [
-  { emoji: "✨", top: "-2%", left: "6%", rotate: -18, size: 52, opacity: 0.32, blur: 0.15 },
-  { emoji: "☕️", top: "8%", left: "78%", rotate: 14, size: 44, opacity: 0.28, blur: 0.2 },
-  { emoji: "🍳", top: "14%", left: "18%", rotate: 8, size: 46, opacity: 0.26, blur: 0.2 },
-  { emoji: "🍝", top: "18%", left: "52%", rotate: -9, size: 56, opacity: 0.24, blur: 0.25 },
-  { emoji: "🍸", top: "28%", left: "84%", rotate: -22, size: 54, opacity: 0.26, blur: 0.22 },
-  { emoji: "🛍️", top: "33%", left: "7%", rotate: 16, size: 50, opacity: 0.24, blur: 0.28 },
-  { emoji: "🏨", top: "40%", left: "60%", rotate: 10, size: 62, opacity: 0.22, blur: 0.32 },
-  { emoji: "🗽", top: "46%", left: "26%", rotate: -14, size: 58, opacity: 0.22, blur: 0.34 },
-  { emoji: "🍻", top: "56%", left: "88%", rotate: 18, size: 48, opacity: 0.24, blur: 0.28 },
-  { emoji: "🎧", top: "64%", left: "10%", rotate: -10, size: 52, opacity: 0.22, blur: 0.34 },
-  { emoji: "🌆", top: "72%", left: "66%", rotate: 12, size: 60, opacity: 0.21, blur: 0.36 },
-  { emoji: "🧁", top: "86%", left: "42%", rotate: -17, size: 50, opacity: 0.22, blur: 0.3 },
+  { emoji: "✨", top: "-3%", left: "4%", rotate: -18, size: 54, opacity: 0.46 },
+  { emoji: "☕️", top: "6%", left: "80%", rotate: 14, size: 44, opacity: 0.42 },
+  { emoji: "🍳", top: "12%", left: "16%", rotate: 8, size: 46, opacity: 0.4 },
+  { emoji: "🍝", top: "16%", left: "52%", rotate: -9, size: 58, opacity: 0.38 },
+  { emoji: "🍸", top: "26%", left: "86%", rotate: -22, size: 56, opacity: 0.42 },
+  { emoji: "🛍️", top: "31%", left: "6%", rotate: 16, size: 50, opacity: 0.38 },
+  { emoji: "🏨", top: "38%", left: "62%", rotate: 10, size: 64, opacity: 0.36 },
+  { emoji: "🗽", top: "44%", left: "24%", rotate: -14, size: 60, opacity: 0.36 },
+  { emoji: "🍻", top: "54%", left: "90%", rotate: 18, size: 48, opacity: 0.38 },
+  { emoji: "🎧", top: "62%", left: "9%", rotate: -10, size: 54, opacity: 0.34 },
+  { emoji: "🌆", top: "70%", left: "68%", rotate: 12, size: 62, opacity: 0.34 },
+  { emoji: "🧁", top: "84%", left: "44%", rotate: -17, size: 50, opacity: 0.36 },
+  { emoji: "🥐", top: "4%", left: "36%", rotate: -6, size: 46, opacity: 0.34 },
+  { emoji: "🍜", top: "22%", left: "34%", rotate: 10, size: 52, opacity: 0.32 },
+  { emoji: "🍣", top: "10%", left: "92%", rotate: -12, size: 48, opacity: 0.34 },
+  { emoji: "🍷", top: "36%", left: "86%", rotate: 8, size: 46, opacity: 0.32 },
+  { emoji: "🧋", top: "48%", left: "72%", rotate: -8, size: 50, opacity: 0.3 },
+  { emoji: "🧇", top: "58%", left: "32%", rotate: 14, size: 48, opacity: 0.3 },
+  { emoji: "🍦", top: "74%", left: "12%", rotate: -14, size: 52, opacity: 0.32 },
+  { emoji: "🥟", top: "88%", left: "10%", rotate: 10, size: 50, opacity: 0.3 },
+  { emoji: "🍕", top: "82%", left: "78%", rotate: -9, size: 56, opacity: 0.32 },
+  { emoji: "🍔", top: "60%", left: "56%", rotate: 6, size: 50, opacity: 0.3 },
 ];
 
 function pickEmoji(i: number): string {
@@ -33,7 +42,7 @@ function pickEmoji(i: number): string {
 export function EmojiCollageBackground() {
   return (
     <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-b from-fuchsia-50 via-white to-sky-50 opacity-95" />
+      <div className="absolute inset-0 bg-gradient-to-b from-fuchsia-50 via-white to-sky-50 opacity-100" />
       {ITEMS.map((it, i) => {
         const emoji = it.emoji || pickEmoji(i);
         return (
@@ -46,14 +55,13 @@ export function EmojiCollageBackground() {
               transform: `rotate(${it.rotate}deg)`,
               fontSize: `${it.size}px`,
               opacity: it.opacity,
-              filter: `blur(${it.blur}rem)`,
             }}
           >
             {emoji}
           </span>
         );
       })}
-      <div className="absolute inset-0 bg-white/10" />
+      <div className="absolute inset-0 bg-white/0" />
     </div>
   );
 }
