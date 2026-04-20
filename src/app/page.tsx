@@ -16,9 +16,9 @@ export default function Home() {
     <div className="relative mx-auto flex min-h-dvh max-w-md flex-col justify-center px-4 py-6 sm:py-12">
       <EmojiCollageBackground />
       <div className="relative z-10 space-y-3 sm:space-y-4">
-        <div className="-mt-1 flex justify-center pb-0.5">
+        <div className="-mt-1 flex w-full justify-center overflow-visible pb-0.5">
           <div
-            className="select-none bg-gradient-to-r from-fuchsia-500 via-violet-500 to-sky-500 bg-clip-text text-[36px] font-extrabold leading-none tracking-tight text-transparent drop-shadow-[0_12px_34px_rgba(236,72,153,0.22)] sm:text-[43px]"
+            className="select-none bg-gradient-to-r from-fuchsia-500 via-violet-500 to-sky-500 bg-clip-text px-1 text-[36px] font-extrabold leading-none tracking-tight text-transparent drop-shadow-[0_12px_34px_rgba(236,72,153,0.22)] sm:text-[43px]"
             style={{
               fontFamily: "var(--font-logo), var(--font-y2k), system-ui, sans-serif",
             }}
