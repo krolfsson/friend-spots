@@ -23,7 +23,7 @@ export default function Home() {
               fontFamily: "var(--font-logo), var(--font-y2k), system-ui, sans-serif",
             }}
           >
-            RecsMaps
+            Mapsies
           </div>
         </div>
 

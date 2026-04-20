@@ -455,17 +455,26 @@ export function CityClient({
           <div className="grid grid-cols-2 gap-[0.6rem] sm:gap-3">
             <Link
               href="/"
-              className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl border border-indigo-200/70 bg-white/70 px-[0.9rem] py-[0.9rem] text-center text-[12px] font-extrabold leading-snug text-indigo-950 shadow-sm shadow-indigo-500/10 ring-1 ring-white/60 transition hover:brightness-105 active:scale-[0.99] sm:px-4 sm:py-3 sm:text-sm"
+              className="y2k-chip inline-flex h-10 w-full items-center justify-center rounded-full px-3 text-center text-sm font-extrabold text-indigo-950 transition hover:-translate-y-0.5 active:scale-[0.99] sm:h-11 sm:px-4"
             >
-              Skapa din egen karta och dela med kompisar
+              Ny karta
             </Link>
             <button
               type="button"
               onClick={() => void shareRoom()}
-              className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl bg-gradient-to-r from-emerald-400 to-teal-500 px-[0.9rem] py-[0.9rem] text-[12px] font-extrabold leading-snug text-white shadow-sm shadow-emerald-500/25 ring-1 ring-white/60 transition hover:brightness-110 active:scale-[0.99] sm:px-4 sm:py-3 sm:text-sm"
+              className="y2k-chip-active inline-flex h-10 w-full items-center justify-center rounded-full px-3 text-center text-sm font-extrabold text-white transition hover:-translate-y-0.5 active:scale-[0.99] sm:h-11 sm:px-4"
             >
-              Dela kartan
+              Dela karta
             </button>
+          </div>
+
+          <div className="flex justify-center pt-1">
+            <div
+              className="select-none bg-gradient-to-r from-fuchsia-500 via-violet-500 to-sky-500 bg-clip-text text-[22px] font-extrabold leading-none tracking-tight text-transparent drop-shadow-[0_10px_26px_rgba(236,72,153,0.18)]"
+              style={{ fontFamily: "var(--font-logo), var(--font-y2k), system-ui, sans-serif" }}
+            >
+              Mapsies
+            </div>
           </div>
         </div>
       </div>
