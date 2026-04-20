@@ -327,8 +327,8 @@ export function CityClient({
     <div className="relative mx-auto max-w-5xl px-[1.2rem] pb-[4.2rem] pt-6">
       <div className="space-y-[0.6rem]">
         <FadingHorizontalChips rowClassName="py-0" disableLeftFade>
-          <div className="sticky left-0 z-20 -ml-[0.15rem] pr-[0.6rem]">
-            <div className="rounded-full bg-gradient-to-r from-white/92 via-white/55 to-transparent backdrop-blur-[2px]">
+          <div className="sticky left-0 z-20 -ml-[0.15rem]">
+            <div className="rounded-full bg-white/70 p-0.5 ring-1 ring-white/70 backdrop-blur-[2px]">
               <button
                 type="button"
                 aria-label="Öppna meny: stad och nytt tips"
