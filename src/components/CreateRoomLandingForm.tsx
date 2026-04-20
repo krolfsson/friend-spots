@@ -6,7 +6,6 @@ import { useState } from "react";
 export function CreateRoomLandingForm() {
   const router = useRouter();
   const [name, setName] = useState("");
-  const [slug, setSlug] = useState("");
   const [pin, setPin] = useState("");
   const [pinConfirm, setPinConfirm] = useState("");
   const [busy, setBusy] = useState(false);
@@ -22,7 +21,6 @@ export function CreateRoomLandingForm() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: name.trim() || undefined,
-          slug: slug.trim() || undefined,
           pin: pin.trim(),
           pinConfirm: pinConfirm.trim(),
         }),
@@ -42,25 +40,13 @@ export function CreateRoomLandingForm() {
   return (
     <form onSubmit={onSubmit} className="space-y-4">
       <label className="block text-xs font-extrabold text-indigo-900/80">
-        Namn (valfritt)
+        Namn (du kan ändra detta senare)
         <input
           value={name}
           onChange={(e) => setName(e.target.value)}
-          placeholder="t.ex. Sommarresan 2026"
+          placeholder="t.ex. Bucketlist 4 Lyfe"
           className="mt-1 w-full rounded-2xl border border-fuchsia-200/70 bg-white/90 px-4 py-3 text-sm font-semibold text-indigo-950 outline-none focus:ring-4 focus:ring-fuchsia-300/50"
         />
-      </label>
-      <label className="block text-xs font-extrabold text-indigo-900/80">
-        Adress i webbläsaren (valfritt)
-        <input
-          value={slug}
-          onChange={(e) => setSlug(e.target.value)}
-          placeholder="tom = genereras automatiskt"
-          className="mt-1 w-full rounded-2xl border border-indigo-200/70 bg-white/90 px-4 py-3 text-sm font-semibold text-indigo-950 outline-none focus:ring-4 focus:ring-indigo-300/45"
-        />
-        <span className="mt-1 block text-[11px] font-bold text-indigo-900/45">
-          Blir en sökväg som <span className="text-indigo-800">…/mitt-namn</span>
-        </span>
       </label>
       <label className="block text-xs font-extrabold text-indigo-900/80">
         Pinkod
