@@ -147,7 +147,7 @@ export function CityClient({
     [cityList, addTargetSlug, activeCity],
   );
 
-  const refreshCity = useCallback(async (slug: string) => {
+  const refreshCity = useCallback(async (slug: string, signal?: AbortSignal) => {
     setError(null);
     try {
       const params = new URLSearchParams({
@@ -160,6 +160,7 @@ export function CityClient({
       if (vt) headers["X-Voter-Token"] = vt;
       const res = await fetch(`/api/spots?${params.toString()}`, {
         headers,
+        signal,
       });
       const data = (await res.json()) as {
         spots?: DashboardSpot[];
@@ -174,12 +175,21 @@ export function CityClient({
         prev.map((c) => (c.slug === slug ? { ...c, _count: { spots: spots.length } } : c)),
       );
     } catch (e) {
+      // När man byter stad/filters snabbt kan tidigare fetch avbrytas — visa inte fel för det.
+      if (e instanceof DOMException && e.name === "AbortError") return;
+      if (e instanceof Error && e.name === "AbortError") return;
+      if (e instanceof TypeError && e.message.includes("Failed to fetch")) {
+        setError("Tillfälligt nätverksfel. Försök igen.");
+        return;
+      }
       setError(e instanceof Error ? e.message : "Okänt fel");
     }
   }, [roomSlug]);
 
   useEffect(() => {
-    void refreshCity(activeCity.slug);
+    const ctrl = new AbortController();
+    void refreshCity(activeCity.slug, ctrl.signal);
+    return () => ctrl.abort();
   }, [activeCity.slug, refreshCity]);
 
   const removeSpot = useCallback((spotId: string, slug: string, spotCategory: string) => {

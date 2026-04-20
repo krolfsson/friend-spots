@@ -139,7 +139,7 @@ export function SpotsMap({
             a.target = "_blank";
             a.rel = "noopener noreferrer";
             a.className = "text-xs font-bold text-fuchsia-700 underline";
-            a.textContent = "Öppna i Google Maps";
+            a.textContent = "Öppna i Hitta";
             wrap.append(titleEl, a);
             iw.setContent(wrap);
             iw.open({ map, anchor: marker });
