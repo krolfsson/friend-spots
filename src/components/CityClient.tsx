@@ -1264,7 +1264,7 @@ function SpotCard({
             {saveError ? (
               <p className="mb-3 text-xs font-bold text-rose-600">{saveError}</p>
             ) : null}
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <button
                 type="button"
                 disabled={saving || !editName.trim()}
@@ -1281,6 +1281,9 @@ function SpotCard({
               >
                 Avbryt
               </button>
+              <span className="ml-auto select-none text-[11px] font-bold italic text-indigo-950/55 [transform:rotate(-2deg)]">
+                ↖︎ lägg till en passande emoji
+              </span>
             </div>
           </div>
         </div>,
