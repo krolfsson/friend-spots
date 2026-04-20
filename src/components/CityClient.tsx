@@ -626,7 +626,7 @@ export function CityClient({
           className="fixed inset-0 z-[65] flex touch-manipulation items-end justify-center bg-indigo-950/35 p-2 sm:items-center sm:p-3"
           role="dialog"
           aria-modal="true"
-          aria-label={locale === "en" ? "Share map" : "Dela kartan"}
+          aria-label={t(locale, "room.actions.shareMap")}
           onPointerDown={(e) => {
             if (e.target === e.currentTarget) setShareOpen(false);
           }}
@@ -635,7 +635,7 @@ export function CityClient({
             <header className="flex items-center justify-between gap-3 border-b border-indigo-200/60 bg-white/70 px-4 py-3">
               <div className="min-w-0 flex-1">
                 <h2 className="truncate text-sm font-extrabold tracking-tight text-indigo-950">
-                  {locale === "en" ? "Share map" : "Dela kartan"}
+                  {t(locale, "room.actions.shareMap")}
                 </h2>
                 <p className="mt-0.5 text-[12px] font-bold text-indigo-900/55">{t(locale, "share.copy")}</p>
               </div>

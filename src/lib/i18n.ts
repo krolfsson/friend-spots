@@ -23,8 +23,8 @@ export const MESSAGES: Record<Locale, Record<string, string>> = {
     "home.open.placeholder": "t.ex. /rolfsson",
     "home.open.cta": "Öppna karta",
 
-    "room.actions.newMap": "Ny karta",
-    "room.actions.shareMap": "Dela karta",
+    "room.actions.newMap": "Skapa ny karta",
+    "room.actions.shareMap": "Dela med vänner",
     "room.actions.directions": "Hitta",
     "room.view.map": "Karta",
     "room.view.list": "Topplista",
@@ -108,8 +108,8 @@ export const MESSAGES: Record<Locale, Record<string, string>> = {
     "home.open.placeholder": "e.g. /rolfsson",
     "home.open.cta": "Open map",
 
-    "room.actions.newMap": "New map",
-    "room.actions.shareMap": "Share map",
+    "room.actions.newMap": "Create new map",
+    "room.actions.shareMap": "Share with friends",
     "room.actions.directions": "Directions",
     "room.view.map": "Map",
     "room.view.list": "Leaderboard",
