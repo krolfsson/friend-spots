@@ -18,10 +18,10 @@ export default function Home() {
       <div className="relative z-10 space-y-3 sm:space-y-4">
         <div className="flex justify-center pb-1">
           <div
-            className="select-none text-[28px] leading-none tracking-tight text-indigo-950/90 sm:text-[34px]"
+            className="select-none bg-gradient-to-r from-fuchsia-500 via-violet-500 to-sky-500 bg-clip-text text-[30px] font-extrabold leading-none tracking-tight text-transparent drop-shadow-[0_10px_30px_rgba(236,72,153,0.20)] sm:text-[36px]"
             style={{
               fontFamily: "var(--font-logo), var(--font-y2k), system-ui, sans-serif",
-              textShadow: "0 1px 0 rgba(255,255,255,0.65)",
+              WebkitTextStroke: "0.6px rgba(255,255,255,0.35)",
             }}
           >
             RecsMaps

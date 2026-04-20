@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { DotGothic16, M_PLUS_Rounded_1c } from "next/font/google";
+import { Fredoka, M_PLUS_Rounded_1c } from "next/font/google";
 import { SITE_DESCRIPTION, SITE_TITLE } from "@/lib/site";
 import "./globals.css";
 
@@ -9,9 +9,9 @@ const y2k = M_PLUS_Rounded_1c({
   variable: "--font-y2k",
 });
 
-const logo = DotGothic16({
+const logo = Fredoka({
   subsets: ["latin"],
-  weight: "400",
+  weight: ["500", "600", "700"],
   variable: "--font-logo",
 });
 
