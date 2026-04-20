@@ -330,7 +330,7 @@ export function CityClient({
   }, [addOpen]);
 
   return (
-    <div className="relative mx-auto max-w-5xl px-[1.2rem] pb-[4.2rem] pt-6">
+    <div className="relative mx-auto max-w-5xl px-[0.96rem] pb-[4.2rem] pt-6">
       <div className="space-y-[0.6rem]">
         <FadingHorizontalChips rowClassName="py-0">
           <button
@@ -359,7 +359,7 @@ export function CityClient({
                 key={c.id}
                 type="button"
                 onClick={() => setActiveCity(c)}
-                  className={`inline-flex h-9 min-h-9 shrink-0 items-center justify-center gap-[0.45rem] rounded-full px-[1.05rem] text-sm font-extrabold leading-none tracking-tight transition active:scale-95 ${
+                  className={`inline-flex h-9 min-h-9 shrink-0 items-center justify-center gap-[0.45rem] rounded-full px-[0.84rem] text-sm font-extrabold leading-none tracking-tight transition active:scale-95 ${
                   active ? "y2k-chip-active text-white" : "y2k-chip text-indigo-950 hover:-translate-y-0.5"
                 }`}
               >
@@ -454,7 +454,7 @@ export function CityClient({
                 overlayPosition="right"
                 overlay={
                   <div className="flex flex-col items-end gap-[0.6rem]">
-                    <div className="inline-flex h-9 min-h-9 max-w-[min(70vw,18rem)] items-center gap-2 rounded-full bg-white/85 px-[1.05rem] text-sm font-extrabold leading-none tracking-tight text-indigo-950 shadow-sm shadow-indigo-500/10 ring-1 ring-white/60 backdrop-blur-sm">
+                    <div className="inline-flex h-9 min-h-9 max-w-[min(70vw,18rem)] items-center gap-2 rounded-full bg-white/85 px-[0.84rem] text-sm font-extrabold leading-none tracking-tight text-indigo-950 shadow-sm shadow-indigo-500/10 ring-1 ring-white/60 backdrop-blur-sm">
                       <span className="truncate">{roomTitleLive}</span>
                       <button
                         type="button"
@@ -472,7 +472,7 @@ export function CityClient({
                     <button
                       type="button"
                       onClick={() => setHereOn((v) => !v)}
-                      className="inline-flex h-9 min-h-9 flex-row items-center gap-2 rounded-full bg-white/85 px-[1.05rem] text-sm font-extrabold leading-none tracking-tight text-indigo-950 shadow-sm shadow-indigo-500/10 ring-1 ring-white/60 backdrop-blur-sm transition hover:brightness-105 active:scale-95"
+                      className="inline-flex h-9 min-h-9 flex-row items-center gap-2 rounded-full bg-white/85 px-[0.84rem] text-sm font-extrabold leading-none tracking-tight text-indigo-950 shadow-sm shadow-indigo-500/10 ring-1 ring-white/60 backdrop-blur-sm transition hover:brightness-105 active:scale-95"
                       aria-label={locale === "en" ? "You are here" : "Här är du"}
                       title={locale === "en" ? "You are here" : "Här är du"}
                     >
@@ -513,14 +513,14 @@ export function CityClient({
           <div className="grid grid-cols-2 gap-[0.6rem] sm:gap-3">
             <Link
               href="/"
-              className="y2k-chip inline-flex h-10 w-full items-center justify-center rounded-full px-3 text-center text-sm font-extrabold text-indigo-950 transition hover:-translate-y-0.5 active:scale-[0.99] sm:h-11 sm:px-4"
+              className="y2k-chip inline-flex h-10 w-full items-center justify-center rounded-full px-[0.6rem] text-center text-sm font-extrabold text-indigo-950 transition hover:-translate-y-0.5 active:scale-[0.99] sm:h-11 sm:px-[0.8rem]"
             >
               {t(locale, "room.actions.newMap")}
             </Link>
             <button
               type="button"
               onClick={() => void shareRoom()}
-              className="y2k-chip-active inline-flex h-10 w-full items-center justify-center rounded-full px-3 text-center text-sm font-extrabold text-white transition hover:-translate-y-0.5 active:scale-[0.99] sm:h-11 sm:px-4"
+              className="y2k-chip-active inline-flex h-10 w-full items-center justify-center rounded-full px-[0.6rem] text-center text-sm font-extrabold text-white transition hover:-translate-y-0.5 active:scale-[0.99] sm:h-11 sm:px-[0.8rem]"
             >
               {t(locale, "room.actions.shareMap")}
             </button>
@@ -817,7 +817,7 @@ function Chip({
     <button
       type="button"
       onClick={onClick}
-      className={`inline-flex h-9 min-h-9 shrink-0 items-center justify-center rounded-full px-[1.05rem] text-sm font-extrabold leading-none tracking-tight transition active:scale-95 ${
+      className={`inline-flex h-9 min-h-9 shrink-0 items-center justify-center rounded-full px-[0.84rem] text-sm font-extrabold leading-none tracking-tight transition active:scale-95 ${
         active ? activeClass : "y2k-chip text-indigo-950 hover:-translate-y-0.5"
       }`}
     >
