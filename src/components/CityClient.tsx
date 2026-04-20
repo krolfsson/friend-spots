@@ -404,7 +404,7 @@ export function CityClient({
               {t(locale, "room.view.map")}
             </Chip>
             <Chip active={viewMode === "list"} onClick={() => setViewMode("list")} tone="violet">
-              <span className="mr-1">📋</span>
+              <span className="mr-1">🥇</span>
               {t(locale, "room.view.list")}
             </Chip>
           </FadingHorizontalChips>
@@ -1159,7 +1159,7 @@ function SpotCard({
         </div>
         <div className="flex min-h-14 shrink-0 select-none items-center justify-end self-center">
           <div
-            className="flex h-14 w-8 shrink-0 flex-col overflow-hidden rounded-full border border-indigo-300/55 bg-indigo-50/40 text-[11px] font-extrabold leading-none lg:h-12 lg:w-7 lg:text-[10px]"
+            className="flex h-14 w-8 shrink-0 flex-col overflow-hidden rounded-full border border-emerald-300/60 bg-emerald-50/50 text-[11px] font-extrabold leading-none lg:h-12 lg:w-7 lg:text-[10px]"
             role="group"
             aria-label={
               spot.viewerHasPlussed
@@ -1175,8 +1175,8 @@ function SpotCard({
               }
               className={`flex flex-1 items-center justify-center transition active:scale-[0.98] disabled:cursor-wait disabled:opacity-60 ${
                 spot.viewerHasPlussed
-                  ? "bg-gradient-to-b from-indigo-300/75 to-violet-400/70 text-indigo-950 hover:brightness-95"
-                  : "bg-gradient-to-b from-indigo-400/65 to-violet-500/60 text-white hover:brightness-105"
+                  ? "bg-gradient-to-b from-teal-600 to-emerald-700 text-white shadow-inner shadow-emerald-900/20 hover:brightness-110"
+                  : "bg-gradient-to-b from-emerald-400 to-teal-500 text-white shadow-inner shadow-emerald-600/25 hover:brightness-105"
               }`}
               onPointerDown={(e) => e.stopPropagation()}
               onClick={(e) => {
@@ -1186,7 +1186,7 @@ function SpotCard({
             >
               {spot.viewerHasPlussed ? "✓" : "+1"}
             </button>
-            <div className="flex h-7 items-center justify-center gap-0.5 border-t border-indigo-300/50 bg-indigo-50/95 px-0.5 text-indigo-950 tabular-nums lg:h-6">
+            <div className="flex h-7 items-center justify-center gap-0.5 border-t border-emerald-300/55 bg-emerald-50/95 px-0.5 text-emerald-950 tabular-nums lg:h-6">
               <span aria-hidden className="leading-none">
                 🙋
               </span>
