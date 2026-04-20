@@ -164,7 +164,7 @@ export function AddSpotForm({
             key={c.id}
             type="button"
             onClick={() => setCategory(c.id)}
-            className={`rounded-full px-2.5 py-1.5 text-xs font-extrabold tracking-tight transition active:scale-95 sm:px-3 sm:py-2 sm:text-sm ${
+            className={`ui-press rounded-full px-2.5 py-1.5 text-xs font-extrabold tracking-tight transition active:scale-95 sm:px-3 sm:py-2 sm:text-sm ${
               category === c.id ? "y2k-chip-active" : "y2k-chip text-indigo-950 hover:-translate-y-0.5"
             }`}
           >
@@ -198,7 +198,7 @@ export function AddSpotForm({
                 <button
                   key={s.placeId}
                   type="button"
-                  className="block w-full rounded-xl px-3 py-2.5 text-left text-sm font-bold text-indigo-950 hover:bg-fuchsia-50"
+                  className="ui-press block w-full rounded-xl px-3 py-2.5 text-left text-sm font-bold text-indigo-950 hover:bg-fuchsia-50"
                   onClick={() => {
                     setSelected(s);
                     setQuery(s.label);
@@ -229,7 +229,7 @@ export function AddSpotForm({
           type="button"
           disabled={!canSave || saving}
           onClick={() => void save()}
-          className="rounded-full bg-gradient-to-r from-fuchsia-500 to-violet-600 px-5 py-2 text-sm font-extrabold text-white transition enabled:hover:brightness-110 enabled:active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 sm:px-6 sm:py-2.5"
+          className="ui-press rounded-full bg-gradient-to-r from-fuchsia-500 to-violet-600 px-5 py-2 text-sm font-extrabold text-white transition enabled:hover:brightness-110 enabled:active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 sm:px-6 sm:py-2.5"
         >
           {saving ? t(locale, "add.saving") : t(locale, "add.save")}
         </button>
@@ -256,7 +256,7 @@ export function AddSpotForm({
           <button
             type="button"
             onClick={() => onRequestClose?.()}
-            className="grid h-10 w-10 place-items-center rounded-full border border-white/70 bg-white/70 text-lg font-bold text-indigo-950 shadow-sm hover:bg-white"
+            className="ui-press grid h-10 w-10 place-items-center rounded-full border border-white/70 bg-white/70 text-lg font-bold text-indigo-950 shadow-sm hover:bg-white"
             aria-label="Stäng lägg till"
           >
             ×

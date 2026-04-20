@@ -66,7 +66,7 @@ export function CreateRoomLandingForm({ locale }: { locale: Locale }) {
       <button
         type="submit"
         disabled={busy || pin.trim().length < 4}
-        className="w-full rounded-full bg-gradient-to-r from-emerald-400 to-teal-500 py-2.5 text-sm font-extrabold text-white transition enabled:hover:brightness-110 enabled:active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-40 sm:py-3"
+        className="ui-press w-full rounded-full bg-gradient-to-r from-emerald-400 to-teal-500 py-2.5 text-sm font-extrabold text-white transition enabled:hover:brightness-110 enabled:active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-40 sm:py-3"
       >
         {busy ? (locale === "en" ? "Creating…" : "Skapar…") : t(locale, "home.create.cta")}
       </button>

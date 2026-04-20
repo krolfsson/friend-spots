@@ -43,7 +43,7 @@ export function OpenExistingRoomForm({ locale }: { locale: Locale }) {
       <button
         type="submit"
         disabled={!slug}
-        className="w-full rounded-full bg-gradient-to-r from-sky-500 to-indigo-600 py-2.5 text-sm font-extrabold text-white transition enabled:hover:brightness-110 enabled:active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-40 sm:py-3"
+        className="ui-press w-full rounded-full bg-gradient-to-r from-sky-500 to-indigo-600 py-2.5 text-sm font-extrabold text-white transition enabled:hover:brightness-110 enabled:active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-40 sm:py-3"
       >
         {t(locale, "home.open.cta")}
       </button>

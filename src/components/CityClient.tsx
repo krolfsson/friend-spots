@@ -550,7 +550,7 @@ export function CityClient({
               <button
                 type="button"
                 onClick={() => setRenameOpen(false)}
-                className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-indigo-200/60 bg-white/90 text-lg font-bold leading-none text-indigo-950 shadow-sm transition hover:bg-indigo-50/90"
+                className="ui-press grid h-9 w-9 shrink-0 place-items-center rounded-full border border-indigo-200/60 bg-white/90 text-lg font-bold leading-none text-indigo-950 shadow-sm transition hover:bg-indigo-50/90"
                 aria-label={t(locale, "common.close")}
               >
                 ×
@@ -579,14 +579,14 @@ export function CityClient({
                 type="button"
                 disabled={renameBusy}
                 onClick={() => void saveRoomTitle()}
-                className="inline-flex min-h-11 flex-1 items-center justify-center rounded-2xl bg-gradient-to-r from-emerald-400 to-teal-500 px-4 py-3 text-sm font-extrabold text-white shadow-sm shadow-emerald-500/20 ring-1 ring-white/60 transition hover:brightness-110 active:scale-[0.99] disabled:opacity-50"
+                className="ui-press inline-flex min-h-11 flex-1 items-center justify-center rounded-2xl bg-gradient-to-r from-emerald-400 to-teal-500 px-4 py-3 text-sm font-extrabold text-white shadow-sm shadow-emerald-500/20 ring-1 ring-white/60 transition hover:brightness-110 active:scale-[0.99] disabled:opacity-50"
               >
                 {renameBusy ? t(locale, "rename.saving") : t(locale, "rename.save")}
               </button>
               <button
                 type="button"
                 onClick={() => setRenameOpen(false)}
-                className="inline-flex min-h-11 items-center justify-center rounded-2xl border border-indigo-200/70 bg-white/80 px-4 py-3 text-sm font-extrabold text-indigo-950 shadow-sm shadow-indigo-500/10 ring-1 ring-white/60 transition hover:brightness-105 active:scale-[0.99]"
+                className="ui-press inline-flex min-h-11 items-center justify-center rounded-2xl border border-indigo-200/70 bg-white/80 px-4 py-3 text-sm font-extrabold text-indigo-950 shadow-sm shadow-indigo-500/10 ring-1 ring-white/60 transition hover:brightness-105 active:scale-[0.99]"
               >
                 {t(locale, "common.cancel")}
               </button>
@@ -616,7 +616,7 @@ export function CityClient({
               <button
                 type="button"
                 onClick={() => setShareOpen(false)}
-                className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-indigo-200/60 bg-white/90 text-lg font-bold leading-none text-indigo-950 shadow-sm transition hover:bg-indigo-50/90"
+                className="ui-press grid h-9 w-9 shrink-0 place-items-center rounded-full border border-indigo-200/60 bg-white/90 text-lg font-bold leading-none text-indigo-950 shadow-sm transition hover:bg-indigo-50/90"
                 aria-label={t(locale, "common.close")}
               >
                 ×
@@ -626,7 +626,7 @@ export function CityClient({
             <div className="grid grid-cols-2 gap-2 p-3">
               <a
                 href={sharePayload.sms}
-                className="inline-flex min-h-11 items-center justify-center rounded-2xl border border-indigo-200/70 bg-white/80 px-3 py-3 text-[12px] font-extrabold text-indigo-950 shadow-sm shadow-indigo-500/10 transition hover:brightness-105 active:scale-[0.99]"
+                className="ui-press inline-flex min-h-11 items-center justify-center rounded-2xl border border-indigo-200/70 bg-white/80 px-3 py-3 text-[12px] font-extrabold text-indigo-950 shadow-sm shadow-indigo-500/10 transition hover:brightness-105 active:scale-[0.99]"
               >
                 {t(locale, "share.sheet.sms")}
               </a>
@@ -634,7 +634,7 @@ export function CityClient({
                 href={sharePayload.whatsapp}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex min-h-11 items-center justify-center rounded-2xl border border-emerald-200/80 bg-emerald-50/70 px-3 py-3 text-[12px] font-extrabold text-emerald-950 shadow-sm shadow-emerald-500/10 transition hover:brightness-105 active:scale-[0.99]"
+                className="ui-press inline-flex min-h-11 items-center justify-center rounded-2xl border border-emerald-200/80 bg-emerald-50/70 px-3 py-3 text-[12px] font-extrabold text-emerald-950 shadow-sm shadow-emerald-500/10 transition hover:brightness-105 active:scale-[0.99]"
               >
                 WhatsApp
               </a>
@@ -642,13 +642,13 @@ export function CityClient({
                 href={sharePayload.facebook}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex min-h-11 items-center justify-center rounded-2xl border border-sky-200/80 bg-sky-50/70 px-3 py-3 text-[12px] font-extrabold text-sky-950 shadow-sm shadow-sky-500/10 transition hover:brightness-105 active:scale-[0.99]"
+                className="ui-press inline-flex min-h-11 items-center justify-center rounded-2xl border border-sky-200/80 bg-sky-50/70 px-3 py-3 text-[12px] font-extrabold text-sky-950 shadow-sm shadow-sky-500/10 transition hover:brightness-105 active:scale-[0.99]"
               >
                 Facebook
               </a>
               <a
                 href={sharePayload.mailto}
-                className="inline-flex min-h-11 items-center justify-center rounded-2xl border border-fuchsia-200/80 bg-fuchsia-50/60 px-3 py-3 text-[12px] font-extrabold text-fuchsia-950 shadow-sm shadow-fuchsia-500/10 transition hover:brightness-105 active:scale-[0.99]"
+                className="ui-press inline-flex min-h-11 items-center justify-center rounded-2xl border border-fuchsia-200/80 bg-fuchsia-50/60 px-3 py-3 text-[12px] font-extrabold text-fuchsia-950 shadow-sm shadow-fuchsia-500/10 transition hover:brightness-105 active:scale-[0.99]"
               >
                 Mail
               </a>
@@ -658,14 +658,14 @@ export function CityClient({
               <button
                 type="button"
                 onClick={() => void copyShare()}
-                className="inline-flex min-h-11 flex-1 items-center justify-center rounded-2xl bg-gradient-to-r from-emerald-400 to-teal-500 px-4 py-3 text-sm font-extrabold text-white shadow-sm shadow-emerald-500/20 ring-1 ring-white/60 transition hover:brightness-110 active:scale-[0.99]"
+                className="ui-press inline-flex min-h-11 flex-1 items-center justify-center rounded-2xl bg-gradient-to-r from-emerald-400 to-teal-500 px-4 py-3 text-sm font-extrabold text-white shadow-sm shadow-emerald-500/20 ring-1 ring-white/60 transition hover:brightness-110 active:scale-[0.99]"
               >
                 {t(locale, "share.sheet.copy")}
               </button>
               <button
                 type="button"
                 onClick={() => setShareOpen(false)}
-                className="inline-flex min-h-11 items-center justify-center rounded-2xl border border-indigo-200/70 bg-white/80 px-4 py-3 text-sm font-extrabold text-indigo-950 shadow-sm shadow-indigo-500/10 ring-1 ring-white/60 transition hover:brightness-105 active:scale-[0.99]"
+                className="ui-press inline-flex min-h-11 items-center justify-center rounded-2xl border border-indigo-200/70 bg-white/80 px-4 py-3 text-sm font-extrabold text-indigo-950 shadow-sm shadow-indigo-500/10 ring-1 ring-white/60 transition hover:brightness-105 active:scale-[0.99]"
               >
                 {t(locale, "share.sheet.close")}
               </button>
@@ -695,7 +695,7 @@ export function CityClient({
                 <button
                   type="button"
                   onClick={() => setAddOpen(false)}
-                  className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-indigo-200/60 bg-white/90 text-lg font-bold leading-none text-indigo-950 shadow-sm backdrop-blur-sm transition hover:bg-indigo-50/90 sm:h-10 sm:w-10"
+                  className="ui-press grid h-9 w-9 shrink-0 place-items-center rounded-full border border-indigo-200/60 bg-white/90 text-lg font-bold leading-none text-indigo-950 shadow-sm backdrop-blur-sm transition hover:bg-indigo-50/90 sm:h-10 sm:w-10"
                   aria-label={t(locale, "common.close")}
                 >
                   ×
@@ -1261,7 +1261,7 @@ function SpotCard({
               <p className="text-sm font-extrabold tracking-tight text-indigo-950">{t(locale, "edit.title")}</p>
               <button
                 type="button"
-                className="grid h-10 w-10 place-items-center rounded-full border border-white/70 bg-white/70 text-lg font-bold text-indigo-950 shadow-sm hover:bg-white"
+                className="ui-press grid h-10 w-10 place-items-center rounded-full border border-white/70 bg-white/70 text-lg font-bold text-indigo-950 shadow-sm hover:bg-white"
                 aria-label="Stäng"
                 onClick={() => setEditing(false)}
               >
@@ -1301,7 +1301,7 @@ function SpotCard({
                   key={c.id}
                   type="button"
                   onClick={() => setEditCategory(c.id)}
-                  className={`rounded-full px-3 py-2 text-xs font-extrabold tracking-tight transition active:scale-[0.98] ${
+                  className={`ui-press rounded-full px-3 py-2 text-xs font-extrabold tracking-tight transition active:scale-[0.98] ${
                     editCategory === c.id ? "y2k-chip-active" : "y2k-chip text-indigo-950 hover:-translate-y-0.5"
                   }`}
                 >
@@ -1318,7 +1318,7 @@ function SpotCard({
                 type="button"
                 disabled={saving || !editName.trim()}
                 onClick={() => void saveEdit()}
-                className="rounded-full bg-gradient-to-r from-fuchsia-500 to-violet-600 px-5 py-2.5 text-sm font-extrabold text-white transition enabled:hover:brightness-110 enabled:active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40"
+                className="ui-press rounded-full bg-gradient-to-r from-fuchsia-500 to-violet-600 px-5 py-2.5 text-sm font-extrabold text-white transition enabled:hover:brightness-110 enabled:active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40"
               >
                 {saving ? t(locale, "add.saving") : t(locale, "add.save")}
               </button>
@@ -1326,7 +1326,7 @@ function SpotCard({
                 type="button"
                 disabled={saving}
                 onClick={() => setEditing(false)}
-                className="rounded-full border border-indigo-200/80 bg-white px-5 py-2.5 text-sm font-extrabold text-indigo-950 hover:bg-indigo-50"
+                className="ui-press rounded-full border border-indigo-200/80 bg-white px-5 py-2.5 text-sm font-extrabold text-indigo-950 hover:bg-indigo-50"
               >
                 {locale === "en" ? "Cancel" : "Avbryt"}
               </button>

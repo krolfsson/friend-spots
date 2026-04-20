@@ -96,7 +96,7 @@ export function CityPickOrCreate({
             type="button"
             disabled={busy || newCityName.trim().length < 2}
             onClick={() => void createCity()}
-            className="shrink-0 rounded-full bg-gradient-to-r from-emerald-400 to-teal-500 px-4 py-2 text-xs font-extrabold text-white disabled:opacity-40"
+            className="ui-press shrink-0 rounded-full bg-gradient-to-r from-emerald-400 to-teal-500 px-4 py-2 text-xs font-extrabold text-white disabled:opacity-40"
           >
             {busy ? "…" : locale === "en" ? "Create" : "Skapa"}
           </button>
@@ -149,7 +149,7 @@ export function CityPickOrCreate({
               type="button"
               disabled={busy}
               onClick={() => void createCity()}
-              className="shrink-0 rounded-full border border-emerald-300/80 bg-gradient-to-r from-emerald-400 to-teal-500 px-3 py-1.5 text-[11px] font-extrabold text-white disabled:opacity-45"
+              className="ui-press shrink-0 rounded-full border border-emerald-300/80 bg-gradient-to-r from-emerald-400 to-teal-500 px-3 py-1.5 text-[11px] font-extrabold text-white disabled:opacity-45"
             >
               {busy ? "…" : locale === "en" ? "Add" : "Lägg till"}
             </button>
