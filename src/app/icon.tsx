@@ -35,7 +35,7 @@ export default function Icon() {
             width: 52,
             height: 52,
             borderRadius: 18,
-            background: "linear-gradient(145deg, rgba(255,255,255,0.80), rgba(255,255,255,0.42))",
+            background: "linear-gradient(145deg, rgba(255,255,255,0.82), rgba(255,255,255,0.45))",
             border: "1.5px solid rgba(255,255,255,0.78)",
             boxShadow: "0 1px 0 rgba(255,255,255,0.75) inset, 0 10px 24px rgba(99,102,241,0.18)",
             display: "flex",
@@ -44,22 +44,23 @@ export default function Icon() {
             backdropFilter: "blur(10px)",
           }}
         >
-          <div
-            style={{
-              fontSize: 44,
-              lineHeight: 1,
-              fontWeight: 900,
-              letterSpacing: "-0.08em",
-              background: "linear-gradient(90deg, #ec4899, #8b5cf6 55%, #38bdf8)",
-              WebkitBackgroundClip: "text",
-              color: "transparent",
-              textShadow: "0 10px 22px rgba(236,72,153,0.22)",
-              transform: "translateY(-1px)",
-              fontFamily: "system-ui, -apple-system, Segoe UI, sans-serif",
-            }}
-          >
-            M
-          </div>
+          <svg width="40" height="40" viewBox="0 0 32 32" aria-hidden>
+            <defs>
+              <linearGradient id="m" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="#ec4899" />
+                <stop offset="55%" stopColor="#8b5cf6" />
+                <stop offset="100%" stopColor="#38bdf8" />
+              </linearGradient>
+              <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+                <feDropShadow dx="0" dy="1.0" stdDeviation="0.9" floodColor="#ec4899" floodOpacity="0.22" />
+              </filter>
+            </defs>
+            <path
+              d="M7.9 24.6V7.9h4.1l4.0 7.3 4.1-7.3h4.0v16.7h-3.8V14.1l-3.2 5.8h-2.2l-3.2-5.8v10.5H7.9Z"
+              fill="url(#m)"
+              filter="url(#shadow)"
+            />
+          </svg>
         </div>
       </div>
     ),

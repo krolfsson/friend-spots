@@ -57,20 +57,29 @@ export default function OpenGraphImage() {
           ))}
         </div>
 
-        {/* Glass card */}
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            background:
+              "radial-gradient(900px 520px at 10% 0%, rgba(233,213,255,0.85), transparent 55%), radial-gradient(820px 520px at 95% 10%, rgba(251,207,232,0.78), transparent 52%), radial-gradient(760px 520px at 55% 100%, rgba(167,243,208,0.42), transparent 58%)",
+            opacity: 0.9,
+          }}
+        />
+
+        {/* Glass card (no backdropFilter; iMessage-friendly) */}
         <div
           style={{
             width: 1020,
             borderRadius: 48,
-            background: "linear-gradient(155deg, rgba(255,255,255,0.82), rgba(255,255,255,0.48))",
-            border: "2px solid rgba(255,255,255,0.78)",
+            background: "linear-gradient(155deg, rgba(255,255,255,0.88), rgba(255,255,255,0.62))",
+            border: "2px solid rgba(255,255,255,0.86)",
             boxShadow:
-              "0 1px 0 rgba(255,255,255,0.85) inset, 0 28px 70px rgba(99,102,241,0.18)",
+              "0 1px 0 rgba(255,255,255,0.9) inset, 0 28px 70px rgba(99,102,241,0.16)",
             padding: 52,
             display: "flex",
             alignItems: "center",
             gap: 34,
-            backdropFilter: "blur(12px)",
           }}
         >
           <div
@@ -78,10 +87,10 @@ export default function OpenGraphImage() {
               width: 170,
               height: 170,
               borderRadius: 56,
-              background: "linear-gradient(145deg, rgba(255,255,255,0.78), rgba(255,255,255,0.42))",
-              border: "2px solid rgba(255,255,255,0.75)",
+              background: "linear-gradient(145deg, rgba(255,255,255,0.86), rgba(255,255,255,0.62))",
+              border: "2px solid rgba(255,255,255,0.88)",
               boxShadow:
-                "0 1px 0 rgba(255,255,255,0.75) inset, 0 22px 60px rgba(236,72,153,0.18)",
+                "0 1px 0 rgba(255,255,255,0.82) inset, 0 22px 60px rgba(236,72,153,0.16)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -89,15 +98,14 @@ export default function OpenGraphImage() {
           >
             <div
               style={{
-                fontSize: 140,
+                fontSize: 132,
                 fontWeight: 900,
                 letterSpacing: "-0.06em",
                 lineHeight: 1,
-                background: "linear-gradient(90deg, #ec4899, #8b5cf6 55%, #38bdf8)",
-                WebkitBackgroundClip: "text",
-                color: "transparent",
-                textShadow: "0 18px 44px rgba(236,72,153,0.22)",
-                transform: "translateY(-4px)",
+                color: "#1e1b4b",
+                textShadow:
+                  "0 18px 44px rgba(236,72,153,0.18), 0 2px 0 rgba(255,255,255,0.65)",
+                transform: "translateY(-3px)",
               }}
             >
               M
@@ -111,10 +119,8 @@ export default function OpenGraphImage() {
                 fontWeight: 900,
                 letterSpacing: "-0.03em",
                 lineHeight: 1.05,
-                background: "linear-gradient(90deg, #ec4899, #8b5cf6 55%, #38bdf8)",
-                WebkitBackgroundClip: "text",
-                color: "transparent",
-                textShadow: "0 18px 44px rgba(236,72,153,0.18)",
+                color: "#1e1b4b",
+                textShadow: "0 18px 44px rgba(236,72,153,0.14)",
               }}
             >
               {SITE_TITLE}
@@ -129,9 +135,7 @@ export default function OpenGraphImage() {
                 lineHeight: 1.1,
               }}
             >
-              Dina och dina vänners
-              <br />
-              bästa tips
+              Skapa en karta med kompisgänget
             </div>
             <div
               style={{

@@ -6,7 +6,7 @@ import { findRoomBySlugInsensitive } from "@/lib/roomLookup";
 import { isReservedRoomSlug } from "@/lib/reservedSlugs";
 import { ROOM_ACCESS_COOKIE, verifyRoomAccessToken } from "@/lib/roomToken";
 import { getRequestLocale } from "@/lib/i18n.server";
-import { SITE_DESCRIPTION } from "@/lib/site";
+import { SITE_DESCRIPTION, SITE_TITLE } from "@/lib/site";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
@@ -31,6 +31,17 @@ export async function generateMetadata({
   return {
     title: label,
     description: SITE_DESCRIPTION,
+    openGraph: {
+      title: label,
+      description: SITE_DESCRIPTION,
+      images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: SITE_TITLE }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: label,
+      description: SITE_DESCRIPTION,
+      images: ["/opengraph-image"],
+    },
   };
 }
 
