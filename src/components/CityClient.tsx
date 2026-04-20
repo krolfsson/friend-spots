@@ -77,7 +77,7 @@ function FadingHorizontalChips({
               : ""
       }`}
     >
-      <div ref={trackRef} className="flex w-max gap-2">
+      <div ref={trackRef} className="flex w-max gap-[0.6rem]">
         {children}
       </div>
     </div>
@@ -284,8 +284,8 @@ export function CityClient({
   }, [addOpen]);
 
   return (
-    <div className="relative mx-auto max-w-5xl px-4 pb-14 pt-5">
-      <div className="space-y-2">
+    <div className="relative mx-auto max-w-5xl px-[1.2rem] pb-[4.2rem] pt-6">
+      <div className="space-y-[0.6rem]">
         <FadingHorizontalChips rowClassName="py-0">
           <button
             type="button"
@@ -309,11 +309,11 @@ export function CityClient({
           {cityList.map((c) => {
             const active = c.slug === activeCity.slug;
             return (
-              <button
+                <button
                 key={c.id}
                 type="button"
                 onClick={() => setActiveCity(c)}
-                className={`inline-flex h-9 min-h-9 shrink-0 items-center justify-center gap-1.5 rounded-full px-3.5 text-sm font-extrabold leading-none tracking-tight transition active:scale-95 ${
+                  className={`inline-flex h-9 min-h-9 shrink-0 items-center justify-center gap-[0.45rem] rounded-full px-[1.05rem] text-sm font-extrabold leading-none tracking-tight transition active:scale-95 ${
                   active ? "y2k-chip-active text-white" : "y2k-chip text-indigo-950 hover:-translate-y-0.5"
                 }`}
               >
@@ -378,7 +378,7 @@ export function CityClient({
           </p>
         ) : null}
 
-        <div className="space-y-2">
+        <div className="space-y-[0.6rem]">
           <div className="min-h-[100px]">
             {mapEnabled && viewMode === "map" ? (
               <SpotsMap
@@ -388,7 +388,7 @@ export function CityClient({
                 onOverlayClick={() => void shareRoom()}
               />
             ) : displaySpots.length === 0 ? null : (
-              <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 {displaySpots.map((s) => (
                   <SpotCard
                     key={s.id}
@@ -403,17 +403,17 @@ export function CityClient({
             )}
           </div>
 
-          <div className="grid grid-cols-2 gap-2 sm:gap-3">
+          <div className="grid grid-cols-2 gap-[0.6rem] sm:gap-3">
             <Link
               href="/"
-              className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl border border-indigo-200/70 bg-white/70 px-3 py-3 text-center text-[12px] font-extrabold leading-snug text-indigo-950 shadow-sm shadow-indigo-500/10 ring-1 ring-white/60 transition hover:brightness-105 active:scale-[0.99] sm:px-4 sm:text-sm"
+              className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl border border-indigo-200/70 bg-white/70 px-[0.9rem] py-[0.9rem] text-center text-[12px] font-extrabold leading-snug text-indigo-950 shadow-sm shadow-indigo-500/10 ring-1 ring-white/60 transition hover:brightness-105 active:scale-[0.99] sm:px-4 sm:py-3 sm:text-sm"
             >
               Skapa din egen karta och dela med kompisar
             </Link>
             <button
               type="button"
               onClick={() => void shareRoom()}
-              className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl bg-gradient-to-r from-emerald-400 to-teal-500 px-3 py-3 text-[12px] font-extrabold leading-snug text-white shadow-sm shadow-emerald-500/25 ring-1 ring-white/60 transition hover:brightness-110 active:scale-[0.99] sm:px-4 sm:text-sm"
+              className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl bg-gradient-to-r from-emerald-400 to-teal-500 px-[0.9rem] py-[0.9rem] text-[12px] font-extrabold leading-snug text-white shadow-sm shadow-emerald-500/25 ring-1 ring-white/60 transition hover:brightness-110 active:scale-[0.99] sm:px-4 sm:py-3 sm:text-sm"
             >
               Dela kartan
             </button>
@@ -631,7 +631,7 @@ function Chip({
     <button
       type="button"
       onClick={onClick}
-      className={`inline-flex h-9 min-h-9 shrink-0 items-center justify-center rounded-full px-3.5 text-sm font-extrabold leading-none tracking-tight transition active:scale-95 ${
+      className={`inline-flex h-9 min-h-9 shrink-0 items-center justify-center rounded-full px-[1.05rem] text-sm font-extrabold leading-none tracking-tight transition active:scale-95 ${
         active ? activeClass : "y2k-chip text-indigo-950 hover:-translate-y-0.5"
       }`}
     >
