@@ -109,6 +109,7 @@ export function CityClient({
   const [renameBusy, setRenameBusy] = useState(false);
   const [renameValue, setRenameValue] = useState(roomTitle);
   const [roomTitleLive, setRoomTitleLive] = useState(roomTitle);
+  const [hereOn, setHereOn] = useState(false);
   /** Stad som POST /api/spots använder — samma som vald rad i lägg-till-panelen. */
   const [addTargetSlug, setAddTargetSlug] = useState(city.slug);
   const [category, setCategory] = useState<"alla" | CategoryId>("alla");
@@ -422,9 +423,24 @@ export function CityClient({
                 spots={displaySpots}
                 cityName={activeCity.name}
                 locale={locale}
+                userHereOn={hereOn}
+                onUserHereError={(msg) => showToast(msg, "info")}
                 overlayPosition="right"
                 overlay={
                   <div className="inline-flex h-9 min-h-9 max-w-[min(70vw,18rem)] items-center gap-2 rounded-full bg-white/85 px-[1.05rem] text-sm font-extrabold leading-none tracking-tight text-indigo-950 shadow-sm shadow-indigo-500/10 ring-1 ring-white/60 backdrop-blur-sm">
+                    <button
+                      type="button"
+                      onClick={() => setHereOn((v) => !v)}
+                      className={`inline-flex h-7 items-center justify-center rounded-full px-2.5 text-[11px] font-extrabold transition active:scale-95 ${
+                        hereOn
+                          ? "bg-gradient-to-r from-sky-500 to-indigo-600 text-white"
+                          : "border border-indigo-200/70 bg-white/85 text-indigo-900/80 hover:bg-indigo-50"
+                      }`}
+                      aria-label="Du är här"
+                      title="Du är här"
+                    >
+                      📍
+                    </button>
                     <span className="truncate">{roomTitleLive}</span>
                     <button
                       type="button"

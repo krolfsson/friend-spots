@@ -71,16 +71,24 @@ export function SpotsMap({
   spots,
   cityName,
   locale = "sv",
+  userHereOn = false,
+  onUserHereError,
   overlay,
   overlayPosition = "left",
 }: {
   spots: DashboardSpot[];
   cityName: string;
   locale?: "sv" | "en";
+  userHereOn?: boolean;
+  onUserHereError?: (message: string) => void;
   overlay?: React.ReactNode;
   overlayPosition?: "left" | "right";
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const mapRef = useRef<google.maps.Map | null>(null);
+  const hereMarkerRef = useRef<google.maps.Marker | null>(null);
+  const hereCircleRef = useRef<google.maps.Circle | null>(null);
+  const watchIdRef = useRef<number | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY?.trim() ?? "";
@@ -119,6 +127,7 @@ export function SpotsMap({
           fullscreenControl: true,
           gestureHandling: "greedy",
         });
+        mapRef.current = map;
 
         iw = new google.maps.InfoWindow();
         const emojiIconCache = new Map<string, google.maps.Icon>();
@@ -180,8 +189,102 @@ export function SpotsMap({
       cancelled = true;
       markers.forEach((m) => m.setMap(null));
       iw?.close();
+      mapRef.current = null;
     };
   }, [apiKey, cityName, plotted, locale]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+
+    function clearWatch() {
+      if (watchIdRef.current != null) {
+        navigator.geolocation?.clearWatch(watchIdRef.current);
+        watchIdRef.current = null;
+      }
+      hereMarkerRef.current?.setMap(null);
+      hereMarkerRef.current = null;
+      hereCircleRef.current?.setMap(null);
+      hereCircleRef.current = null;
+    }
+
+    if (!userHereOn) {
+      clearWatch();
+      return;
+    }
+
+    if (typeof navigator === "undefined" || !navigator.geolocation) {
+      onUserHereError?.(locale === "en" ? "Location not available in this browser." : "Plats är inte tillgänglig i den här webbläsaren.");
+      return;
+    }
+
+    // Create marker/circle lazily on first position update.
+    const dotSymbol: google.maps.Symbol = {
+      path: google.maps.SymbolPath.CIRCLE,
+      fillColor: "#3b82f6",
+      fillOpacity: 1,
+      strokeColor: "#ffffff",
+      strokeOpacity: 1,
+      strokeWeight: 3,
+      scale: 6.5,
+    };
+
+    watchIdRef.current = navigator.geolocation.watchPosition(
+      (pos) => {
+        const lat = pos.coords.latitude;
+        const lng = pos.coords.longitude;
+        const acc = Math.max(0, pos.coords.accuracy ?? 0);
+        const center = { lat, lng };
+
+        if (!hereMarkerRef.current) {
+          hereMarkerRef.current = new google.maps.Marker({
+            map,
+            position: center,
+            icon: dotSymbol,
+            zIndex: 99999,
+            clickable: false,
+          });
+        } else {
+          hereMarkerRef.current.setPosition(center);
+        }
+
+        if (!hereCircleRef.current) {
+          hereCircleRef.current = new google.maps.Circle({
+            map,
+            center,
+            radius: acc,
+            strokeColor: "#60a5fa",
+            strokeOpacity: 0.55,
+            strokeWeight: 2,
+            fillColor: "#60a5fa",
+            fillOpacity: 0.18,
+            clickable: false,
+          });
+        } else {
+          hereCircleRef.current.setCenter(center);
+          hereCircleRef.current.setRadius(acc);
+        }
+
+        // Follow live position.
+        map.panTo(center);
+      },
+      () => {
+        onUserHereError?.(
+          locale === "en"
+            ? "Location permission denied."
+            : "Platsdelning nekades.",
+        );
+        clearWatch();
+      },
+      {
+        enableHighAccuracy: true,
+        maximumAge: 10_000,
+        timeout: 10_000,
+      },
+    );
+
+    return () => clearWatch();
+  }, [userHereOn, locale, onUserHereError]);
 
   if (!apiKey) {
     return (
