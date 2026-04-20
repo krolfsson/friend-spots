@@ -43,7 +43,7 @@ export const MESSAGES: Record<Locale, Record<string, string>> = {
     "cat.annat": "Annat",
 
     "share.copy":
-      "Låt dina kompisar fylla i sina bästa tips, eller plussa tips som de håller mer om.",
+      "Låt dina kompisar fylla i sina bästa tips, eller plussa tips som de håller med om.",
     "share.copiedToast": "Kopierat! Klistra in i iMessage/Facebook/valfri app.",
     "share.sheet.sms": "SMS / iMessage",
     "share.sheet.whatsapp": "WhatsApp",
