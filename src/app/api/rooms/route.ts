@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
     };
 
     const pin = body.pin?.trim() ?? "";
-    const pinConfirm = body.pinConfirm?.trim() ?? "";
+    const pinConfirm = body.pinConfirm?.trim() ?? pin;
 
     if (pin.length < 4 || pin.length > 128) {
       return NextResponse.json({ error: "Pinkod måste vara minst 4 tecken" }, { status: 400 });

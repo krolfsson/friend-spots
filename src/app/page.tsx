@@ -12,20 +12,20 @@ export const metadata: Metadata = {
 
 export default function Home() {
   return (
-    <div className="mx-auto flex min-h-dvh max-w-md flex-col justify-center px-4 py-12">
-      <div className="space-y-4">
-        <div className="y2k-panel rounded-[1.75rem] p-6 sm:p-8">
+    <div className="mx-auto flex min-h-dvh max-w-md flex-col justify-center px-4 py-6 sm:py-12">
+      <div className="space-y-3 sm:space-y-4">
+        <div className="y2k-panel rounded-[1.75rem] p-5 sm:p-8">
           <h1 className="mb-1 text-xl font-extrabold tracking-tight text-indigo-950">
             Skapa en karta med kompisgänget
           </h1>
-          <p className="mb-6 text-sm font-semibold text-indigo-900/60">
+          <p className="mb-4 text-sm font-semibold text-indigo-900/60 sm:mb-6">
             Skapa en länk, dela den i gruppchatten och fyll kartan med era favoritplatser och tips. Välj en pinkod
             så att nya webbläsare kan låsa upp kartan (inloggningen sparas som kaka i upp till 90 dagar).
           </p>
           <CreateRoomLandingForm />
         </div>
 
-        <div className="y2k-panel rounded-[1.75rem] p-6 sm:p-8">
+        <div className="y2k-panel rounded-[1.75rem] p-5 sm:p-8">
           <OpenExistingRoomForm />
         </div>
       </div>

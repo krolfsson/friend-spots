@@ -7,7 +7,6 @@ export function CreateRoomLandingForm() {
   const router = useRouter();
   const [name, setName] = useState("");
   const [pin, setPin] = useState("");
-  const [pinConfirm, setPinConfirm] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -22,7 +21,6 @@ export function CreateRoomLandingForm() {
         body: JSON.stringify({
           name: name.trim() || undefined,
           pin: pin.trim(),
-          pinConfirm: pinConfirm.trim(),
         }),
       });
       const data = (await res.json()) as { slug?: string; error?: string };
@@ -38,14 +36,14 @@ export function CreateRoomLandingForm() {
   }
 
   return (
-    <form onSubmit={onSubmit} className="space-y-4">
+    <form onSubmit={onSubmit} className="space-y-3">
       <label className="block text-xs font-extrabold text-indigo-900/80">
         Namn (du kan ändra detta senare)
         <input
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder="t.ex. Bucketlist 4 Lyfe"
-          className="mt-1 w-full rounded-2xl border border-fuchsia-200/70 bg-white/90 px-4 py-3 text-sm font-semibold text-indigo-950 outline-none focus:ring-4 focus:ring-fuchsia-300/50"
+          className="mt-1 box-border h-10 w-full rounded-xl border border-fuchsia-200/70 bg-white/90 px-3 text-sm font-semibold text-indigo-950 shadow-inner shadow-fuchsia-100/80 outline-none focus:ring-2 focus:ring-fuchsia-300/55 sm:h-11 sm:rounded-2xl sm:px-3.5"
         />
       </label>
       <label className="block text-xs font-extrabold text-indigo-900/80">
@@ -58,27 +56,14 @@ export function CreateRoomLandingForm() {
           onChange={(e) => setPin(e.target.value)}
           required
           minLength={4}
-          className="mt-1 w-full rounded-2xl border border-fuchsia-200/70 bg-white/90 px-4 py-3 text-base font-semibold tracking-widest text-indigo-950 outline-none focus:ring-4 focus:ring-fuchsia-300/50"
-        />
-      </label>
-      <label className="block text-xs font-extrabold text-indigo-900/80">
-        Upprepa pinkod
-        <input
-          type="password"
-          inputMode="numeric"
-          autoComplete="new-password"
-          value={pinConfirm}
-          onChange={(e) => setPinConfirm(e.target.value)}
-          required
-          minLength={4}
-          className="mt-1 w-full rounded-2xl border border-fuchsia-200/70 bg-white/90 px-4 py-3 text-base font-semibold tracking-widest text-indigo-950 outline-none focus:ring-4 focus:ring-fuchsia-300/50"
+          className="mt-1 box-border h-10 w-full rounded-xl border border-fuchsia-200/70 bg-white/90 px-3 text-base font-semibold tracking-widest text-indigo-950 shadow-inner shadow-fuchsia-100/80 outline-none focus:ring-2 focus:ring-fuchsia-300/55 sm:h-11 sm:rounded-2xl sm:px-3.5"
         />
       </label>
       {error ? <p className="text-sm font-bold text-rose-600">{error}</p> : null}
       <button
         type="submit"
-        disabled={busy || pin.trim().length < 4 || pinConfirm.trim().length < 4}
-        className="w-full rounded-full bg-gradient-to-r from-emerald-400 to-teal-500 py-3 text-sm font-extrabold text-white transition enabled:hover:brightness-110 enabled:active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-40"
+        disabled={busy || pin.trim().length < 4}
+        className="w-full rounded-full bg-gradient-to-r from-emerald-400 to-teal-500 py-2.5 text-sm font-extrabold text-white transition enabled:hover:brightness-110 enabled:active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-40 sm:py-3"
       >
         {busy ? "Skapar…" : "Skapa karta"}
       </button>
