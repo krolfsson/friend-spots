@@ -427,32 +427,41 @@ export function CityClient({
                 onUserHereError={(msg) => showToast(msg, "info")}
                 overlayPosition="right"
                 overlay={
-                  <div className="inline-flex h-9 min-h-9 max-w-[min(70vw,18rem)] items-center gap-2 rounded-full bg-white/85 px-[1.05rem] text-sm font-extrabold leading-none tracking-tight text-indigo-950 shadow-sm shadow-indigo-500/10 ring-1 ring-white/60 backdrop-blur-sm">
+                  <div className="flex items-center gap-[0.6rem]">
                     <button
                       type="button"
                       onClick={() => setHereOn((v) => !v)}
-                      className={`inline-flex h-7 items-center justify-center rounded-full px-2.5 text-[11px] font-extrabold transition active:scale-95 ${
-                        hereOn
-                          ? "bg-gradient-to-r from-sky-500 to-indigo-600 text-white"
-                          : "border border-indigo-200/70 bg-white/85 text-indigo-900/80 hover:bg-indigo-50"
-                      }`}
-                      aria-label="Du är här"
-                      title="Du är här"
+                      className="inline-flex h-9 min-h-9 items-center gap-2 rounded-full bg-white/85 px-[1.05rem] text-sm font-extrabold leading-none tracking-tight text-indigo-950 shadow-sm shadow-indigo-500/10 ring-1 ring-white/60 backdrop-blur-sm transition hover:brightness-105 active:scale-95"
+                      aria-label={locale === "en" ? "You are here" : "Här är du"}
+                      title={locale === "en" ? "You are here" : "Här är du"}
                     >
-                      📍
-                    </button>
-                    <span className="truncate">{roomTitleLive}</span>
-                    <button
-                      type="button"
-                      onClick={() => setRenameOpen(true)}
-                      className="grid h-7 w-7 shrink-0 place-items-center rounded-full border border-indigo-200/70 bg-white/85 text-indigo-900/80 shadow-sm transition hover:bg-indigo-50 active:scale-95"
-                      aria-label={t(locale, "rename.title")}
-                      title={t(locale, "rename.title")}
-                    >
-                      <span aria-hidden className="text-[15px] leading-none">
-                        ⚙️
+                      <span
+                        aria-hidden
+                        className={`grid h-7 w-7 place-items-center rounded-full border shadow-sm transition ${
+                          hereOn
+                            ? "border-sky-200/70 bg-sky-500 text-white shadow-sky-500/20"
+                            : "border-indigo-200/70 bg-white/85 text-indigo-900/80"
+                        }`}
+                      >
+                        📍
                       </span>
+                      <span className="whitespace-nowrap">{locale === "en" ? "You are here" : "Här är du"}</span>
                     </button>
+
+                    <div className="inline-flex h-9 min-h-9 max-w-[min(62vw,16rem)] items-center gap-2 rounded-full bg-white/85 px-[1.05rem] text-sm font-extrabold leading-none tracking-tight text-indigo-950 shadow-sm shadow-indigo-500/10 ring-1 ring-white/60 backdrop-blur-sm">
+                      <span className="truncate">{roomTitleLive}</span>
+                      <button
+                        type="button"
+                        onClick={() => setRenameOpen(true)}
+                        className="grid h-7 w-7 shrink-0 place-items-center rounded-full border border-indigo-200/70 bg-white/85 text-indigo-900/80 shadow-sm transition hover:bg-indigo-50 active:scale-95"
+                        aria-label={t(locale, "rename.title")}
+                        title={t(locale, "rename.title")}
+                      >
+                        <span aria-hidden className="text-[15px] leading-none">
+                          ⚙️
+                        </span>
+                      </button>
+                    </div>
                   </div>
                 }
               />

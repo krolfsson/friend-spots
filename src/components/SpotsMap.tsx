@@ -89,6 +89,7 @@ export function SpotsMap({
   const hereMarkerRef = useRef<google.maps.Marker | null>(null);
   const hereCircleRef = useRef<google.maps.Circle | null>(null);
   const watchIdRef = useRef<number | null>(null);
+  const didCenterHereRef = useRef(false);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY?.trim() ?? "";
@@ -206,6 +207,7 @@ export function SpotsMap({
       hereMarkerRef.current = null;
       hereCircleRef.current?.setMap(null);
       hereCircleRef.current = null;
+      didCenterHereRef.current = false;
     }
 
     if (!userHereOn) {
@@ -265,8 +267,11 @@ export function SpotsMap({
           hereCircleRef.current.setRadius(acc);
         }
 
-        // Follow live position.
-        map.panTo(center);
+        // Center once when toggled on; after that keep updating marker/ring only.
+        if (!didCenterHereRef.current) {
+          didCenterHereRef.current = true;
+          map.panTo(center);
+        }
       },
       () => {
         onUserHereError?.(
