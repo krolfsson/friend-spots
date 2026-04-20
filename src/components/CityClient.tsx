@@ -20,10 +20,13 @@ type ToastTone = "success" | "info";
 function FadingHorizontalChips({
   children,
   rowClassName = "py-2",
+  disableLeftFade = false,
 }: {
   children: React.ReactNode;
   /** Vertikal padding kring chip-raden */
   rowClassName?: string;
+  /** Behåll vänsterkant helt skarp (för sticky första chip). */
+  disableLeftFade?: boolean;
 }) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
@@ -42,9 +45,9 @@ function FadingHorizontalChips({
     }
     const atStart = el.scrollLeft <= 2;
     const atEnd = el.scrollLeft >= maxScroll - 2;
-    setFadeLeft(!atStart);
+    setFadeLeft(disableLeftFade ? false : !atStart);
     setFadeRight(!atEnd);
-  }, []);
+  }, [disableLeftFade]);
 
   useEffect(() => {
     const el = scrollRef.current;
@@ -323,28 +326,30 @@ export function CityClient({
   return (
     <div className="relative mx-auto max-w-5xl px-[1.2rem] pb-[4.2rem] pt-6">
       <div className="space-y-[0.6rem]">
-        <div className="relative">
-          <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-14 bg-gradient-to-r from-white/85 via-white/35 to-transparent backdrop-blur-[1px]" />
-          <button
-            type="button"
-            aria-label="Öppna meny: stad och nytt tips"
-            onClick={() => {
-              setAddTargetSlug(activeCity.slug);
-              setAddOpen(true);
-            }}
-            className="y2k-fab-sm absolute left-0 top-0 z-20 grid h-9 min-h-9 w-9 place-items-center rounded-full text-white transition hover:brightness-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/80 active:scale-95"
-          >
-            <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden>
-              <path
-                d="M12 5v14M5 12h14"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.4"
-                strokeLinecap="round"
-              />
-            </svg>
-          </button>
-          <FadingHorizontalChips rowClassName="py-0">
+        <FadingHorizontalChips rowClassName="py-0" disableLeftFade>
+          <div className="sticky left-0 z-20 -ml-[0.15rem] pr-[0.6rem]">
+            <div className="rounded-full bg-gradient-to-r from-white/92 via-white/55 to-transparent backdrop-blur-[2px]">
+              <button
+                type="button"
+                aria-label="Öppna meny: stad och nytt tips"
+                onClick={() => {
+                  setAddTargetSlug(activeCity.slug);
+                  setAddOpen(true);
+                }}
+                className="y2k-fab-sm grid h-9 min-h-9 w-9 place-items-center rounded-full text-white transition hover:brightness-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/80 active:scale-95"
+              >
+                <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden>
+                  <path
+                    d="M12 5v14M5 12h14"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.4"
+                    strokeLinecap="round"
+                  />
+                </svg>
+              </button>
+            </div>
+          </div>
           {cityList.map((c) => {
             const active = c.slug === activeCity.slug;
             return (
@@ -361,8 +366,7 @@ export function CityClient({
               </button>
             );
           })}
-          </FadingHorizontalChips>
-        </div>
+        </FadingHorizontalChips>
 
         <FadingHorizontalChips rowClassName="py-0">
           <Chip active={category === "alla"} onClick={() => setCategory("alla")} tone="violet">
