@@ -213,7 +213,7 @@ export function AddSpotForm({
             maxLength={8}
             placeholder="😊"
             aria-label="Emoji"
-            className="box-border h-10 w-10 rounded-xl border border-sky-200/70 bg-white/90 text-center text-lg leading-none text-indigo-950 shadow-inner shadow-sky-100/80 outline-none placeholder:text-indigo-900/35 focus:ring-2 focus:ring-sky-300/55 sm:h-11 sm:w-11 sm:text-xl"
+            className="box-border h-10 w-10 rounded-xl border border-sky-200/70 bg-white/90 text-center text-lg leading-none text-indigo-950 shadow-inner shadow-sky-100/80 outline-none placeholder:text-indigo-900/35 placeholder:opacity-40 focus:ring-2 focus:ring-sky-300/55 sm:h-11 sm:w-11 sm:text-xl"
           />
         </div>
       </div>
