@@ -285,61 +285,56 @@ export function CityClient({
 
   return (
     <div className="relative mx-auto max-w-5xl px-4 pb-14 pt-5">
-      <div className="mb-1.5 flex items-center gap-2">
-        <button
-          type="button"
-          aria-label="Öppna meny: stad och nytt tips"
-          onClick={() => {
-            setAddTargetSlug(activeCity.slug);
-            setAddOpen(true);
-          }}
-          className="y2k-fab-sm grid h-9 w-9 shrink-0 place-items-center rounded-full text-white transition hover:brightness-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/80 active:scale-95"
-        >
-          <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden>
-            <path
-              d="M12 5v14M5 12h14"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.4"
-              strokeLinecap="round"
-            />
-          </svg>
-        </button>
-        <div className="min-w-0 flex-1">
-          <FadingHorizontalChips rowClassName="py-1">
-            {cityList.map((c) => {
-              const active = c.slug === activeCity.slug;
-              return (
-                <button
-                  key={c.id}
-                  type="button"
-                  onClick={() => setActiveCity(c)}
-                  className={`inline-flex h-9 min-h-9 shrink-0 items-center justify-center gap-1.5 rounded-full px-3.5 text-sm font-extrabold leading-none tracking-tight transition active:scale-95 ${
-                    active ? "y2k-chip-active text-white" : "y2k-chip text-indigo-950 hover:-translate-y-0.5"
-                  }`}
-                >
-                  <span aria-hidden>🌃</span>
-                  <span className="max-w-[11rem] truncate">{c.name}</span>
-                </button>
-              );
-            })}
-          </FadingHorizontalChips>
+      <div className="space-y-2.5">
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            aria-label="Öppna meny: stad och nytt tips"
+            onClick={() => {
+              setAddTargetSlug(activeCity.slug);
+              setAddOpen(true);
+            }}
+            className="y2k-fab-sm grid h-9 w-9 shrink-0 place-items-center rounded-full text-white transition hover:brightness-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/80 active:scale-95"
+          >
+            <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden>
+              <path
+                d="M12 5v14M5 12h14"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.4"
+                strokeLinecap="round"
+              />
+            </svg>
+          </button>
+          <div className="min-w-0 flex-1">
+            <FadingHorizontalChips rowClassName="py-1">
+              {cityList.map((c) => {
+                const active = c.slug === activeCity.slug;
+                return (
+                  <button
+                    key={c.id}
+                    type="button"
+                    onClick={() => setActiveCity(c)}
+                    className={`inline-flex h-9 min-h-9 shrink-0 items-center justify-center gap-1.5 rounded-full px-3.5 text-sm font-extrabold leading-none tracking-tight transition active:scale-95 ${
+                      active ? "y2k-chip-active text-white" : "y2k-chip text-indigo-950 hover:-translate-y-0.5"
+                    }`}
+                  >
+                    <span aria-hidden>🌃</span>
+                    <span className="max-w-[11rem] truncate">{c.name}</span>
+                  </button>
+                );
+              })}
+            </FadingHorizontalChips>
+          </div>
         </div>
-      </div>
 
-      <div className="mb-0.5">
         <FadingHorizontalChips>
           <Chip active={category === "alla"} onClick={() => setCategory("alla")} tone="violet">
             <span className="mr-1">✨</span>
             Alla
           </Chip>
           {CATEGORIES.map((c) => (
-            <Chip
-              key={c.id}
-              active={category === c.id}
-              onClick={() => setCategory(c.id)}
-              tone="pink"
-            >
+            <Chip key={c.id} active={category === c.id} onClick={() => setCategory(c.id)} tone="pink">
               <span className="mr-1">{c.emoji}</span>
               {c.label}
               <span
@@ -352,9 +347,7 @@ export function CityClient({
             </Chip>
           ))}
         </FadingHorizontalChips>
-      </div>
 
-      <div className="mb-3">
         <FadingHorizontalChips>
           <Chip active={neighborhood === "alla"} onClick={() => setNeighborhood("alla")} tone="violet">
             <span className="mr-1">🗺️</span>
@@ -369,59 +362,61 @@ export function CityClient({
             Övrigt
           </Chip>
         </FadingHorizontalChips>
-      </div>
 
-      {mapEnabled ? (
-        <div className="mb-3 flex flex-wrap gap-2">
-          <Chip active={viewMode === "map"} onClick={() => setViewMode("map")} tone="violet">
-            <span className="mr-1">🗺️</span>
-            Karta
-          </Chip>
-          <Chip active={viewMode === "list"} onClick={() => setViewMode("list")} tone="violet">
-            <span className="mr-1">📋</span>
-            Lista
-          </Chip>
-        </div>
-      ) : null}
-
-      {error ? (
-        <p className="mb-4 rounded-2xl border border-rose-200/80 bg-rose-50/90 px-4 py-3 text-sm font-bold text-rose-800">
-          {error}
-        </p>
-      ) : null}
-
-      <div className="mb-10 min-h-[100px]">
-        {mapEnabled && viewMode === "map" ? (
-          <SpotsMap spots={displaySpots} cityName={activeCity.name} />
-        ) : displaySpots.length === 0 ? null : (
-          <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
-            {displaySpots.map((s) => (
-              <SpotCard
-                key={s.id}
-                roomSlug={roomSlug}
-                spot={s}
-                mapsCityName={activeCity.name}
-                onPurge={() => removeSpot(s.id, activeCity.slug, s.category)}
-                onEdited={() => void refreshCity(activeCity.slug)}
-              />
-            ))}
+        {mapEnabled ? (
+          <div className="flex flex-wrap gap-2">
+            <Chip active={viewMode === "map"} onClick={() => setViewMode("map")} tone="violet">
+              <span className="mr-1">🗺️</span>
+              Karta
+            </Chip>
+            <Chip active={viewMode === "list"} onClick={() => setViewMode("list")} tone="violet">
+              <span className="mr-1">📋</span>
+              Lista
+            </Chip>
           </div>
-        )}
+        ) : null}
 
-        <div className="mt-4 grid grid-cols-2 gap-2 sm:gap-3">
-          <Link
-            href="/"
-            className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl border border-indigo-200/70 bg-white/70 px-3 py-3 text-center text-[12px] font-extrabold leading-snug text-indigo-950 shadow-sm shadow-indigo-500/10 ring-1 ring-white/60 transition hover:brightness-105 active:scale-[0.99] sm:px-4 sm:text-sm"
-          >
-            Skapa din egen karta och dela med kompisar
-          </Link>
-          <button
-            type="button"
-            onClick={() => void shareRoom()}
-            className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl bg-gradient-to-r from-emerald-400 to-teal-500 px-3 py-3 text-[12px] font-extrabold leading-snug text-white shadow-sm shadow-emerald-500/25 ring-1 ring-white/60 transition hover:brightness-110 active:scale-[0.99] sm:px-4 sm:text-sm"
-          >
-            Dela kartan
-          </button>
+        {error ? (
+          <p className="rounded-2xl border border-rose-200/80 bg-rose-50/90 px-4 py-3 text-sm font-bold text-rose-800">
+            {error}
+          </p>
+        ) : null}
+
+        <div className="space-y-2.5">
+          <div className="min-h-[100px]">
+            {mapEnabled && viewMode === "map" ? (
+              <SpotsMap spots={displaySpots} cityName={activeCity.name} />
+            ) : displaySpots.length === 0 ? null : (
+              <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
+                {displaySpots.map((s) => (
+                  <SpotCard
+                    key={s.id}
+                    roomSlug={roomSlug}
+                    spot={s}
+                    mapsCityName={activeCity.name}
+                    onPurge={() => removeSpot(s.id, activeCity.slug, s.category)}
+                    onEdited={() => void refreshCity(activeCity.slug)}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="grid grid-cols-2 gap-2 sm:gap-3">
+            <Link
+              href="/"
+              className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl border border-indigo-200/70 bg-white/70 px-3 py-3 text-center text-[12px] font-extrabold leading-snug text-indigo-950 shadow-sm shadow-indigo-500/10 ring-1 ring-white/60 transition hover:brightness-105 active:scale-[0.99] sm:px-4 sm:text-sm"
+            >
+              Skapa din egen karta och dela med kompisar
+            </Link>
+            <button
+              type="button"
+              onClick={() => void shareRoom()}
+              className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl bg-gradient-to-r from-emerald-400 to-teal-500 px-3 py-3 text-[12px] font-extrabold leading-snug text-white shadow-sm shadow-emerald-500/25 ring-1 ring-white/60 transition hover:brightness-110 active:scale-[0.99] sm:px-4 sm:text-sm"
+            >
+              Dela kartan
+            </button>
+          </div>
         </div>
       </div>
 
