@@ -65,22 +65,20 @@ function FadingHorizontalChips({
   }, [sync]);
 
   return (
-    <div className="-mx-1 px-1">
-      <div
-        ref={scrollRef}
-        className={`overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden ${rowClassName} ${
-          fadeLeft && fadeRight
-            ? "chip-row-fade-both"
-            : fadeRight
-              ? "chip-row-fade-right"
-              : fadeLeft
-                ? "chip-row-fade-left"
-                : ""
-        }`}
-      >
-        <div ref={trackRef} className="flex w-max gap-2 px-1">
-          {children}
-        </div>
+    <div
+      ref={scrollRef}
+      className={`overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden ${rowClassName} ${
+        fadeLeft && fadeRight
+          ? "chip-row-fade-both"
+          : fadeRight
+            ? "chip-row-fade-right"
+            : fadeLeft
+              ? "chip-row-fade-left"
+              : ""
+      }`}
+    >
+      <div ref={trackRef} className="flex w-max gap-2">
+        {children}
       </div>
     </div>
   );
@@ -286,7 +284,7 @@ export function CityClient({
   return (
     <div className="relative mx-auto max-w-5xl px-4 pb-14 pt-5">
       <div className="space-y-2">
-        <div className="flex items-center gap-2">
+        <FadingHorizontalChips rowClassName="py-0">
           <button
             type="button"
             aria-label="Öppna meny: stad och nytt tips"
@@ -294,7 +292,7 @@ export function CityClient({
               setAddTargetSlug(activeCity.slug);
               setAddOpen(true);
             }}
-            className="y2k-fab-sm grid h-9 w-9 shrink-0 place-items-center rounded-full text-white transition hover:brightness-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/80 active:scale-95"
+            className="y2k-fab-sm grid h-9 min-h-9 w-9 shrink-0 place-items-center rounded-full text-white transition hover:brightness-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/80 active:scale-95"
           >
             <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden>
               <path
@@ -306,32 +304,28 @@ export function CityClient({
               />
             </svg>
           </button>
-          <div className="min-w-0 flex-1">
-            <FadingHorizontalChips rowClassName="py-0">
-              {cityList.map((c) => {
-                const active = c.slug === activeCity.slug;
-                return (
-                  <button
-                    key={c.id}
-                    type="button"
-                    onClick={() => setActiveCity(c)}
-                    className={`inline-flex h-9 min-h-9 shrink-0 items-center justify-center gap-1.5 rounded-full px-3.5 text-sm font-extrabold leading-none tracking-tight transition active:scale-95 ${
-                      active ? "y2k-chip-active text-white" : "y2k-chip text-indigo-950 hover:-translate-y-0.5"
-                    }`}
-                  >
-                    <span aria-hidden>🌃</span>
-                    <span className="max-w-[11rem] truncate">{c.name}</span>
-                  </button>
-                );
-              })}
-            </FadingHorizontalChips>
-          </div>
-        </div>
+          {cityList.map((c) => {
+            const active = c.slug === activeCity.slug;
+            return (
+              <button
+                key={c.id}
+                type="button"
+                onClick={() => setActiveCity(c)}
+                className={`inline-flex h-9 min-h-9 shrink-0 items-center justify-center gap-1.5 rounded-full px-3.5 text-sm font-extrabold leading-none tracking-tight transition active:scale-95 ${
+                  active ? "y2k-chip-active text-white" : "y2k-chip text-indigo-950 hover:-translate-y-0.5"
+                }`}
+              >
+                <span aria-hidden>🌃</span>
+                <span className="max-w-[11rem] truncate">{c.name}</span>
+              </button>
+            );
+          })}
+        </FadingHorizontalChips>
 
         <FadingHorizontalChips rowClassName="py-0">
           <Chip active={category === "alla"} onClick={() => setCategory("alla")} tone="violet">
             <span className="mr-1">✨</span>
-            Alla
+            Alla kategorier
           </Chip>
           {CATEGORIES.map((c) => (
             <Chip key={c.id} active={category === c.id} onClick={() => setCategory(c.id)} tone="pink">
@@ -364,7 +358,7 @@ export function CityClient({
         </FadingHorizontalChips>
 
         {mapEnabled ? (
-          <div className="flex flex-wrap gap-2">
+          <FadingHorizontalChips rowClassName="py-0">
             <Chip active={viewMode === "map"} onClick={() => setViewMode("map")} tone="violet">
               <span className="mr-1">🗺️</span>
               Karta
@@ -373,7 +367,7 @@ export function CityClient({
               <span className="mr-1">📋</span>
               Lista
             </Chip>
-          </div>
+          </FadingHorizontalChips>
         ) : null}
 
         {error ? (
