@@ -24,6 +24,8 @@ model City {
   room      Room     @relation(fields: [roomId], references: [id], onDelete: Cascade)
   name      String
   slug      String
+  /** Valfri emoji/flagga som visas i stadsmenyn (t.ex. 🇸🇪). */
+  emoji     String?
   createdAt DateTime @default(now())
   spots     Spot[]
 

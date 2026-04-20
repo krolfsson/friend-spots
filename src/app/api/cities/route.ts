@@ -21,11 +21,17 @@ export async function POST(req: NextRequest) {
     const auth = await getAuthorizedRoomFromRequest(req);
     if (!auth.ok) return auth.response;
 
-    const body = (await req.json()) as { name?: string; slug?: string };
+    const body = (await req.json()) as { name?: string; slug?: string; emoji?: string };
     const name = body.name?.trim();
     if (!name) {
       return NextResponse.json({ error: "Namn saknas" }, { status: 400 });
     }
+
+    const rawEmoji = typeof body.emoji === "string" ? body.emoji.trim() : "";
+    const emoji =
+      rawEmoji.length > 0
+        ? Array.from(rawEmoji).slice(0, 8).join("")
+        : "🇸🇪";
 
     let slug = body.slug?.trim() ? slugify(body.slug) : slugify(name);
     if (!slug) slug = "stad";
@@ -38,7 +44,7 @@ export async function POST(req: NextRequest) {
     }
 
     const created = await prisma.city.create({
-      data: { name, slug, roomId: auth.room.id },
+      data: { name, slug, roomId: auth.room.id, emoji },
     });
     const city = await prisma.city.findUnique({
       where: { id: created.id },

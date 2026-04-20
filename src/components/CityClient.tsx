@@ -14,7 +14,7 @@ import { getOrCreateVoterToken } from "@/lib/voterClient";
 import { isMapViewConfigured, SpotsMap } from "@/components/SpotsMap";
 import { sortSpotsByCreatedAtNewestFirst } from "@/lib/sortSpots";
 
-type City = { id: string; name: string; slug: string; _count?: { spots: number } };
+type City = { id: string; name: string; slug: string; emoji?: string | null; _count?: { spots: number } };
 
 type ToastTone = "success" | "info";
 
@@ -363,7 +363,7 @@ export function CityClient({
                   active ? "y2k-chip-active text-white" : "y2k-chip text-indigo-950 hover:-translate-y-0.5"
                 }`}
               >
-                <span aria-hidden>🌃</span>
+                <span aria-hidden>{c.emoji?.trim() || "🌃"}</span>
                 <span className="max-w-[11rem] truncate">{c.name}</span>
               </button>
             );

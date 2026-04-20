@@ -2,8 +2,14 @@
 
 import { useEffect, useMemo, useState } from "react";
 import type { Locale } from "@/lib/i18n";
+import { cityNewEmojiInputClassName } from "@/lib/cityEmojiUi";
 
-export type CityLite = { id: string; name: string; slug: string; _count?: { spots: number } };
+export type CityLite = { id: string; name: string; slug: string; emoji?: string | null; _count?: { spots: number } };
+
+function optionPrefix(c: CityLite): string {
+  const e = c.emoji?.trim();
+  return e ? `${e} ` : "";
+}
 
 export function CityPickOrCreate({
   roomSlug,
@@ -25,6 +31,7 @@ export function CityPickOrCreate({
   embedded?: boolean;
 }) {
   const [newCityName, setNewCityName] = useState("");
+  const [newCityEmoji, setNewCityEmoji] = useState("");
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
 
@@ -56,7 +63,10 @@ export function CityPickOrCreate({
       const res = await fetch("/api/cities", {
         method: "POST",
         headers: { "Content-Type": "application/json", "X-Room-Slug": roomSlug },
-        body: JSON.stringify({ name }),
+        body: JSON.stringify({
+          name,
+          emoji: newCityEmoji.trim() || undefined,
+        }),
       });
       const data = (await res.json()) as { city?: CityLite; error?: string };
       if (!res.ok) throw new Error(data.error ?? (locale === "en" ? "Could not create city" : "Kunde inte skapa stad"));
@@ -64,6 +74,7 @@ export function CityPickOrCreate({
       if (!created?.slug) throw new Error("Saknar stad");
       onCityCreated(created);
       setNewCityName("");
+      setNewCityEmoji("");
     } catch (e) {
       setErr(e instanceof Error ? e.message : "Okänt fel");
     } finally {
@@ -75,28 +86,46 @@ export function CityPickOrCreate({
     ? "min-w-0 max-w-full space-y-2"
     : "mb-4 min-w-0 max-w-full rounded-2xl border border-fuchsia-200/60 bg-white/75 px-3 py-3 sm:px-4";
 
+  const nameInputClassEmpty =
+    "box-border h-10 min-h-10 w-full min-w-0 flex-1 rounded-xl border border-fuchsia-200/70 bg-white/90 px-3 text-sm font-semibold text-indigo-950 shadow-inner shadow-fuchsia-100/80 outline-none focus:ring-2 focus:ring-fuchsia-300/50 sm:h-11 sm:rounded-2xl sm:px-3.5";
+
+  const nameInputClassDetails =
+    "box-border h-10 min-h-10 w-full min-w-0 flex-1 rounded-xl border border-fuchsia-200/70 bg-white/90 px-3 text-sm font-semibold text-indigo-950 shadow-inner shadow-fuchsia-100/80 outline-none focus:ring-2 focus:ring-fuchsia-300/55 sm:h-11 sm:rounded-2xl sm:px-3.5";
+
   if (ordered.length === 0) {
     return (
       <div className={shell}>
         <p className="text-xs font-bold text-indigo-900/55">
           {locale === "en" ? "No cities yet — create the first one." : "Inga städer än — skapa den första."}
         </p>
-        <div className="mt-2 flex flex-wrap items-stretch gap-2">
-          <input
-            value={newCityName}
-            onChange={(e) => {
-              setNewCityName(e.target.value);
-              setErr(null);
-            }}
-            placeholder={locale === "en" ? "City name" : "Stadens namn"}
-            aria-label={locale === "en" ? "New city name" : "Ny stads namn"}
-            className="min-h-10 min-w-0 flex-1 rounded-xl border border-fuchsia-200/70 bg-white/90 px-3 py-2 text-sm font-semibold text-indigo-950 outline-none focus:ring-2 focus:ring-fuchsia-300/50"
-          />
+        <div className="mt-2 space-y-2">
+          <div className="flex min-w-0 max-w-full items-center gap-2">
+            <input
+              value={newCityName}
+              onChange={(e) => {
+                setNewCityName(e.target.value);
+                setErr(null);
+              }}
+              placeholder={locale === "en" ? "City name" : "Stadens namn"}
+              aria-label={locale === "en" ? "New city name" : "Ny stads namn"}
+              className={nameInputClassEmpty}
+            />
+            <div className="flex shrink-0 flex-col items-end">
+              <input
+                value={newCityEmoji}
+                onChange={(e) => setNewCityEmoji(e.target.value)}
+                maxLength={8}
+                placeholder="🇸🇪"
+                aria-label={locale === "en" ? "City emoji or flag" : "Stad-emoji eller flagga"}
+                className={cityNewEmojiInputClassName}
+              />
+            </div>
+          </div>
           <button
             type="button"
             disabled={busy || newCityName.trim().length < 2}
             onClick={() => void createCity()}
-            className="ui-press shrink-0 rounded-full bg-gradient-to-r from-emerald-400 to-teal-500 px-4 py-2 text-xs font-extrabold text-white disabled:opacity-40"
+            className="ui-press w-full rounded-full bg-gradient-to-r from-emerald-400 to-teal-500 py-2.5 text-xs font-extrabold text-white disabled:opacity-40 sm:w-auto sm:px-6"
           >
             {busy ? "…" : locale === "en" ? "Create" : "Skapa"}
           </button>
@@ -123,6 +152,7 @@ export function CityPickOrCreate({
       >
         {ordered.map((c) => (
           <option key={c.id} value={c.slug}>
+            {optionPrefix(c)}
             {c.name}
             {c._count != null ? ` (${c._count.spots})` : ""}
           </option>
@@ -133,23 +163,35 @@ export function CityPickOrCreate({
         <summary className="cursor-pointer list-none py-1 text-[11px] font-extrabold tracking-wide text-indigo-800/75 hover:text-indigo-950">
           {locale === "en" ? "+ New city (optional)" : "+ Ny stad (valfritt)"}
         </summary>
-        <div className="mt-1.5 flex flex-wrap items-stretch gap-2 pb-0.5">
-          <input
-            value={newCityName}
-            onChange={(e) => {
-              setNewCityName(e.target.value);
-              setErr(null);
-            }}
-            placeholder={locale === "en" ? "Name of new city" : "Namn på ny stad"}
-            aria-label={locale === "en" ? "Name of new city" : "Namn på ny stad"}
-            className="min-h-9 min-w-0 flex-1 rounded-lg border border-indigo-200/70 bg-white/90 px-2.5 py-1.5 text-xs font-semibold text-indigo-950 outline-none focus:ring-2 focus:ring-fuchsia-300/45"
-          />
+        <div className="mt-1.5 space-y-2 pb-0.5">
+          <div className="flex min-w-0 max-w-full items-center gap-2">
+            <input
+              value={newCityName}
+              onChange={(e) => {
+                setNewCityName(e.target.value);
+                setErr(null);
+              }}
+              placeholder={locale === "en" ? "Name of new city" : "Namn på ny stad"}
+              aria-label={locale === "en" ? "Name of new city" : "Namn på ny stad"}
+              className={nameInputClassDetails}
+            />
+            <div className="flex shrink-0 flex-col items-end">
+              <input
+                value={newCityEmoji}
+                onChange={(e) => setNewCityEmoji(e.target.value)}
+                maxLength={8}
+                placeholder="🇸🇪"
+                aria-label={locale === "en" ? "City emoji or flag" : "Stad-emoji eller flagga"}
+                className={cityNewEmojiInputClassName}
+              />
+            </div>
+          </div>
           {canCreate ? (
             <button
               type="button"
               disabled={busy}
               onClick={() => void createCity()}
-              className="ui-press shrink-0 rounded-full border border-emerald-300/80 bg-gradient-to-r from-emerald-400 to-teal-500 px-3 py-1.5 text-[11px] font-extrabold text-white disabled:opacity-45"
+              className="ui-press rounded-full border border-emerald-300/80 bg-gradient-to-r from-emerald-400 to-teal-500 px-4 py-2 text-[11px] font-extrabold text-white disabled:opacity-45"
             >
               {busy ? "…" : locale === "en" ? "Add" : "Lägg till"}
             </button>
