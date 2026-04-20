@@ -285,7 +285,7 @@ export function CityClient({
 
   return (
     <div className="relative mx-auto max-w-5xl px-4 pb-14 pt-5">
-      <div className="space-y-2.5">
+      <div className="space-y-2">
         <div className="flex items-center gap-2">
           <button
             type="button"
@@ -307,7 +307,7 @@ export function CityClient({
             </svg>
           </button>
           <div className="min-w-0 flex-1">
-            <FadingHorizontalChips rowClassName="py-1">
+            <FadingHorizontalChips rowClassName="py-0">
               {cityList.map((c) => {
                 const active = c.slug === activeCity.slug;
                 return (
@@ -328,7 +328,7 @@ export function CityClient({
           </div>
         </div>
 
-        <FadingHorizontalChips>
+        <FadingHorizontalChips rowClassName="py-0">
           <Chip active={category === "alla"} onClick={() => setCategory("alla")} tone="violet">
             <span className="mr-1">✨</span>
             Alla
@@ -348,7 +348,7 @@ export function CityClient({
           ))}
         </FadingHorizontalChips>
 
-        <FadingHorizontalChips>
+        <FadingHorizontalChips rowClassName="py-0">
           <Chip active={neighborhood === "alla"} onClick={() => setNeighborhood("alla")} tone="violet">
             <span className="mr-1">🗺️</span>
             Alla områden
@@ -382,7 +382,7 @@ export function CityClient({
           </p>
         ) : null}
 
-        <div className="space-y-2.5">
+        <div className="space-y-2">
           <div className="min-h-[100px]">
             {mapEnabled && viewMode === "map" ? (
               <SpotsMap spots={displaySpots} cityName={activeCity.name} />
