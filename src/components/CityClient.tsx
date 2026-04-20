@@ -450,6 +450,9 @@ export function CityClient({
                       aria-label={locale === "en" ? "You are here" : "Här är du"}
                       title={locale === "en" ? "You are here" : "Här är du"}
                     >
+                      <span className="whitespace-nowrap">
+                        {locale === "en" ? "You are here" : "Här är du"}
+                      </span>
                       <span
                         aria-hidden
                         className={`grid h-7 w-7 shrink-0 place-items-center rounded-full border shadow-sm transition ${
@@ -459,9 +462,6 @@ export function CityClient({
                         }`}
                       >
                         📍
-                      </span>
-                      <span className="whitespace-nowrap">
-                        {locale === "en" ? "You are here" : "Här är du"}
                       </span>
                     </button>
                   </div>
