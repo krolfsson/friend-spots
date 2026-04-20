@@ -44,6 +44,12 @@ export const MESSAGES: Record<Locale, Record<string, string>> = {
 
     "share.copy": "Fyll gärna i dina tips här, eller plussa tips som du håller med om.",
     "share.copiedToast": "Kopierat! Klistra in i iMessage/Facebook/valfri app.",
+    "share.sheet.sms": "SMS / iMessage",
+    "share.sheet.whatsapp": "WhatsApp",
+    "share.sheet.facebook": "Facebook",
+    "share.sheet.email": "E-post",
+    "share.sheet.copy": "Kopiera länk",
+    "share.sheet.close": "Stäng",
 
     "rename.title": "Byt kartnamn",
     "rename.subtitle": "Länken ändras inte. Bara namnet.",
@@ -62,6 +68,23 @@ export const MESSAGES: Record<Locale, Record<string, string>> = {
 
     "edit.title": "Redigera tips",
     "edit.categoryLabel": "Kategori",
+
+    "common.close": "Stäng",
+    "common.cancel": "Avbryt",
+
+    "spots.loadError": "Kunde inte ladda tips",
+    "spots.saveError": "Kunde inte spara",
+    "spots.deleteConfirm": "Ta bort detta tips permanent?",
+    "spots.deleteError": "Kunde inte ta bort tipset.",
+    "spots.pointsAria.remove": "Poäng {score}, tryck för att ta bort din +1",
+    "spots.pointsAria.add": "Poäng {score}, tryck +1 för att höja",
+    "spots.plusAria.remove": "Ta bort din +1",
+    "spots.plusAria.add": "Lägg till +1 i poäng",
+    "spots.menu.close": "Stäng meny",
+    "spots.menu.delete": "Ta bort",
+    "spots.menu.edit": "Redigera",
+
+    "add.closeAria": "Stäng lägg till",
 
     "unlock.lede": "Ange pinkod för att öppna kartan.",
     "unlock.pinLabel": "Pinkod",
@@ -104,6 +127,12 @@ export const MESSAGES: Record<Locale, Record<string, string>> = {
 
     "share.copy": "Add your own tips here, or +1 tips you agree with.",
     "share.copiedToast": "Copied! Paste into iMessage/Facebook/any app.",
+    "share.sheet.sms": "SMS / iMessage",
+    "share.sheet.whatsapp": "WhatsApp",
+    "share.sheet.facebook": "Facebook",
+    "share.sheet.email": "Email",
+    "share.sheet.copy": "Copy link",
+    "share.sheet.close": "Close",
 
     "rename.title": "Rename map",
     "rename.subtitle": "The link won’t change. Only the name.",
@@ -122,6 +151,23 @@ export const MESSAGES: Record<Locale, Record<string, string>> = {
 
     "edit.title": "Edit tip",
     "edit.categoryLabel": "Category",
+
+    "common.close": "Close",
+    "common.cancel": "Cancel",
+
+    "spots.loadError": "Could not load tips",
+    "spots.saveError": "Could not save",
+    "spots.deleteConfirm": "Delete this tip permanently?",
+    "spots.deleteError": "Could not delete the tip.",
+    "spots.pointsAria.remove": "Score {score}, tap to remove your +1",
+    "spots.pointsAria.add": "Score {score}, tap +1 to increase",
+    "spots.plusAria.remove": "Remove your +1",
+    "spots.plusAria.add": "Add +1 to score",
+    "spots.menu.close": "Close menu",
+    "spots.menu.delete": "Delete",
+    "spots.menu.edit": "Edit",
+
+    "add.closeAria": "Close add tip",
 
     "unlock.lede": "Enter the PIN to open the map.",
     "unlock.pinLabel": "PIN",

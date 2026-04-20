@@ -187,7 +187,7 @@ export function CityClient({
         categoryCounts?: Record<string, number>;
         error?: string;
       };
-      if (!res.ok) throw new Error(data.error ?? "Kunde inte ladda tips");
+      if (!res.ok) throw new Error(data.error ?? t(locale, "spots.loadError"));
       const spots = data.spots ?? [];
       const counts = data.categoryCounts ?? {};
       setBundle((prev) => ({ ...prev, [slug]: { spots, categoryCounts: counts } }));
@@ -204,7 +204,7 @@ export function CityClient({
       }
       setError(e instanceof Error ? e.message : "Okänt fel");
     }
-  }, [roomSlug]);
+  }, [roomSlug, locale]);
 
   useEffect(() => {
     const ctrl = new AbortController();
@@ -384,7 +384,7 @@ export function CityClient({
         <FadingHorizontalChips rowClassName="py-0">
           <Chip active={neighborhood === "alla"} onClick={() => setNeighborhood("alla")} tone="violet">
             <span className="mr-1">🗺️</span>
-            Alla områden
+            {locale === "en" ? "All areas" : "Alla områden"}
           </Chip>
           {neighborhoods.map((n) => (
             <Chip key={n} active={neighborhood === n} onClick={() => setNeighborhood(n)} tone="violet">
@@ -392,7 +392,7 @@ export function CityClient({
             </Chip>
           ))}
           <Chip active={neighborhood === "ovrigt"} onClick={() => setNeighborhood("ovrigt")} tone="muted">
-            Övrigt
+            {locale === "en" ? "Other" : "Övrigt"}
           </Chip>
         </FadingHorizontalChips>
 
@@ -524,7 +524,7 @@ export function CityClient({
                 type="button"
                 onClick={() => setRenameOpen(false)}
                 className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-indigo-200/60 bg-white/90 text-lg font-bold leading-none text-indigo-950 shadow-sm transition hover:bg-indigo-50/90"
-                aria-label={locale === "en" ? "Close" : "Stäng"}
+                aria-label={t(locale, "common.close")}
               >
                 ×
               </button>
@@ -561,7 +561,7 @@ export function CityClient({
                 onClick={() => setRenameOpen(false)}
                 className="inline-flex min-h-11 items-center justify-center rounded-2xl border border-indigo-200/70 bg-white/80 px-4 py-3 text-sm font-extrabold text-indigo-950 shadow-sm shadow-indigo-500/10 ring-1 ring-white/60 transition hover:brightness-105 active:scale-[0.99]"
               >
-                {locale === "en" ? "Cancel" : "Avbryt"}
+                {t(locale, "common.cancel")}
               </button>
             </div>
           </div>
@@ -590,7 +590,7 @@ export function CityClient({
                 type="button"
                 onClick={() => setShareOpen(false)}
                 className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-indigo-200/60 bg-white/90 text-lg font-bold leading-none text-indigo-950 shadow-sm transition hover:bg-indigo-50/90"
-                aria-label={locale === "en" ? "Close" : "Stäng"}
+                aria-label={t(locale, "common.close")}
               >
                 ×
               </button>
@@ -601,7 +601,7 @@ export function CityClient({
                 href={sharePayload.sms}
                 className="inline-flex min-h-11 items-center justify-center rounded-2xl border border-indigo-200/70 bg-white/80 px-3 py-3 text-[12px] font-extrabold text-indigo-950 shadow-sm shadow-indigo-500/10 transition hover:brightness-105 active:scale-[0.99]"
               >
-                SMS / iMessage
+                {t(locale, "share.sheet.sms")}
               </a>
               <a
                 href={sharePayload.whatsapp}
@@ -633,14 +633,14 @@ export function CityClient({
                 onClick={() => void copyShare()}
                 className="inline-flex min-h-11 flex-1 items-center justify-center rounded-2xl bg-gradient-to-r from-emerald-400 to-teal-500 px-4 py-3 text-sm font-extrabold text-white shadow-sm shadow-emerald-500/20 ring-1 ring-white/60 transition hover:brightness-110 active:scale-[0.99]"
               >
-                Kopiera länk
+                {t(locale, "share.sheet.copy")}
               </button>
               <button
                 type="button"
                 onClick={() => setShareOpen(false)}
                 className="inline-flex min-h-11 items-center justify-center rounded-2xl border border-indigo-200/70 bg-white/80 px-4 py-3 text-sm font-extrabold text-indigo-950 shadow-sm shadow-indigo-500/10 ring-1 ring-white/60 transition hover:brightness-105 active:scale-[0.99]"
               >
-                {locale === "en" ? "Close" : "Stäng"}
+                {t(locale, "share.sheet.close")}
               </button>
             </div>
           </div>
@@ -669,7 +669,7 @@ export function CityClient({
                   type="button"
                   onClick={() => setAddOpen(false)}
                   className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-indigo-200/60 bg-white/90 text-lg font-bold leading-none text-indigo-950 shadow-sm backdrop-blur-sm transition hover:bg-indigo-50/90 sm:h-10 sm:w-10"
-                  aria-label={locale === "en" ? "Close" : "Stäng"}
+                  aria-label={t(locale, "common.close")}
                 >
                   ×
                 </button>
@@ -688,6 +688,7 @@ export function CityClient({
                       embedded
                       cities={cityList}
                       selectedSlug={addTargetSlug}
+                      locale={locale}
                       onSelectCity={(c) => {
                         setAddTargetSlug(c.slug);
                         setActiveCity(c);
@@ -991,21 +992,21 @@ function SpotCard({
   );
 
   const deleteSpot = useCallback(async () => {
-    if (!window.confirm("Ta bort detta tips permanent?")) return;
+    if (!window.confirm(t(locale, "spots.deleteConfirm"))) return;
     try {
       const res = await fetch(`/api/spots?spotId=${encodeURIComponent(spot.id)}`, {
         method: "DELETE",
         headers: { "X-Room-Slug": roomSlug },
       });
       if (!res.ok) {
-        window.alert("Kunde inte ta bort tipset.");
+        window.alert(t(locale, "spots.deleteError"));
         return;
       }
       onPurge();
     } catch {
-      window.alert("Nätverksfel.");
+      window.alert(locale === "en" ? "Network error." : "Nätverksfel.");
     }
-  }, [onPurge, roomSlug, spot.id]);
+  }, [onPurge, roomSlug, spot.id, locale]);
 
   const openEditor = useCallback(() => {
     setMenu(null);
@@ -1068,7 +1069,7 @@ function SpotCard({
         }),
       });
       const data = (await res.json()) as { error?: string };
-      if (!res.ok) throw new Error(data.error ?? "Kunde inte spara");
+      if (!res.ok) throw new Error(data.error ?? t(locale, "spots.saveError"));
       setEditing(false);
       onEdited();
     } catch (e) {
@@ -1076,7 +1077,7 @@ function SpotCard({
     } finally {
       setSaving(false);
     }
-  }, [editCategory, editEmoji, editName, editNeighborhood, onEdited, roomSlug, spot.id]);
+  }, [editCategory, editEmoji, editName, editNeighborhood, onEdited, roomSlug, spot.id, locale]);
 
   return (
     <>
@@ -1115,7 +1116,7 @@ function SpotCard({
           <div className="mt-1.5 flex flex-wrap items-center gap-2 lg:flex-nowrap lg:gap-1.5">
             <span className="inline-flex h-8 shrink-0 select-none items-center gap-1 rounded-full border border-fuchsia-200/70 bg-white/70 px-2.5 text-[11px] font-extrabold leading-none text-indigo-900/80 lg:h-7 lg:gap-0.5 lg:px-2 lg:text-[10px]">
               <span>{cat.emoji}</span>
-              <span>{cat.label}</span>
+              <span>{t(locale, `cat.${cat.id}`)}</span>
             </span>
             <a
               className="inline-flex h-8 min-h-8 shrink-0 select-none items-center rounded-full bg-gradient-to-r from-sky-400 to-cyan-400 px-2.5 text-[11px] font-extrabold leading-none text-indigo-950 shadow-sm shadow-cyan-500/20 ring-1 ring-white/60 hover:brightness-110 lg:h-7 lg:min-h-7 lg:px-2 lg:text-[10px]"
@@ -1135,14 +1136,16 @@ function SpotCard({
             role="group"
             aria-label={
               spot.viewerHasPlussed
-                ? `Poäng ${displayScore}, tryck för att ta bort din +1`
-                : `Poäng ${displayScore}, tryck +1 för att höja`
+                ? t(locale, "spots.pointsAria.remove").replace("{score}", String(displayScore))
+                : t(locale, "spots.pointsAria.add").replace("{score}", String(displayScore))
             }
           >
             <button
               type="button"
               disabled={plusBusy}
-              aria-label={spot.viewerHasPlussed ? "Ta bort din +1" : "Lägg till +1 i poäng"}
+              aria-label={
+                spot.viewerHasPlussed ? t(locale, "spots.plusAria.remove") : t(locale, "spots.plusAria.add")
+              }
               className={`flex flex-1 items-center justify-center transition active:scale-[0.98] disabled:cursor-wait disabled:opacity-60 ${
                 spot.viewerHasPlussed
                   ? "bg-gradient-to-b from-indigo-300/75 to-violet-400/70 text-indigo-950 hover:brightness-95"
@@ -1171,7 +1174,7 @@ function SpotCard({
               <button
                 type="button"
                 className="fixed inset-0 z-[4998] cursor-default border-0 bg-indigo-950/35 p-0"
-                aria-label="Stäng meny"
+                aria-label={t(locale, "spots.menu.close")}
                 onClick={() => setMenu(null)}
               />
               <div
@@ -1191,7 +1194,7 @@ function SpotCard({
                     openEditor();
                   }}
                 >
-                  Redigera
+                  {t(locale, "spots.menu.edit")}
                 </button>
                 <button
                   type="button"
@@ -1204,7 +1207,7 @@ function SpotCard({
                     void deleteSpot();
                   }}
                 >
-                  Ta bort
+                  {t(locale, "spots.menu.delete")}
                 </button>
               </div>
             </>,
@@ -1218,7 +1221,7 @@ function SpotCard({
               className="fixed inset-0 z-[420] flex touch-manipulation items-end justify-center overflow-x-hidden bg-indigo-950/45 p-2 sm:items-center sm:p-3"
               role="dialog"
               aria-modal="true"
-              aria-label="Redigera tips"
+              aria-label={t(locale, "edit.title")}
               onPointerDown={(e) => {
                 if (e.target === e.currentTarget) setEditing(false);
               }}
@@ -1228,7 +1231,7 @@ function SpotCard({
                 onPointerDown={(e) => e.stopPropagation()}
               >
             <div className="mb-4 flex items-center justify-between gap-2">
-              <p className="text-sm font-extrabold tracking-tight text-indigo-950">Redigera tips</p>
+              <p className="text-sm font-extrabold tracking-tight text-indigo-950">{t(locale, "edit.title")}</p>
               <button
                 type="button"
                 className="grid h-10 w-10 place-items-center rounded-full border border-white/70 bg-white/70 text-lg font-bold text-indigo-950 shadow-sm hover:bg-white"
