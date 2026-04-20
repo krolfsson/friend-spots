@@ -1244,6 +1244,9 @@ function SpotCard({
                 maxLength={8}
                 className="mt-1 w-full max-w-[5rem] rounded-2xl border border-sky-200/70 bg-white/90 py-2 text-center text-2xl outline-none focus:ring-4 focus:ring-sky-300/50"
               />
+              <span className="mt-1 block text-[11px] font-bold text-indigo-900/55 sm:hidden">
+                Tips: lägg till en passande emoji så blir tipset lättare att hitta.
+              </span>
             </label>
             <p className="mb-2 text-xs font-extrabold text-indigo-900/80">Kategori</p>
             <div className="mb-4 flex flex-wrap gap-2">
@@ -1281,9 +1284,6 @@ function SpotCard({
               >
                 Avbryt
               </button>
-              <span className="ml-auto select-none text-[11px] font-bold italic text-indigo-950/55 [transform:rotate(-2deg)]">
-                ↖︎ lägg till en passande emoji
-              </span>
             </div>
           </div>
         </div>,
