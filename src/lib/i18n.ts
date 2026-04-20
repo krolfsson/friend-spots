@@ -42,7 +42,8 @@ export const MESSAGES: Record<Locale, Record<string, string>> = {
     "cat.boende": "Boende",
     "cat.annat": "Annat",
 
-    "share.copy": "Fyll gärna i dina tips här, eller plussa tips som du håller med om.",
+    "share.copy":
+      "Låt dina kompisar fylla i sina bästa tips, eller plussa tips som de håller mer om.",
     "share.copiedToast": "Kopierat! Klistra in i iMessage/Facebook/valfri app.",
     "share.sheet.sms": "SMS / iMessage",
     "share.sheet.whatsapp": "WhatsApp",
@@ -125,7 +126,8 @@ export const MESSAGES: Record<Locale, Record<string, string>> = {
     "cat.boende": "Stay",
     "cat.annat": "Other",
 
-    "share.copy": "Add your own tips here, or +1 tips you agree with.",
+    "share.copy":
+      "Let your friends add their best tips, or +1 tips they especially agree with.",
     "share.copiedToast": "Copied! Paste into iMessage/Facebook/any app.",
     "share.sheet.sms": "SMS / iMessage",
     "share.sheet.whatsapp": "WhatsApp",
