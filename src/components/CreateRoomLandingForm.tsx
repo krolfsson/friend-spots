@@ -56,8 +56,8 @@ export function CreateRoomLandingForm() {
           onChange={(e) => setPin(e.target.value)}
           required
           minLength={4}
-          placeholder="t.ex. *host* 1234 *host*"
-          className="mt-1 box-border h-10 w-full rounded-xl border border-fuchsia-200/70 bg-white/90 px-3 text-base font-semibold tracking-widest text-indigo-950 shadow-inner shadow-fuchsia-100/80 outline-none placeholder:text-indigo-900/35 placeholder:opacity-40 focus:ring-2 focus:ring-fuchsia-300/55 sm:h-11 sm:rounded-2xl sm:px-3.5"
+          placeholder="t.ex. 1234"
+          className="mt-1 box-border h-10 w-full rounded-xl border border-fuchsia-200/70 bg-white/90 px-3 text-base font-semibold tracking-widest text-indigo-950 shadow-inner shadow-fuchsia-100/80 outline-none placeholder:text-sm placeholder:tracking-normal placeholder:text-indigo-900/35 placeholder:opacity-40 focus:ring-2 focus:ring-fuchsia-300/55 sm:h-11 sm:rounded-2xl sm:px-3.5"
         />
       </label>
       {error ? <p className="text-sm font-bold text-rose-600">{error}</p> : null}
