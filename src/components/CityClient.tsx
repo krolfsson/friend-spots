@@ -222,7 +222,7 @@ export function CityClient({
   const sharePayload = useMemo(() => {
     const url = typeof window !== "undefined" ? window.location.href : "";
     const title = roomTitleLive.trim() || "Karta";
-    const text = SHARE_COPY;
+    const text = `${title} — ${SHARE_COPY}`;
     const message = url ? `${text}\n${url}` : text;
 
     const enc = (s: string) => encodeURIComponent(s);
@@ -429,12 +429,9 @@ export function CityClient({
                       aria-label="Byt kartnamn"
                       title="Byt kartnamn"
                     >
-                      <svg viewBox="0 0 24 24" className="h-4 w-4" aria-hidden>
-                        <path
-                          d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Zm8.5-3.5a7.9 7.9 0 0 0-.08-1.1l1.83-1.42-1.9-3.3-2.2.73a8.2 8.2 0 0 0-1.9-1.1l-.35-2.3h-3.8l-.35 2.3c-.66.25-1.3.6-1.9 1.1l-2.2-.73-1.9 3.3 1.83 1.42c-.05.36-.08.73-.08 1.1s.03.74.08 1.1L3.6 13.42l1.9 3.3 2.2-.73c.6.5 1.24.85 1.9 1.1l.35 2.3h3.8l.35-2.3c.66-.25 1.3-.6 1.9-1.1l2.2.73 1.9-3.3-1.83-1.42c.05-.36.08-.73.08-1.1Z"
-                          fill="currentColor"
-                        />
-                      </svg>
+                      <span aria-hidden className="text-[15px] leading-none">
+                        ⚙️
+                      </span>
                     </button>
                   </div>
                 }
