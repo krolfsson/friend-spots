@@ -20,6 +20,7 @@ type SpotForMaps = {
 export type MapsContext = {
   /** Active tab city; appended after the card title for clearer search. */
   cityName?: string;
+  locale?: "sv" | "en";
 };
 
 function sanitizeMapsQuery(raw: string): string {
@@ -38,7 +39,8 @@ function sanitizeMapsQuery(raw: string): string {
 export function mapsOpenForSpot(spot: SpotForMaps, ctx?: MapsContext): string {
   const city = ctx?.cityName?.trim();
   const joined = [spot.name.trim(), city].filter(Boolean).join(" ").trim() || spot.name.trim();
-  const query = sanitizeMapsQuery(joined) || sanitizeMapsQuery(spot.name) || "Hitta";
+  const fallback = ctx?.locale === "en" ? "Directions" : "Hitta";
+  const query = sanitizeMapsQuery(joined) || sanitizeMapsQuery(spot.name) || fallback;
   const encoded = encodeURIComponent(query);
   return `https://www.google.com/maps/search/?api=1&query=${encoded}`;
 }

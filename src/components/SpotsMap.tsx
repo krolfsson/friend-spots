@@ -70,11 +70,13 @@ export function isMapViewConfigured(): boolean {
 export function SpotsMap({
   spots,
   cityName,
+  locale = "sv",
   overlay,
   overlayPosition = "left",
 }: {
   spots: DashboardSpot[];
   cityName: string;
+  locale?: "sv" | "en";
   overlay?: React.ReactNode;
   overlayPosition?: "left" | "right";
 }) {
@@ -131,7 +133,7 @@ export function SpotsMap({
           });
           marker.addListener("click", () => {
             if (!map || !iw) return;
-            const url = mapsOpenForSpot(spot, { cityName });
+            const url = mapsOpenForSpot(spot, { cityName, locale });
             const wrap = document.createElement("div");
             wrap.className = "p-2 max-w-[220px]";
             const titleEl = document.createElement("div");
@@ -143,7 +145,7 @@ export function SpotsMap({
             a.target = "_blank";
             a.rel = "noopener noreferrer";
             a.className = "text-xs font-bold text-fuchsia-700 underline";
-            a.textContent = "Öppna i Hitta";
+            a.textContent = locale === "en" ? "Open in Directions" : "Öppna i Hitta";
             wrap.append(titleEl, a);
             iw.setContent(wrap);
             iw.open({ map, anchor: marker });
@@ -179,7 +181,7 @@ export function SpotsMap({
       markers.forEach((m) => m.setMap(null));
       iw?.close();
     };
-  }, [apiKey, cityName, plotted]);
+  }, [apiKey, cityName, plotted, locale]);
 
   if (!apiKey) {
     return (

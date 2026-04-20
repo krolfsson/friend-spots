@@ -2,6 +2,8 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { CATEGORIES, type CategoryId, isCategoryId } from "@/lib/categories";
+import type { Locale } from "@/lib/i18n";
+import { t } from "@/lib/i18n";
 
 type Suggestion = { placeId: string; label: string };
 
@@ -33,6 +35,7 @@ export function AddSpotForm({
   roomSlug,
   citySlug,
   placeSearchBiasName,
+  locale,
   embeddedInModal = false,
   onSaved,
   onRequestClose,
@@ -41,12 +44,15 @@ export function AddSpotForm({
   citySlug: string;
   /** Stad där tipset sparas — skickas med i platssök så förslag inte domineras av en annan ort. */
   placeSearchBiasName?: string;
+  locale: Locale;
   /** Ingen egen panel/stäng-knapp — ligger i gemensam modal (CityClient). */
   embeddedInModal?: boolean;
   onSaved: () => void;
   onRequestClose?: () => void;
 }) {
   const contributorName = useGuestContributor();
+
+  const categoryItems = CATEGORIES as readonly { id: CategoryId; label: string; emoji: string }[];
 
   const [category, setCategory] = useState<CategoryId | "">("");
   const [emoji, setEmoji] = useState("");
@@ -139,7 +145,7 @@ export function AddSpotForm({
       setCategory("");
       setPickOpen(false);
       onSaved();
-      setNote("Sparat ✨");
+      setNote(t(locale, "add.savedToast"));
       window.setTimeout(() => setNote(null), 2000);
     } catch (e) {
       setNote(e instanceof Error ? e.message : "Okänt fel");
@@ -153,7 +159,7 @@ export function AddSpotForm({
   const inner = (
     <>
       <div className="flex flex-wrap gap-x-1 gap-y-1.5">
-        {CATEGORIES.map((c) => (
+        {categoryItems.map((c) => (
           <button
             key={c.id}
             type="button"
@@ -163,7 +169,7 @@ export function AddSpotForm({
             }`}
           >
             <span className="mr-0.5 sm:mr-1">{c.emoji}</span>
-            {c.label}
+            {t(locale, `cat.${c.id}`)}
           </button>
         ))}
       </div>
@@ -181,7 +187,7 @@ export function AddSpotForm({
               if (selected && query.trim() === selected.label.trim()) return;
               if (suggestions.length) setPickOpen(true);
             }}
-            placeholder="Sök upp ditt tips"
+            placeholder={t(locale, "add.searchPlaceholder")}
             aria-label="Sök ställe"
             className="box-border h-10 w-full min-w-0 rounded-xl border border-fuchsia-200/70 bg-white/90 px-3 text-sm font-semibold text-indigo-950 shadow-inner shadow-fuchsia-100/80 outline-none ring-0 transition focus:border-transparent focus:ring-2 focus:ring-fuchsia-300/55 sm:h-11 sm:rounded-2xl sm:px-3.5"
           />
@@ -225,7 +231,7 @@ export function AddSpotForm({
           onClick={() => void save()}
           className="rounded-full bg-gradient-to-r from-fuchsia-500 to-violet-600 px-5 py-2 text-sm font-extrabold text-white transition enabled:hover:brightness-110 enabled:active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 sm:px-6 sm:py-2.5"
         >
-          {saving ? "Sparar…" : "Spara"}
+          {saving ? t(locale, "add.saving") : t(locale, "add.save")}
         </button>
         {note ? <span className="text-sm font-bold text-indigo-900/70">{note}</span> : null}
       </div>

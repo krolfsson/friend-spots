@@ -15,9 +15,6 @@ import { isMapViewConfigured, SpotsMap } from "@/components/SpotsMap";
 
 type City = { id: string; name: string; slug: string; _count?: { spots: number } };
 
-const SHARE_COPY =
-  "Fyll gärna i dina tips här, eller plussa tips som du håller med om.";
-
 type ToastTone = "success" | "info";
 
 function FadingHorizontalChips({
@@ -104,6 +101,8 @@ export function CityClient({
   const [cityList, setCityList] = useState<City[]>(cities);
   const [activeCity, setActiveCity] = useState<City>(city);
   const [bundle, setBundle] = useState<DashboardBySlug>(dashboard);
+
+  const categoryItems = CATEGORIES as readonly { id: CategoryId; label: string; emoji: string }[];
   const [addOpen, setAddOpen] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
   const [renameOpen, setRenameOpen] = useState(false);
@@ -225,8 +224,8 @@ export function CityClient({
 
   const sharePayload = useMemo(() => {
     const url = typeof window !== "undefined" ? window.location.href : "";
-    const title = roomTitleLive.trim() || "Karta";
-    const text = `${title} — ${SHARE_COPY}`;
+    const title = roomTitleLive.trim() || (locale === "en" ? "Map" : "Karta");
+    const text = `${title} — ${t(locale, "share.copy")}`;
     const message = url ? `${text}\n${url}` : text;
 
     const enc = (s: string) => encodeURIComponent(s);
@@ -238,16 +237,16 @@ export function CityClient({
     const mailto = `mailto:?subject=${enc(title)}&body=${enc(message)}`;
 
     return { url, title, text, message, sms, whatsapp, facebook, mailto };
-  }, [roomTitleLive]);
+  }, [roomTitleLive, locale]);
 
   const copyShare = useCallback(async () => {
     try {
       await navigator.clipboard.writeText(sharePayload.message);
-      showToast("Kopierat! Klistra in i iMessage/Facebook/valfri app.", "success");
+      showToast(t(locale, "share.copiedToast"), "success");
     } catch {
       showToast(sharePayload.message, "info");
     }
-  }, [sharePayload.message, showToast]);
+  }, [sharePayload.message, showToast, locale]);
 
   const shareRoom = useCallback(async () => {
     try {
@@ -279,18 +278,18 @@ export function CityClient({
         body: JSON.stringify({ name: next || null }),
       });
       const data = (await res.json()) as { name?: string | null; error?: string };
-      if (!res.ok) throw new Error(data.error ?? "Kunde inte spara namn");
+      if (!res.ok) throw new Error(data.error ?? t(locale, "rename.errorDefault"));
       const saved = (data.name ?? "").trim();
       const label = saved || roomSlug;
       setRoomTitleLive(label);
       setRenameOpen(false);
-      showToast("Kartnamn uppdaterat.", "success");
+      showToast(t(locale, "rename.successToast"), "success");
     } catch (e) {
       setError(e instanceof Error ? e.message : "Okänt fel");
     } finally {
       setRenameBusy(false);
     }
-  }, [renameBusy, renameValue, roomSlug, showToast]);
+  }, [renameBusy, renameValue, roomSlug, showToast, locale]);
 
   const removeSpot = useCallback((spotId: string, slug: string, spotCategory: string) => {
     setBundle((prev) => {
@@ -365,12 +364,12 @@ export function CityClient({
         <FadingHorizontalChips rowClassName="py-0">
           <Chip active={category === "alla"} onClick={() => setCategory("alla")} tone="violet">
             <span className="mr-1">✨</span>
-            Alla kategorier
+            {t(locale, "room.filter.allCategories")}
           </Chip>
-          {CATEGORIES.map((c) => (
+          {categoryItems.map((c) => (
             <Chip key={c.id} active={category === c.id} onClick={() => setCategory(c.id)} tone="pink">
               <span className="mr-1">{c.emoji}</span>
-              {c.label}
+              {t(locale, `cat.${c.id}`)}
               <span
                 className={`ml-1 text-[11px] font-black leading-none tabular-nums ${
                   category === c.id ? "text-white/80" : "text-indigo-950/35"
@@ -401,11 +400,11 @@ export function CityClient({
           <FadingHorizontalChips rowClassName="py-0">
             <Chip active={viewMode === "map"} onClick={() => setViewMode("map")} tone="violet">
               <span className="mr-1">🗺️</span>
-              Karta
+              {t(locale, "room.view.map")}
             </Chip>
             <Chip active={viewMode === "list"} onClick={() => setViewMode("list")} tone="violet">
               <span className="mr-1">📋</span>
-              Lista
+              {t(locale, "room.view.list")}
             </Chip>
           </FadingHorizontalChips>
         ) : null}
@@ -422,6 +421,7 @@ export function CityClient({
               <SpotsMap
                 spots={displaySpots}
                 cityName={activeCity.name}
+                locale={locale}
                 overlayPosition="right"
                 overlay={
                   <div className="inline-flex h-9 min-h-9 max-w-[min(70vw,18rem)] items-center gap-2 rounded-full bg-white/85 px-[1.05rem] text-sm font-extrabold leading-none tracking-tight text-indigo-950 shadow-sm shadow-indigo-500/10 ring-1 ring-white/60 backdrop-blur-sm">
@@ -430,8 +430,8 @@ export function CityClient({
                       type="button"
                       onClick={() => setRenameOpen(true)}
                       className="grid h-7 w-7 shrink-0 place-items-center rounded-full border border-indigo-200/70 bg-white/85 text-indigo-900/80 shadow-sm transition hover:bg-indigo-50 active:scale-95"
-                      aria-label="Byt kartnamn"
-                      title="Byt kartnamn"
+                      aria-label={t(locale, "rename.title")}
+                      title={t(locale, "rename.title")}
                     >
                       <span aria-hidden className="text-[15px] leading-none">
                         ⚙️
@@ -448,6 +448,7 @@ export function CityClient({
                     roomSlug={roomSlug}
                     spot={s}
                     mapsCityName={activeCity.name}
+                    locale={locale}
                     onPurge={() => removeSpot(s.id, activeCity.slug, s.category)}
                     onEdited={() => void refreshCity(activeCity.slug)}
                   />
@@ -504,7 +505,7 @@ export function CityClient({
           className="fixed inset-0 z-[66] flex touch-manipulation items-end justify-center bg-indigo-950/35 p-2 sm:items-center sm:p-3"
           role="dialog"
           aria-modal="true"
-          aria-label="Byt kartnamn"
+          aria-label={t(locale, "rename.title")}
           onPointerDown={(e) => {
             if (e.target === e.currentTarget) setRenameOpen(false);
           }}
@@ -513,17 +514,17 @@ export function CityClient({
             <header className="flex items-center justify-between gap-3 border-b border-indigo-200/60 bg-white/70 px-4 py-3">
               <div className="min-w-0 flex-1">
                 <h2 className="truncate text-sm font-extrabold tracking-tight text-indigo-950">
-                  Byt kartnamn
+                  {t(locale, "rename.title")}
                 </h2>
                 <p className="mt-0.5 text-[12px] font-bold text-indigo-900/55">
-                  Länken ändras inte. Bara namnet.
+                  {t(locale, "rename.subtitle")}
                 </p>
               </div>
               <button
                 type="button"
                 onClick={() => setRenameOpen(false)}
                 className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-indigo-200/60 bg-white/90 text-lg font-bold leading-none text-indigo-950 shadow-sm transition hover:bg-indigo-50/90"
-                aria-label="Stäng"
+                aria-label={locale === "en" ? "Close" : "Stäng"}
               >
                 ×
               </button>
@@ -531,16 +532,18 @@ export function CityClient({
 
             <div className="p-3">
               <label className="block text-xs font-extrabold text-indigo-900/80">
-                Namn
+                {locale === "en" ? "Name" : "Namn"}
                 <input
                   value={renameValue}
                   onChange={(e) => setRenameValue(e.target.value)}
-                  placeholder="t.ex. Bucketlist 4 Lyfe"
+                  placeholder={locale === "en" ? "e.g. Bucketlist 4 Lyfe" : "t.ex. Bucketlist 4 Lyfe"}
                   className="mt-1 w-full rounded-2xl border border-indigo-200/70 bg-white/90 px-4 py-3 text-sm font-semibold text-indigo-950 outline-none focus:ring-4 focus:ring-indigo-300/45"
                 />
               </label>
               <p className="mt-1 text-[11px] font-bold text-indigo-900/45">
-                Lämna tomt för att använda adressen (<span className="font-black">{roomSlug}</span>).
+                {locale === "en"
+                  ? `Leave empty to use the link (${roomSlug}).`
+                  : <>Lämna tomt för att använda adressen (<span className="font-black">{roomSlug}</span>).</>}
               </p>
             </div>
 
@@ -551,14 +554,14 @@ export function CityClient({
                 onClick={() => void saveRoomTitle()}
                 className="inline-flex min-h-11 flex-1 items-center justify-center rounded-2xl bg-gradient-to-r from-emerald-400 to-teal-500 px-4 py-3 text-sm font-extrabold text-white shadow-sm shadow-emerald-500/20 ring-1 ring-white/60 transition hover:brightness-110 active:scale-[0.99] disabled:opacity-50"
               >
-                {renameBusy ? "Sparar…" : "Spara"}
+                {renameBusy ? t(locale, "rename.saving") : t(locale, "rename.save")}
               </button>
               <button
                 type="button"
                 onClick={() => setRenameOpen(false)}
                 className="inline-flex min-h-11 items-center justify-center rounded-2xl border border-indigo-200/70 bg-white/80 px-4 py-3 text-sm font-extrabold text-indigo-950 shadow-sm shadow-indigo-500/10 ring-1 ring-white/60 transition hover:brightness-105 active:scale-[0.99]"
               >
-                Avbryt
+                {locale === "en" ? "Cancel" : "Avbryt"}
               </button>
             </div>
           </div>
@@ -570,7 +573,7 @@ export function CityClient({
           className="fixed inset-0 z-[65] flex touch-manipulation items-end justify-center bg-indigo-950/35 p-2 sm:items-center sm:p-3"
           role="dialog"
           aria-modal="true"
-          aria-label="Dela kartan"
+          aria-label={locale === "en" ? "Share map" : "Dela kartan"}
           onPointerDown={(e) => {
             if (e.target === e.currentTarget) setShareOpen(false);
           }}
@@ -579,15 +582,15 @@ export function CityClient({
             <header className="flex items-center justify-between gap-3 border-b border-indigo-200/60 bg-white/70 px-4 py-3">
               <div className="min-w-0 flex-1">
                 <h2 className="truncate text-sm font-extrabold tracking-tight text-indigo-950">
-                  Dela kartan
+                  {locale === "en" ? "Share map" : "Dela kartan"}
                 </h2>
-                <p className="mt-0.5 text-[12px] font-bold text-indigo-900/55">{SHARE_COPY}</p>
+                <p className="mt-0.5 text-[12px] font-bold text-indigo-900/55">{t(locale, "share.copy")}</p>
               </div>
               <button
                 type="button"
                 onClick={() => setShareOpen(false)}
                 className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-indigo-200/60 bg-white/90 text-lg font-bold leading-none text-indigo-950 shadow-sm transition hover:bg-indigo-50/90"
-                aria-label="Stäng"
+                aria-label={locale === "en" ? "Close" : "Stäng"}
               >
                 ×
               </button>
@@ -637,7 +640,7 @@ export function CityClient({
                 onClick={() => setShareOpen(false)}
                 className="inline-flex min-h-11 items-center justify-center rounded-2xl border border-indigo-200/70 bg-white/80 px-4 py-3 text-sm font-extrabold text-indigo-950 shadow-sm shadow-indigo-500/10 ring-1 ring-white/60 transition hover:brightness-105 active:scale-[0.99]"
               >
-                Stäng
+                {locale === "en" ? "Close" : "Stäng"}
               </button>
             </div>
           </div>
@@ -649,7 +652,7 @@ export function CityClient({
           className="fixed inset-0 z-50 flex touch-manipulation items-end justify-center overflow-x-hidden bg-indigo-950/30 p-2 sm:items-center sm:p-3"
           role="dialog"
           aria-modal="true"
-          aria-label="Lägg till tips"
+          aria-label={locale === "en" ? "Add tip" : "Lägg till tips"}
           onPointerDown={(e) => {
             if (e.target === e.currentTarget) setAddOpen(false);
           }}
@@ -659,14 +662,14 @@ export function CityClient({
               <header className="flex shrink-0 items-center justify-between gap-3 border-b border-indigo-200/50 bg-white/35 px-4 py-2.5 backdrop-blur-sm sm:px-5 sm:py-3">
                 <div className="min-w-0 flex-1 pr-1">
                   <h2 className="text-[0.95rem] font-extrabold leading-tight tracking-tight text-indigo-950 sm:text-base">
-                    Nytt tips
+                    {t(locale, "add.title")}
                   </h2>
                 </div>
                 <button
                   type="button"
                   onClick={() => setAddOpen(false)}
                   className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-indigo-200/60 bg-white/90 text-lg font-bold leading-none text-indigo-950 shadow-sm backdrop-blur-sm transition hover:bg-indigo-50/90 sm:h-10 sm:w-10"
-                  aria-label="Stäng"
+                  aria-label={locale === "en" ? "Close" : "Stäng"}
                 >
                   ×
                 </button>
@@ -678,7 +681,7 @@ export function CityClient({
                       id="add-modal-city-label"
                       className="mb-1.5 text-[11px] font-extrabold uppercase tracking-wide text-indigo-900/45"
                     >
-                      Stad
+                      {t(locale, "add.cityLabel")}
                     </h3>
                     <CityPickOrCreate
                       roomSlug={roomSlug}
@@ -713,13 +716,14 @@ export function CityClient({
                       id="add-modal-spot-label"
                       className="mb-1.5 text-[11px] font-extrabold uppercase tracking-wide text-indigo-900/45"
                     >
-                      Plats & kategori
+                      {t(locale, "add.placeCategoryLabel")}
                     </h3>
                     <AddSpotForm
                       roomSlug={roomSlug}
                       embeddedInModal
                       citySlug={addTargetSlug}
                       placeSearchBiasName={addTargetCity.name}
+                      locale={locale}
                       onSaved={() => {
                         void refreshCity(addTargetSlug);
                         window.setTimeout(() => setAddOpen(false), 500);
@@ -777,12 +781,14 @@ function SpotCard({
   roomSlug,
   spot,
   mapsCityName,
+  locale,
   onPurge,
   onEdited,
 }: {
   roomSlug: string;
   spot: DashboardSpot;
   mapsCityName: string;
+  locale: Locale;
   onPurge: () => void;
   onEdited: () => void;
 }) {
@@ -1113,13 +1119,13 @@ function SpotCard({
             </span>
             <a
               className="inline-flex h-8 min-h-8 shrink-0 select-none items-center rounded-full bg-gradient-to-r from-sky-400 to-cyan-400 px-2.5 text-[11px] font-extrabold leading-none text-indigo-950 shadow-sm shadow-cyan-500/20 ring-1 ring-white/60 hover:brightness-110 lg:h-7 lg:min-h-7 lg:px-2 lg:text-[10px]"
-              href={mapsOpenForSpot(spot, { cityName: mapsCityName })}
+              href={mapsOpenForSpot(spot, { cityName: mapsCityName, locale })}
               target="_blank"
               rel="noopener noreferrer"
               onPointerDown={(e) => e.stopPropagation()}
               onClick={(e) => e.stopPropagation()}
             >
-              Hitta
+              {t(locale, "room.actions.directions")}
             </a>
           </div>
         </div>
@@ -1233,7 +1239,7 @@ function SpotCard({
               </button>
             </div>
             <label className="mb-3 block text-xs font-extrabold text-indigo-900/80">
-              Namn
+              {locale === "en" ? "Name" : "Namn"}
               <input
                 value={editName}
                 onChange={(e) => setEditName(e.target.value)}
@@ -1241,16 +1247,16 @@ function SpotCard({
               />
             </label>
             <label className="mb-3 block text-xs font-extrabold text-indigo-900/80">
-              Område (valfritt)
+              {locale === "en" ? "Area (optional)" : "Område (valfritt)"}
               <input
                 value={editNeighborhood}
                 onChange={(e) => setEditNeighborhood(e.target.value)}
-                placeholder="t.ex. Södermalm"
+                placeholder={locale === "en" ? "e.g. Downtown" : "t.ex. Södermalm"}
                 className="mt-1 w-full rounded-2xl border border-fuchsia-200/70 bg-white/90 px-3 py-2.5 text-sm font-semibold text-indigo-950 outline-none focus:ring-4 focus:ring-fuchsia-300/50"
               />
             </label>
             <label className="mb-3 block text-xs font-extrabold text-indigo-900/80">
-              Emoji (valfritt)
+              {locale === "en" ? "Emoji (optional)" : "Emoji (valfritt)"}
               <input
                 value={editEmoji}
                 onChange={(e) => setEditEmoji(e.target.value)}
@@ -1258,9 +1264,9 @@ function SpotCard({
                 className="mt-1 w-full max-w-[5rem] rounded-2xl border border-sky-200/70 bg-white/90 py-2 text-center text-2xl outline-none focus:ring-4 focus:ring-sky-300/50"
               />
             </label>
-            <p className="mb-2 text-xs font-extrabold text-indigo-900/80">Kategori</p>
+            <p className="mb-2 text-xs font-extrabold text-indigo-900/80">{t(locale, "edit.categoryLabel")}</p>
             <div className="mb-4 flex flex-wrap gap-2">
-              {CATEGORIES.map((c) => (
+              {(CATEGORIES as readonly { id: CategoryId; label: string; emoji: string }[]).map((c) => (
                 <button
                   key={c.id}
                   type="button"
@@ -1270,7 +1276,7 @@ function SpotCard({
                   }`}
                 >
                   <span className="mr-1">{c.emoji}</span>
-                  {c.label}
+                  {t(locale, `cat.${c.id}`)}
                 </button>
               ))}
             </div>
@@ -1284,7 +1290,7 @@ function SpotCard({
                 onClick={() => void saveEdit()}
                 className="rounded-full bg-gradient-to-r from-fuchsia-500 to-violet-600 px-5 py-2.5 text-sm font-extrabold text-white transition enabled:hover:brightness-110 enabled:active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40"
               >
-                {saving ? "Sparar…" : "Spara"}
+                {saving ? t(locale, "add.saving") : t(locale, "add.save")}
               </button>
               <button
                 type="button"
@@ -1292,7 +1298,7 @@ function SpotCard({
                 onClick={() => setEditing(false)}
                 className="rounded-full border border-indigo-200/80 bg-white px-5 py-2.5 text-sm font-extrabold text-indigo-950 hover:bg-indigo-50"
               >
-                Avbryt
+                {locale === "en" ? "Cancel" : "Avbryt"}
               </button>
             </div>
           </div>
