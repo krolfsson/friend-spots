@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { AddSpotForm } from "@/components/AddSpotForm";
@@ -11,6 +12,9 @@ import { getOrCreateVoterToken } from "@/lib/voterClient";
 import { isMapViewConfigured, SpotsMap } from "@/components/SpotsMap";
 
 type City = { id: string; name: string; slug: string; _count?: { spots: number } };
+
+const SHARE_COPY =
+  "Fyll gärna i dina tips här, eller plussa tips som du håller med om.";
 
 function FadingHorizontalChips({
   children,
@@ -115,7 +119,7 @@ export function CityClient({
     setNeighborhood("alla");
   }, [activeCity.slug, category]);
 
-  const baseSpots = bundle[activeCity.slug]?.spots ?? [];
+  const baseSpots = useMemo(() => bundle[activeCity.slug]?.spots ?? [], [bundle, activeCity.slug]);
   const categoryCounts = bundle[activeCity.slug]?.categoryCounts ?? {};
 
   const filteredByCategory = useMemo(() => {
@@ -191,6 +195,33 @@ export function CityClient({
     void refreshCity(activeCity.slug, ctrl.signal);
     return () => ctrl.abort();
   }, [activeCity.slug, refreshCity]);
+
+  const shareRoom = useCallback(async () => {
+    const url = typeof window !== "undefined" ? window.location.href : "";
+    const title = activeCity.name?.trim() || "Karta";
+    const text = SHARE_COPY;
+
+    try {
+      const nav = typeof navigator !== "undefined" ? navigator : null;
+      const share = (nav && "share" in nav ? /** @type {any} */ (nav).share : undefined) as
+        | undefined
+        | ((data: { title?: string; text?: string; url?: string }) => Promise<void>);
+      if (share) {
+        await share({ title, text, url });
+        return;
+      }
+    } catch {
+      // user cancelled or share failed -> fallback below
+    }
+
+    const payload = url ? `${text}\n${url}` : text;
+    try {
+      await navigator.clipboard.writeText(payload);
+      setError("Länken är kopierad. Klistra in i iMessage/Facebook/valfri app.");
+    } catch {
+      setError(payload);
+    }
+  }, [activeCity.name]);
 
   const removeSpot = useCallback((spotId: string, slug: string, spotCategory: string) => {
     setBundle((prev) => {
@@ -345,6 +376,22 @@ export function CityClient({
             ))}
           </div>
         )}
+
+        <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:gap-3">
+          <Link
+            href="/"
+            className="inline-flex min-h-11 flex-1 items-center justify-center rounded-2xl border border-indigo-200/70 bg-white/70 px-4 py-3 text-sm font-extrabold text-indigo-950 shadow-sm shadow-indigo-500/10 ring-1 ring-white/60 transition hover:brightness-105 active:scale-[0.99]"
+          >
+            Skapa din egen karta och dela med kompisar
+          </Link>
+          <button
+            type="button"
+            onClick={() => void shareRoom()}
+            className="inline-flex min-h-11 flex-1 items-center justify-center rounded-2xl bg-gradient-to-r from-emerald-400 to-teal-500 px-4 py-3 text-sm font-extrabold text-white shadow-sm shadow-emerald-500/25 ring-1 ring-white/60 transition hover:brightness-110 active:scale-[0.99]"
+          >
+            Dela kartan
+          </button>
+        </div>
       </div>
 
       {addOpen ? (
