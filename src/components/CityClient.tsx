@@ -452,7 +452,7 @@ export function CityClient({
                     >
                       <span
                         aria-hidden
-                        className={`order-1 grid h-7 w-7 shrink-0 place-items-center rounded-full border shadow-sm transition ${
+                        className={`grid h-7 w-7 shrink-0 place-items-center rounded-full border shadow-sm transition ${
                           hereOn
                             ? "border-sky-200/70 bg-sky-500 text-white shadow-sky-500/20"
                             : "border-indigo-200/70 bg-white/85 text-indigo-900/80"
@@ -460,7 +460,7 @@ export function CityClient({
                       >
                         📍
                       </span>
-                      <span className="order-2 whitespace-nowrap">
+                      <span className="whitespace-nowrap">
                         {locale === "en" ? "You are here" : "Här är du"}
                       </span>
                     </button>
