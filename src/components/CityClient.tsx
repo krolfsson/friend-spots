@@ -16,6 +16,8 @@ type City = { id: string; name: string; slug: string; _count?: { spots: number }
 const SHARE_COPY =
   "Fyll gärna i dina tips här, eller plussa tips som du håller med om.";
 
+type ToastTone = "success" | "info";
+
 function FadingHorizontalChips({
   children,
   rowClassName = "py-2",
@@ -105,6 +107,7 @@ export function CityClient({
   const [neighborhood, setNeighborhood] = useState<string>("alla");
   const [viewMode, setViewMode] = useState<"list" | "map">("map");
   const [error, setError] = useState<string | null>(null);
+  const [toast, setToast] = useState<{ message: string; tone?: ToastTone } | null>(null);
   const mapEnabled = isMapViewConfigured();
 
   useEffect(() => {
@@ -196,6 +199,16 @@ export function CityClient({
     return () => ctrl.abort();
   }, [activeCity.slug, refreshCity]);
 
+  const showToast = useCallback((message: string, tone: ToastTone = "success") => {
+    setToast({ message, tone });
+  }, []);
+
+  useEffect(() => {
+    if (!toast) return;
+    const t = window.setTimeout(() => setToast(null), 3200);
+    return () => window.clearTimeout(t);
+  }, [toast]);
+
   const shareRoom = useCallback(async () => {
     const url = typeof window !== "undefined" ? window.location.href : "";
     const title = activeCity.name?.trim() || "Karta";
@@ -207,6 +220,7 @@ export function CityClient({
         | undefined
         | ((data: { title?: string; text?: string; url?: string }) => Promise<void>);
       if (share) {
+        // Keep the payload minimal for best mobile compatibility.
         await share({ title, text, url });
         return;
       }
@@ -217,11 +231,11 @@ export function CityClient({
     const payload = url ? `${text}\n${url}` : text;
     try {
       await navigator.clipboard.writeText(payload);
-      setError("Länken är kopierad. Klistra in i iMessage/Facebook/valfri app.");
+      showToast("Länken är kopierad. Klistra in i iMessage/Facebook/valfri app.", "success");
     } catch {
-      setError(payload);
+      showToast(payload, "info");
     }
-  }, [activeCity.name]);
+  }, [activeCity.name, showToast]);
 
   const removeSpot = useCallback((spotId: string, slug: string, spotCategory: string) => {
     setBundle((prev) => {
@@ -377,22 +391,38 @@ export function CityClient({
           </div>
         )}
 
-        <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:gap-3">
+        <div className="mt-4 grid grid-cols-2 gap-2 sm:gap-3">
           <Link
             href="/"
-            className="inline-flex min-h-11 flex-1 items-center justify-center rounded-2xl border border-indigo-200/70 bg-white/70 px-4 py-3 text-sm font-extrabold text-indigo-950 shadow-sm shadow-indigo-500/10 ring-1 ring-white/60 transition hover:brightness-105 active:scale-[0.99]"
+            className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl border border-indigo-200/70 bg-white/70 px-3 py-3 text-center text-[12px] font-extrabold leading-snug text-indigo-950 shadow-sm shadow-indigo-500/10 ring-1 ring-white/60 transition hover:brightness-105 active:scale-[0.99] sm:px-4 sm:text-sm"
           >
             Skapa din egen karta och dela med kompisar
           </Link>
           <button
             type="button"
             onClick={() => void shareRoom()}
-            className="inline-flex min-h-11 flex-1 items-center justify-center rounded-2xl bg-gradient-to-r from-emerald-400 to-teal-500 px-4 py-3 text-sm font-extrabold text-white shadow-sm shadow-emerald-500/25 ring-1 ring-white/60 transition hover:brightness-110 active:scale-[0.99]"
+            className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl bg-gradient-to-r from-emerald-400 to-teal-500 px-3 py-3 text-[12px] font-extrabold leading-snug text-white shadow-sm shadow-emerald-500/25 ring-1 ring-white/60 transition hover:brightness-110 active:scale-[0.99] sm:px-4 sm:text-sm"
           >
             Dela kartan
           </button>
         </div>
       </div>
+
+      {toast ? (
+        <div className="pointer-events-none fixed inset-x-0 bottom-0 z-[60] flex justify-center px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+          <div
+            className={`pointer-events-none w-full max-w-md translate-y-0 rounded-2xl border px-4 py-3 text-sm font-extrabold shadow-2xl backdrop-blur-sm transition ${
+              toast.tone === "info"
+                ? "border-indigo-200/70 bg-white/80 text-indigo-950 shadow-indigo-500/10"
+                : "border-emerald-200/80 bg-emerald-50/90 text-emerald-950 shadow-emerald-500/15"
+            }`}
+            role="status"
+            aria-live="polite"
+          >
+            {toast.message}
+          </div>
+        </div>
+      ) : null}
 
       {addOpen ? (
         <div
