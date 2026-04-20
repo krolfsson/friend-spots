@@ -27,7 +27,7 @@ export const MESSAGES: Record<Locale, Record<string, string>> = {
     "room.actions.shareMap": "Dela karta",
     "room.actions.directions": "Hitta",
     "room.view.map": "Karta",
-    "room.view.list": "Lista",
+    "room.view.list": "Topplista",
     "room.filter.allCategories": "Alla kategorier",
 
     "cat.frukost": "Frukost",
@@ -111,7 +111,7 @@ export const MESSAGES: Record<Locale, Record<string, string>> = {
     "room.actions.shareMap": "Share map",
     "room.actions.directions": "Directions",
     "room.view.map": "Map",
-    "room.view.list": "List",
+    "room.view.list": "Leaderboard",
     "room.filter.allCategories": "All categories",
 
     "cat.frukost": "Breakfast",
