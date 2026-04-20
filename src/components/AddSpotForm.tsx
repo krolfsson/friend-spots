@@ -206,18 +206,18 @@ export function AddSpotForm({
           ) : null}
         </div>
 
-        <input
-          value={emoji}
-          onChange={(e) => setEmoji(e.target.value)}
-          maxLength={8}
-          placeholder="🌟"
-          aria-label="Emoji"
-          className="box-border h-10 w-10 shrink-0 rounded-xl border border-sky-200/70 bg-white/90 text-center text-lg leading-none shadow-inner shadow-sky-100/80 outline-none focus:ring-2 focus:ring-sky-300/55 sm:h-11 sm:w-11 sm:text-xl"
-        />
+        <div className="flex shrink-0 flex-col items-end">
+          <input
+            value={emoji}
+            onChange={(e) => setEmoji(e.target.value)}
+            maxLength={8}
+            placeholder="🌟"
+            aria-label="Emoji"
+            className="box-border h-10 w-10 rounded-xl border border-sky-200/70 bg-white/90 text-center text-lg leading-none shadow-inner shadow-sky-100/80 outline-none focus:ring-2 focus:ring-sky-300/55 sm:h-11 sm:w-11 sm:text-xl"
+          />
+          <p className="mt-1 text-[11px] font-bold text-indigo-900/55 sm:hidden">Välj en emoji.</p>
+        </div>
       </div>
-      <p className="mt-1 text-[11px] font-bold text-indigo-900/55 sm:hidden">
-        Välj en emoji.
-      </p>
 
       <div className="mt-3 flex flex-wrap items-center gap-2 sm:gap-3">
         <button
