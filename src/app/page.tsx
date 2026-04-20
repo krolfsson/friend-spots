@@ -1,6 +1,8 @@
 import { CreateRoomLandingForm } from "@/components/CreateRoomLandingForm";
 import { EmojiCollageBackground } from "@/components/EmojiCollageBackground";
 import { OpenExistingRoomForm } from "@/components/OpenExistingRoomForm";
+import { t } from "@/lib/i18n";
+import { getRequestLocale } from "@/lib/i18n.server";
 import { SITE_DESCRIPTION } from "@/lib/site";
 import type { Metadata } from "next";
 
@@ -11,7 +13,8 @@ export const metadata: Metadata = {
   description: SITE_DESCRIPTION,
 };
 
-export default function Home() {
+export default async function Home() {
+  const locale = await getRequestLocale();
   return (
     <div className="relative mx-auto flex min-h-dvh max-w-md flex-col justify-center px-4 py-6 sm:py-12">
       <EmojiCollageBackground />
@@ -29,17 +32,16 @@ export default function Home() {
 
         <div className="y2k-panel rounded-[1.75rem] p-5 sm:p-8">
           <h1 className="mb-1 text-xl font-extrabold tracking-tight text-indigo-950">
-            Skapa en karta med kompisgänget
+            {t(locale, "home.title")}
           </h1>
           <p className="mb-4 text-sm font-semibold text-indigo-900/60 sm:mb-6">
-            Skapa en länk, dela den i gruppchatten och fyll kartan med era favoritplatser och tips. Välj en pinkod
-            så att nya webbläsare kan låsa upp kartan (inloggningen sparas som kaka i upp till 90 dagar).
+            {t(locale, "home.lede")}
           </p>
-          <CreateRoomLandingForm />
+          <CreateRoomLandingForm locale={locale} />
         </div>
 
         <div className="y2k-panel rounded-[1.75rem] p-5 sm:p-8">
-          <OpenExistingRoomForm />
+          <OpenExistingRoomForm locale={locale} />
         </div>
       </div>
     </div>

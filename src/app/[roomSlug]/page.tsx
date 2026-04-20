@@ -5,6 +5,7 @@ import { getDashboardDataForRoom } from "@/lib/getDashboard";
 import { findRoomBySlugInsensitive } from "@/lib/roomLookup";
 import { isReservedRoomSlug } from "@/lib/reservedSlugs";
 import { ROOM_ACCESS_COOKIE, verifyRoomAccessToken } from "@/lib/roomToken";
+import { getRequestLocale } from "@/lib/i18n.server";
 import { SITE_DESCRIPTION } from "@/lib/site";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
@@ -34,6 +35,7 @@ export async function generateMetadata({
 }
 
 export default async function RoomPage({ params }: { params: Promise<{ roomSlug: string }> }) {
+  const locale = await getRequestLocale();
   const { roomSlug } = await params;
   const slug = roomSlug.trim();
   if (!slug || isReservedRoomSlug(slug)) notFound();
@@ -49,7 +51,13 @@ export default async function RoomPage({ params }: { params: Promise<{ roomSlug:
   const authed = Boolean(claims && claims.roomId === room.id);
 
   if (!authed) {
-    return <UnlockRoomForm roomSlug={canonicalSlug} title={room.name?.trim() || canonicalSlug} />;
+    return (
+      <UnlockRoomForm
+        roomSlug={canonicalSlug}
+        title={room.name?.trim() || canonicalSlug}
+        locale={locale}
+      />
+    );
   }
 
   const { cities, bySlug } = await getDashboardDataForRoom(room.id);
@@ -76,6 +84,7 @@ export default async function RoomPage({ params }: { params: Promise<{ roomSlug:
     <CityClient
       roomSlug={canonicalSlug}
       roomTitle={room.name?.trim() || canonicalSlug}
+      locale={locale}
       cities={cities}
       city={city}
       dashboard={bySlug}

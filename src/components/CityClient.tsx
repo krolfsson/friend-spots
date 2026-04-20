@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import type { Locale } from "@/lib/i18n";
+import { t } from "@/lib/i18n";
 import { createPortal } from "react-dom";
 import { AddSpotForm } from "@/components/AddSpotForm";
 import { CityPickOrCreate } from "@/components/CityPickOrCreate";
@@ -87,12 +89,14 @@ function FadingHorizontalChips({
 export function CityClient({
   roomSlug,
   roomTitle,
+  locale,
   cities,
   city,
   dashboard,
 }: {
   roomSlug: string;
   roomTitle: string;
+  locale: Locale;
   cities: City[];
   city: City;
   dashboard: DashboardBySlug;
@@ -457,14 +461,14 @@ export function CityClient({
               href="/"
               className="y2k-chip inline-flex h-10 w-full items-center justify-center rounded-full px-3 text-center text-sm font-extrabold text-indigo-950 transition hover:-translate-y-0.5 active:scale-[0.99] sm:h-11 sm:px-4"
             >
-              Ny karta
+              {t(locale, "room.actions.newMap")}
             </Link>
             <button
               type="button"
               onClick={() => void shareRoom()}
               className="y2k-chip-active inline-flex h-10 w-full items-center justify-center rounded-full px-3 text-center text-sm font-extrabold text-white transition hover:-translate-y-0.5 active:scale-[0.99] sm:h-11 sm:px-4"
             >
-              Dela karta
+              {t(locale, "room.actions.shareMap")}
             </button>
           </div>
 

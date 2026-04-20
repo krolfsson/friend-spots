@@ -3,13 +3,17 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import type { Locale } from "@/lib/i18n";
+import { t } from "@/lib/i18n";
 
 export function UnlockRoomForm({
   roomSlug,
   title,
+  locale,
 }: {
   roomSlug: string;
   title: string;
+  locale: Locale;
 }) {
   const router = useRouter();
   const [pin, setPin] = useState("");
@@ -27,7 +31,7 @@ export function UnlockRoomForm({
         body: JSON.stringify({ pin }),
       });
       const data = (await res.json()) as { error?: string };
-      if (!res.ok) throw new Error(data.error ?? "Kunde inte låsa upp");
+      if (!res.ok) throw new Error(data.error ?? t(locale, "unlock.errorDefault"));
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Okänt fel");
@@ -40,10 +44,10 @@ export function UnlockRoomForm({
     <div className="mx-auto flex min-h-dvh max-w-md flex-col justify-center px-4 py-12">
       <div className="y2k-panel rounded-[1.75rem] p-6 sm:p-8">
         <h1 className="mb-1 text-xl font-extrabold tracking-tight text-indigo-950">{title}</h1>
-        <p className="mb-6 text-sm font-semibold text-indigo-900/60">Ange pinkod för att öppna kartan.</p>
+        <p className="mb-6 text-sm font-semibold text-indigo-900/60">{t(locale, "unlock.lede")}</p>
         <form onSubmit={onSubmit} className="space-y-4">
           <label className="block text-xs font-extrabold text-indigo-900/80">
-            Pinkod
+            {t(locale, "unlock.pinLabel")}
             <input
               type="password"
               inputMode="numeric"
@@ -61,7 +65,7 @@ export function UnlockRoomForm({
             disabled={busy || pin.trim().length < 4}
             className="w-full rounded-full bg-gradient-to-r from-fuchsia-500 to-violet-600 py-3 text-sm font-extrabold text-white transition enabled:hover:brightness-110 enabled:active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-40"
           >
-            {busy ? "Öppnar…" : "Öppna kartan"}
+            {busy ? t(locale, "unlock.ctaBusy") : t(locale, "unlock.cta")}
           </button>
         </form>
         <p className="mt-6 text-center text-xs font-bold text-indigo-900/45">
@@ -69,7 +73,7 @@ export function UnlockRoomForm({
             href="/"
             className="text-indigo-800 underline decoration-indigo-300 underline-offset-2 hover:text-indigo-950"
           >
-            Skapa egen karta
+            {t(locale, "unlock.createLink")}
           </Link>
         </p>
       </div>

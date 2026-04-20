@@ -2,8 +2,10 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import type { Locale } from "@/lib/i18n";
+import { t } from "@/lib/i18n";
 
-export function CreateRoomLandingForm() {
+export function CreateRoomLandingForm({ locale }: { locale: Locale }) {
   const router = useRouter();
   const [name, setName] = useState("");
   const [pin, setPin] = useState("");
@@ -38,16 +40,16 @@ export function CreateRoomLandingForm() {
   return (
     <form onSubmit={onSubmit} className="space-y-3">
       <label className="block text-xs font-extrabold text-indigo-900/80">
-        Namn (du kan ändra detta senare)
+        {t(locale, "home.create.nameLabel")}
         <input
           value={name}
           onChange={(e) => setName(e.target.value)}
-          placeholder="t.ex. Bucketlist 4 Lyfe"
+          placeholder={t(locale, "home.create.namePlaceholder")}
           className="mt-1 box-border h-10 w-full rounded-xl border border-fuchsia-200/70 bg-white/90 px-3 text-sm font-semibold text-indigo-950 shadow-inner shadow-fuchsia-100/80 outline-none placeholder:text-indigo-900/35 placeholder:opacity-40 focus:ring-2 focus:ring-fuchsia-300/55 sm:h-11 sm:rounded-2xl sm:px-3.5"
         />
       </label>
       <label className="block text-xs font-extrabold text-indigo-900/80">
-        Pinkod
+        {t(locale, "home.create.pinLabel")}
         <input
           type="password"
           inputMode="numeric"
@@ -56,7 +58,7 @@ export function CreateRoomLandingForm() {
           onChange={(e) => setPin(e.target.value)}
           required
           minLength={4}
-          placeholder="t.ex. 1234"
+          placeholder={t(locale, "home.create.pinPlaceholder")}
           className="mt-1 box-border h-10 w-full rounded-xl border border-fuchsia-200/70 bg-white/90 px-3 text-base font-semibold tracking-widest text-indigo-950 shadow-inner shadow-fuchsia-100/80 outline-none placeholder:text-sm placeholder:tracking-normal placeholder:text-indigo-900/35 placeholder:opacity-40 focus:ring-2 focus:ring-fuchsia-300/55 sm:h-11 sm:rounded-2xl sm:px-3.5"
         />
       </label>
@@ -66,7 +68,7 @@ export function CreateRoomLandingForm() {
         disabled={busy || pin.trim().length < 4}
         className="w-full rounded-full bg-gradient-to-r from-emerald-400 to-teal-500 py-2.5 text-sm font-extrabold text-white transition enabled:hover:brightness-110 enabled:active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-40 sm:py-3"
       >
-        {busy ? "Skapar…" : "Skapa karta"}
+        {busy ? (locale === "en" ? "Creating…" : "Skapar…") : t(locale, "home.create.cta")}
       </button>
     </form>
   );
