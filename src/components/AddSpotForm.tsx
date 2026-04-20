@@ -181,7 +181,7 @@ export function AddSpotForm({
               if (selected && query.trim() === selected.label.trim()) return;
               if (suggestions.length) setPickOpen(true);
             }}
-            placeholder=""
+            placeholder="Sök upp ditt tips"
             aria-label="Sök ställe"
             className="box-border h-10 w-full min-w-0 rounded-xl border border-fuchsia-200/70 bg-white/90 px-3 text-sm font-semibold text-indigo-950 shadow-inner shadow-fuchsia-100/80 outline-none ring-0 transition focus:border-transparent focus:ring-2 focus:ring-fuchsia-300/55 sm:h-11 sm:rounded-2xl sm:px-3.5"
           />
@@ -211,11 +211,10 @@ export function AddSpotForm({
             value={emoji}
             onChange={(e) => setEmoji(e.target.value)}
             maxLength={8}
-            placeholder="🌟"
+            placeholder="😊"
             aria-label="Emoji"
             className="box-border h-10 w-10 rounded-xl border border-sky-200/70 bg-white/90 text-center text-lg leading-none shadow-inner shadow-sky-100/80 outline-none focus:ring-2 focus:ring-sky-300/55 sm:h-11 sm:w-11 sm:text-xl"
           />
-          <p className="mt-1 text-[11px] font-bold text-indigo-900/55 sm:hidden">Välj en emoji.</p>
         </div>
       </div>
 
