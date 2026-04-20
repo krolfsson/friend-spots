@@ -70,9 +70,13 @@ export function isMapViewConfigured(): boolean {
 export function SpotsMap({
   spots,
   cityName,
+  overlayLabel,
+  onOverlayClick,
 }: {
   spots: DashboardSpot[];
   cityName: string;
+  overlayLabel?: string;
+  onOverlayClick?: () => void;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -207,6 +211,16 @@ export function SpotsMap({
           <div className="absolute inset-0 z-10 flex items-center justify-center bg-indigo-50/80 text-sm font-bold text-indigo-900/70">
             Laddar karta…
           </div>
+        ) : null}
+        {overlayLabel && onOverlayClick ? (
+          <button
+            type="button"
+            onClick={onOverlayClick}
+            className="absolute left-2 top-2 z-20 inline-flex h-9 min-h-9 items-center justify-center rounded-full bg-white/85 px-3.5 text-sm font-extrabold leading-none tracking-tight text-indigo-950 shadow-sm shadow-indigo-500/10 ring-1 ring-white/60 backdrop-blur-sm transition hover:brightness-105 active:scale-95"
+            aria-label={overlayLabel}
+          >
+            {overlayLabel}
+          </button>
         ) : null}
         <div
           ref={containerRef}

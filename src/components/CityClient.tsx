@@ -379,7 +379,12 @@ export function CityClient({
         <div className="space-y-2">
           <div className="min-h-[100px]">
             {mapEnabled && viewMode === "map" ? (
-              <SpotsMap spots={displaySpots} cityName={activeCity.name} />
+              <SpotsMap
+                spots={displaySpots}
+                cityName={activeCity.name}
+                overlayLabel="Dela"
+                onOverlayClick={() => void shareRoom()}
+              />
             ) : displaySpots.length === 0 ? null : (
               <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
                 {displaySpots.map((s) => (
