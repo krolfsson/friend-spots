@@ -1214,7 +1214,7 @@ function SpotCard({
             </button>
             <div className="flex h-7 items-center justify-center gap-0.5 border-t border-emerald-300/55 bg-emerald-50/95 px-0.5 text-emerald-950 tabular-nums lg:h-6">
               <span aria-hidden className="leading-none">
-                🙋
+                👍
               </span>
               <span className="tabular-nums">{displayScore}</span>
             </div>

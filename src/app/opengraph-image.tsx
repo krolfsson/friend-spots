@@ -149,7 +149,7 @@ export default function OpenGraphImage() {
               {[
                 "🗺️ Kartläge först",
                 "📍 Tips",
-                "🙋 +1",
+                "👍 +1",
                 "🔒 Pinkod",
               ].map((chip, i) => (
                 <div
