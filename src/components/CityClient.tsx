@@ -101,6 +101,7 @@ export function CityClient({
   const [activeCity, setActiveCity] = useState<City>(city);
   const [bundle, setBundle] = useState<DashboardBySlug>(dashboard);
   const [addOpen, setAddOpen] = useState(false);
+  const [shareOpen, setShareOpen] = useState(false);
   /** Stad som POST /api/spots använder — samma som vald rad i lägg-till-panelen. */
   const [addTargetSlug, setAddTargetSlug] = useState(city.slug);
   const [category, setCategory] = useState<"alla" | CategoryId>("alla");
@@ -209,11 +210,33 @@ export function CityClient({
     return () => window.clearTimeout(t);
   }, [toast]);
 
-  const shareRoom = useCallback(async () => {
+  const sharePayload = useMemo(() => {
     const url = typeof window !== "undefined" ? window.location.href : "";
     const title = activeCity.name?.trim() || "Karta";
     const text = SHARE_COPY;
+    const message = url ? `${text}\n${url}` : text;
 
+    const enc = (s: string) => encodeURIComponent(s);
+    const sms = `sms:&body=${enc(message)}`;
+    const whatsapp = `https://wa.me/?text=${enc(message)}`;
+    const facebook = url
+      ? `https://www.facebook.com/sharer/sharer.php?u=${enc(url)}&quote=${enc(text)}`
+      : `https://www.facebook.com/sharer/sharer.php?quote=${enc(text)}`;
+    const mailto = `mailto:?subject=${enc(title)}&body=${enc(message)}`;
+
+    return { url, title, text, message, sms, whatsapp, facebook, mailto };
+  }, [activeCity.name]);
+
+  const copyShare = useCallback(async () => {
+    try {
+      await navigator.clipboard.writeText(sharePayload.message);
+      showToast("Kopierat! Klistra in i iMessage/Facebook/valfri app.", "success");
+    } catch {
+      showToast(sharePayload.message, "info");
+    }
+  }, [sharePayload.message, showToast]);
+
+  const shareRoom = useCallback(async () => {
     try {
       const nav = typeof navigator !== "undefined" ? navigator : null;
       const share = (nav && "share" in nav ? /** @type {any} */ (nav).share : undefined) as
@@ -221,21 +244,15 @@ export function CityClient({
         | ((data: { title?: string; text?: string; url?: string }) => Promise<void>);
       if (share) {
         // Keep the payload minimal for best mobile compatibility.
-        await share({ title, text, url });
+        await share({ title: sharePayload.title, text: sharePayload.text, url: sharePayload.url });
         return;
       }
     } catch {
       // user cancelled or share failed -> fallback below
     }
 
-    const payload = url ? `${text}\n${url}` : text;
-    try {
-      await navigator.clipboard.writeText(payload);
-      showToast("Länken är kopierad. Klistra in i iMessage/Facebook/valfri app.", "success");
-    } catch {
-      showToast(payload, "info");
-    }
-  }, [activeCity.name, showToast]);
+    setShareOpen(true);
+  }, [sharePayload]);
 
   const removeSpot = useCallback((spotId: string, slug: string, spotCategory: string) => {
     setBundle((prev) => {
@@ -420,6 +437,85 @@ export function CityClient({
             aria-live="polite"
           >
             {toast.message}
+          </div>
+        </div>
+      ) : null}
+
+      {shareOpen ? (
+        <div
+          className="fixed inset-0 z-[65] flex touch-manipulation items-end justify-center bg-indigo-950/35 p-2 sm:items-center sm:p-3"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Dela kartan"
+          onPointerDown={(e) => {
+            if (e.target === e.currentTarget) setShareOpen(false);
+          }}
+        >
+          <div className="w-full max-w-md overflow-hidden rounded-2xl border border-indigo-200/70 bg-white/80 shadow-2xl shadow-indigo-950/25 backdrop-blur-sm sm:rounded-[1.75rem]">
+            <header className="flex items-center justify-between gap-3 border-b border-indigo-200/60 bg-white/70 px-4 py-3">
+              <div className="min-w-0 flex-1">
+                <h2 className="truncate text-sm font-extrabold tracking-tight text-indigo-950">
+                  Dela kartan
+                </h2>
+                <p className="mt-0.5 text-[12px] font-bold text-indigo-900/55">{SHARE_COPY}</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShareOpen(false)}
+                className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-indigo-200/60 bg-white/90 text-lg font-bold leading-none text-indigo-950 shadow-sm transition hover:bg-indigo-50/90"
+                aria-label="Stäng"
+              >
+                ×
+              </button>
+            </header>
+
+            <div className="grid grid-cols-2 gap-2 p-3">
+              <a
+                href={sharePayload.sms}
+                className="inline-flex min-h-11 items-center justify-center rounded-2xl border border-indigo-200/70 bg-white/80 px-3 py-3 text-[12px] font-extrabold text-indigo-950 shadow-sm shadow-indigo-500/10 transition hover:brightness-105 active:scale-[0.99]"
+              >
+                SMS / iMessage
+              </a>
+              <a
+                href={sharePayload.whatsapp}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex min-h-11 items-center justify-center rounded-2xl border border-emerald-200/80 bg-emerald-50/70 px-3 py-3 text-[12px] font-extrabold text-emerald-950 shadow-sm shadow-emerald-500/10 transition hover:brightness-105 active:scale-[0.99]"
+              >
+                WhatsApp
+              </a>
+              <a
+                href={sharePayload.facebook}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex min-h-11 items-center justify-center rounded-2xl border border-sky-200/80 bg-sky-50/70 px-3 py-3 text-[12px] font-extrabold text-sky-950 shadow-sm shadow-sky-500/10 transition hover:brightness-105 active:scale-[0.99]"
+              >
+                Facebook
+              </a>
+              <a
+                href={sharePayload.mailto}
+                className="inline-flex min-h-11 items-center justify-center rounded-2xl border border-fuchsia-200/80 bg-fuchsia-50/60 px-3 py-3 text-[12px] font-extrabold text-fuchsia-950 shadow-sm shadow-fuchsia-500/10 transition hover:brightness-105 active:scale-[0.99]"
+              >
+                Mail
+              </a>
+            </div>
+
+            <div className="flex gap-2 border-t border-indigo-200/60 bg-white/60 p-3">
+              <button
+                type="button"
+                onClick={() => void copyShare()}
+                className="inline-flex min-h-11 flex-1 items-center justify-center rounded-2xl bg-gradient-to-r from-emerald-400 to-teal-500 px-4 py-3 text-sm font-extrabold text-white shadow-sm shadow-emerald-500/20 ring-1 ring-white/60 transition hover:brightness-110 active:scale-[0.99]"
+              >
+                Kopiera länk
+              </button>
+              <button
+                type="button"
+                onClick={() => setShareOpen(false)}
+                className="inline-flex min-h-11 items-center justify-center rounded-2xl border border-indigo-200/70 bg-white/80 px-4 py-3 text-sm font-extrabold text-indigo-950 shadow-sm shadow-indigo-500/10 ring-1 ring-white/60 transition hover:brightness-105 active:scale-[0.99]"
+              >
+                Stäng
+              </button>
+            </div>
           </div>
         </div>
       ) : null}
