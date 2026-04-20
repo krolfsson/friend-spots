@@ -102,6 +102,10 @@ export function CityClient({
   const [bundle, setBundle] = useState<DashboardBySlug>(dashboard);
   const [addOpen, setAddOpen] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
+  const [renameOpen, setRenameOpen] = useState(false);
+  const [renameBusy, setRenameBusy] = useState(false);
+  const [renameValue, setRenameValue] = useState(roomTitle);
+  const [roomTitleLive, setRoomTitleLive] = useState(roomTitle);
   /** Stad som POST /api/spots använder — samma som vald rad i lägg-till-panelen. */
   const [addTargetSlug, setAddTargetSlug] = useState(city.slug);
   const [category, setCategory] = useState<"alla" | CategoryId>("alla");
@@ -110,6 +114,11 @@ export function CityClient({
   const [error, setError] = useState<string | null>(null);
   const [toast, setToast] = useState<{ message: string; tone?: ToastTone } | null>(null);
   const mapEnabled = isMapViewConfigured();
+
+  useEffect(() => {
+    setRoomTitleLive(roomTitle);
+    setRenameValue(roomTitle);
+  }, [roomTitle]);
 
   useEffect(() => {
     setCityList(cities);
@@ -212,7 +221,7 @@ export function CityClient({
 
   const sharePayload = useMemo(() => {
     const url = typeof window !== "undefined" ? window.location.href : "";
-    const title = roomTitle.trim() || "Karta";
+    const title = roomTitleLive.trim() || "Karta";
     const text = SHARE_COPY;
     const message = url ? `${text}\n${url}` : text;
 
@@ -225,7 +234,7 @@ export function CityClient({
     const mailto = `mailto:?subject=${enc(title)}&body=${enc(message)}`;
 
     return { url, title, text, message, sms, whatsapp, facebook, mailto };
-  }, [roomTitle]);
+  }, [roomTitleLive]);
 
   const copyShare = useCallback(async () => {
     try {
@@ -253,6 +262,31 @@ export function CityClient({
 
     setShareOpen(true);
   }, [sharePayload]);
+
+  const saveRoomTitle = useCallback(async () => {
+    if (renameBusy) return;
+    const next = renameValue.trim();
+    setRenameBusy(true);
+    setError(null);
+    try {
+      const res = await fetch(`/api/rooms/${encodeURIComponent(roomSlug)}/name`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: next || null }),
+      });
+      const data = (await res.json()) as { name?: string | null; error?: string };
+      if (!res.ok) throw new Error(data.error ?? "Kunde inte spara namn");
+      const saved = (data.name ?? "").trim();
+      const label = saved || roomSlug;
+      setRoomTitleLive(label);
+      setRenameOpen(false);
+      showToast("Kartnamn uppdaterat.", "success");
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Okänt fel");
+    } finally {
+      setRenameBusy(false);
+    }
+  }, [renameBusy, renameValue, roomSlug, showToast]);
 
   const removeSpot = useCallback((spotId: string, slug: string, spotCategory: string) => {
     setBundle((prev) => {
@@ -384,8 +418,26 @@ export function CityClient({
               <SpotsMap
                 spots={displaySpots}
                 cityName={activeCity.name}
-                overlayLabel={roomTitle}
-                onOverlayClick={() => void shareRoom()}
+                overlayPosition="right"
+                overlay={
+                  <div className="inline-flex h-9 min-h-9 max-w-[min(70vw,18rem)] items-center gap-2 rounded-full bg-white/85 px-[1.05rem] text-sm font-extrabold leading-none tracking-tight text-indigo-950 shadow-sm shadow-indigo-500/10 ring-1 ring-white/60 backdrop-blur-sm">
+                    <span className="truncate">{roomTitleLive}</span>
+                    <button
+                      type="button"
+                      onClick={() => setRenameOpen(true)}
+                      className="grid h-7 w-7 shrink-0 place-items-center rounded-full border border-indigo-200/70 bg-white/85 text-indigo-900/80 shadow-sm transition hover:bg-indigo-50 active:scale-95"
+                      aria-label="Byt kartnamn"
+                      title="Byt kartnamn"
+                    >
+                      <svg viewBox="0 0 24 24" className="h-4 w-4" aria-hidden>
+                        <path
+                          d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Zm8.5-3.5a7.9 7.9 0 0 0-.08-1.1l1.83-1.42-1.9-3.3-2.2.73a8.2 8.2 0 0 0-1.9-1.1l-.35-2.3h-3.8l-.35 2.3c-.66.25-1.3.6-1.9 1.1l-2.2-.73-1.9 3.3 1.83 1.42c-.05.36-.08.73-.08 1.1s.03.74.08 1.1L3.6 13.42l1.9 3.3 2.2-.73c.6.5 1.24.85 1.9 1.1l.35 2.3h3.8l.35-2.3c.66-.25 1.3-.6 1.9-1.1l2.2.73 1.9-3.3-1.83-1.42c.05-.36.08-.73.08-1.1Z"
+                          fill="currentColor"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                }
               />
             ) : displaySpots.length === 0 ? null : (
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -433,6 +485,72 @@ export function CityClient({
             aria-live="polite"
           >
             {toast.message}
+          </div>
+        </div>
+      ) : null}
+
+      {renameOpen ? (
+        <div
+          className="fixed inset-0 z-[66] flex touch-manipulation items-end justify-center bg-indigo-950/35 p-2 sm:items-center sm:p-3"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Byt kartnamn"
+          onPointerDown={(e) => {
+            if (e.target === e.currentTarget) setRenameOpen(false);
+          }}
+        >
+          <div className="w-full max-w-md overflow-hidden rounded-2xl border border-indigo-200/70 bg-white/80 shadow-2xl shadow-indigo-950/25 backdrop-blur-sm sm:rounded-[1.75rem]">
+            <header className="flex items-center justify-between gap-3 border-b border-indigo-200/60 bg-white/70 px-4 py-3">
+              <div className="min-w-0 flex-1">
+                <h2 className="truncate text-sm font-extrabold tracking-tight text-indigo-950">
+                  Byt kartnamn
+                </h2>
+                <p className="mt-0.5 text-[12px] font-bold text-indigo-900/55">
+                  Länken ändras inte. Bara namnet.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setRenameOpen(false)}
+                className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-indigo-200/60 bg-white/90 text-lg font-bold leading-none text-indigo-950 shadow-sm transition hover:bg-indigo-50/90"
+                aria-label="Stäng"
+              >
+                ×
+              </button>
+            </header>
+
+            <div className="p-3">
+              <label className="block text-xs font-extrabold text-indigo-900/80">
+                Namn
+                <input
+                  value={renameValue}
+                  onChange={(e) => setRenameValue(e.target.value)}
+                  placeholder="t.ex. Sommarresan 2026"
+                  className="mt-1 w-full rounded-2xl border border-indigo-200/70 bg-white/90 px-4 py-3 text-sm font-semibold text-indigo-950 outline-none focus:ring-4 focus:ring-indigo-300/45"
+                />
+              </label>
+              <p className="mt-1 text-[11px] font-bold text-indigo-900/45">
+                Lämna tomt för att använda adressen (<span className="font-black">{roomSlug}</span>).
+              </p>
+            </div>
+
+            <div className="flex gap-2 border-t border-indigo-200/60 bg-white/60 p-3">
+              <button
+                type="button"
+                disabled={renameBusy}
+                onClick={() => void saveRoomTitle()}
+                className="inline-flex min-h-11 flex-1 items-center justify-center rounded-2xl bg-gradient-to-r from-emerald-400 to-teal-500 px-4 py-3 text-sm font-extrabold text-white shadow-sm shadow-emerald-500/20 ring-1 ring-white/60 transition hover:brightness-110 active:scale-[0.99] disabled:opacity-50"
+              >
+                {renameBusy ? "Sparar…" : "Spara"}
+              </button>
+              <button
+                type="button"
+                onClick={() => setRenameOpen(false)}
+                className="inline-flex min-h-11 items-center justify-center rounded-2xl border border-indigo-200/70 bg-white/80 px-4 py-3 text-sm font-extrabold text-indigo-950 shadow-sm shadow-indigo-500/10 ring-1 ring-white/60 transition hover:brightness-105 active:scale-[0.99]"
+              >
+                Avbryt
+              </button>
+            </div>
           </div>
         </div>
       ) : null}

@@ -70,13 +70,13 @@ export function isMapViewConfigured(): boolean {
 export function SpotsMap({
   spots,
   cityName,
-  overlayLabel,
-  onOverlayClick,
+  overlay,
+  overlayPosition = "left",
 }: {
   spots: DashboardSpot[];
   cityName: string;
-  overlayLabel?: string;
-  onOverlayClick?: () => void;
+  overlay?: React.ReactNode;
+  overlayPosition?: "left" | "right";
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -212,15 +212,12 @@ export function SpotsMap({
             Laddar karta…
           </div>
         ) : null}
-        {overlayLabel && onOverlayClick ? (
-          <button
-            type="button"
-            onClick={onOverlayClick}
-            className="absolute left-2 top-2 z-20 inline-flex h-9 min-h-9 items-center justify-center rounded-full bg-white/85 px-3.5 text-sm font-extrabold leading-none tracking-tight text-indigo-950 shadow-sm shadow-indigo-500/10 ring-1 ring-white/60 backdrop-blur-sm transition hover:brightness-105 active:scale-95"
-            aria-label={overlayLabel}
+        {overlay ? (
+          <div
+            className={`absolute top-2 z-20 ${overlayPosition === "right" ? "right-2" : "left-2"}`}
           >
-            {overlayLabel}
-          </button>
+            {overlay}
+          </div>
         ) : null}
         <div
           ref={containerRef}
