@@ -522,7 +522,7 @@ export function CityClient({
                 <input
                   value={renameValue}
                   onChange={(e) => setRenameValue(e.target.value)}
-                  placeholder="t.ex. Sommarresan 2026"
+                  placeholder="t.ex. Bucketlist 4 Lyfe"
                   className="mt-1 w-full rounded-2xl border border-indigo-200/70 bg-white/90 px-4 py-3 text-sm font-semibold text-indigo-950 outline-none focus:ring-4 focus:ring-indigo-300/45"
                 />
               </label>
