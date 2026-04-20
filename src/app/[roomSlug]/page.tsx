@@ -72,5 +72,13 @@ export default async function RoomPage({ params }: { params: Promise<{ roomSlug:
     if (envHit) city = envHit;
   }
 
-  return <CityClient roomSlug={canonicalSlug} cities={cities} city={city} dashboard={bySlug} />;
+  return (
+    <CityClient
+      roomSlug={canonicalSlug}
+      roomTitle={room.name?.trim() || canonicalSlug}
+      cities={cities}
+      city={city}
+      dashboard={bySlug}
+    />
+  );
 }

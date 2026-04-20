@@ -86,11 +86,13 @@ function FadingHorizontalChips({
 
 export function CityClient({
   roomSlug,
+  roomTitle,
   cities,
   city,
   dashboard,
 }: {
   roomSlug: string;
+  roomTitle: string;
   cities: City[];
   city: City;
   dashboard: DashboardBySlug;
@@ -210,7 +212,7 @@ export function CityClient({
 
   const sharePayload = useMemo(() => {
     const url = typeof window !== "undefined" ? window.location.href : "";
-    const title = activeCity.name?.trim() || "Karta";
+    const title = roomTitle.trim() || "Karta";
     const text = SHARE_COPY;
     const message = url ? `${text}\n${url}` : text;
 
@@ -223,7 +225,7 @@ export function CityClient({
     const mailto = `mailto:?subject=${enc(title)}&body=${enc(message)}`;
 
     return { url, title, text, message, sms, whatsapp, facebook, mailto };
-  }, [activeCity.name]);
+  }, [roomTitle]);
 
   const copyShare = useCallback(async () => {
     try {
@@ -382,7 +384,7 @@ export function CityClient({
               <SpotsMap
                 spots={displaySpots}
                 cityName={activeCity.name}
-                overlayLabel="Dela"
+                overlayLabel={roomTitle}
                 onOverlayClick={() => void shareRoom()}
               />
             ) : displaySpots.length === 0 ? null : (
