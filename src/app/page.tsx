@@ -16,6 +16,18 @@ export default function Home() {
     <div className="relative mx-auto flex min-h-dvh max-w-md flex-col justify-center px-4 py-6 sm:py-12">
       <EmojiCollageBackground />
       <div className="relative z-10 space-y-3 sm:space-y-4">
+        <div className="flex justify-center pb-1">
+          <div
+            className="select-none text-[28px] leading-none tracking-tight text-indigo-950/90 sm:text-[34px]"
+            style={{
+              fontFamily: "var(--font-logo), var(--font-y2k), system-ui, sans-serif",
+              textShadow: "0 1px 0 rgba(255,255,255,0.65)",
+            }}
+          >
+            RecsMaps
+          </div>
+        </div>
+
         <div className="y2k-panel rounded-[1.75rem] p-5 sm:p-8">
           <h1 className="mb-1 text-xl font-extrabold tracking-tight text-indigo-950">
             Skapa en karta med kompisgänget

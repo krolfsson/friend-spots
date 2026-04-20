@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { M_PLUS_Rounded_1c } from "next/font/google";
+import { DotGothic16, M_PLUS_Rounded_1c } from "next/font/google";
 import { SITE_DESCRIPTION, SITE_TITLE } from "@/lib/site";
 import "./globals.css";
 
@@ -7,6 +7,12 @@ const y2k = M_PLUS_Rounded_1c({
   subsets: ["latin"],
   weight: ["400", "500", "700", "800"],
   variable: "--font-y2k",
+});
+
+const logo = DotGothic16({
+  subsets: ["latin"],
+  weight: "400",
+  variable: "--font-logo",
 });
 
 export const metadata: Metadata = {
@@ -51,7 +57,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="sv">
-      <body className={`${y2k.variable} min-h-dvh font-sans antialiased`} style={{ fontFamily: "var(--font-y2k), system-ui, sans-serif" }}>
+      <body
+        className={`${y2k.variable} ${logo.variable} min-h-dvh font-sans antialiased`}
+        style={{ fontFamily: "var(--font-y2k), system-ui, sans-serif" }}
+      >
         {children}
       </body>
     </html>
