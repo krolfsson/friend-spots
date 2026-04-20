@@ -22,21 +22,39 @@ function escapeSvgText(s: string): string {
     .replace(/"/g, "&quot;");
 }
 
-function buildEmojiMarkerIcon(
+/** Samma poäng som i listan: 1 bas + antal plussar. */
+function spotDisplayScore(spot: DashboardSpot): number {
+  return 1 + spot.plusCount;
+}
+
+function buildSpotMarkerIcon(
   emoji: string,
+  score: number,
   cache: Map<string, google.maps.Icon>,
 ): google.maps.Icon {
-  const hit = cache.get(emoji);
+  const scoreLabel = score > 99 ? "99+" : String(score);
+  const cacheKey = `${emoji}\0${scoreLabel}`;
+  const hit = cache.get(cacheKey);
   if (hit) return hit;
-  const size = 44;
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}"><defs><filter id="s" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="1" stdDeviation="1.5" flood-opacity="0.3"/></filter></defs><circle cx="${size / 2}" cy="${size / 2}" r="16.5" fill="#ffffff" stroke="#4f46e5" stroke-width="2" filter="url(#s)"/><text x="${size / 2}" y="${size / 2}" font-size="20" text-anchor="middle" dominant-baseline="central" font-family="system-ui,&quot;Apple Color Emoji&quot;,&quot;Segoe UI Emoji&quot;,&quot;Noto Color Emoji&quot;,sans-serif">${escapeSvgText(emoji)}</text></svg>`;
+
+  const size = 38;
+  const mainCx = 18;
+  const mainCy = 18;
+  const mainR = 12.5;
+  const emojiFont = 15;
+  const badgeCx = 28.5;
+  const badgeCy = 25.5;
+  const badgeR = scoreLabel.length > 2 ? 8.8 : 7.6;
+  const badgeFont = scoreLabel.length > 2 ? 7.5 : 9;
+
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}"><defs><filter id="s" x="-35%" y="-35%" width="170%" height="170%"><feDropShadow dx="0" dy="1" stdDeviation="1.2" flood-opacity="0.28"/></filter></defs><circle cx="${mainCx}" cy="${mainCy}" r="${mainR}" fill="#ffffff" stroke="#4f46e5" stroke-width="1.75" filter="url(#s)"/><text x="${mainCx}" y="${mainCy}" font-size="${emojiFont}" text-anchor="middle" dominant-baseline="central" font-family="system-ui,&quot;Apple Color Emoji&quot;,&quot;Segoe UI Emoji&quot;,&quot;Noto Color Emoji&quot;,sans-serif">${escapeSvgText(emoji)}</text><circle cx="${badgeCx}" cy="${badgeCy}" r="${badgeR}" fill="#10b981" stroke="#ffffff" stroke-width="1.75"/><text x="${badgeCx}" y="${badgeCy}" font-size="${badgeFont}" font-weight="800" text-anchor="middle" dominant-baseline="central" fill="#ffffff" font-family="system-ui,ui-sans-serif,sans-serif">${escapeSvgText(scoreLabel)}</text></svg>`;
   const url = `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
   const icon: google.maps.Icon = {
     url,
     scaledSize: new google.maps.Size(size, size),
-    anchor: new google.maps.Point(size / 2, size / 2),
+    anchor: new google.maps.Point(mainCx, mainCy),
   };
-  cache.set(emoji, icon);
+  cache.set(cacheKey, icon);
   return icon;
 }
 
@@ -139,7 +157,7 @@ export function SpotsMap({
             map,
             position: { lat: spot.lat!, lng: spot.lng! },
             title: spot.name,
-            icon: buildEmojiMarkerIcon(spotMapEmoji(spot), emojiIconCache),
+            icon: buildSpotMarkerIcon(spotMapEmoji(spot), spotDisplayScore(spot), emojiIconCache),
           });
           marker.addListener("click", () => {
             if (!map || !iw) return;
