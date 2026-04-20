@@ -34,7 +34,7 @@ export function OpenExistingRoomForm() {
           autoCorrect="off"
           spellCheck={false}
           inputMode="url"
-          className="mt-1 box-border h-10 w-full rounded-xl border border-sky-200/70 bg-white/90 px-3 text-sm font-semibold text-indigo-950 shadow-inner shadow-sky-100/80 outline-none placeholder:text-indigo-900/35 placeholder:opacity-60 focus:ring-2 focus:ring-sky-300/55 sm:h-11 sm:rounded-2xl sm:px-3.5"
+          className="mt-1 box-border h-10 w-full rounded-xl border border-sky-200/70 bg-white/90 px-3 text-sm font-semibold text-indigo-950 shadow-inner shadow-sky-100/80 outline-none placeholder:text-indigo-900/35 placeholder:opacity-40 focus:ring-2 focus:ring-sky-300/55 sm:h-11 sm:rounded-2xl sm:px-3.5"
         />
       </label>
 
