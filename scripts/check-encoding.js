@@ -8,7 +8,7 @@
  *   Unexpected character '\0'
  */
 
-const fs = require("node:fs");
+const fsMod = require("node:fs");
 const path = require("node:path");
 
 /** @param {string} p */
@@ -20,10 +20,8 @@ function posix(p) {
 function walk(dir) {
   /** @type {string[]} */
   const out = [];
-  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-    if (entry.name === "node_modules" || entry.name === ".next" || entry.name === ".git") {
-      continue;
-    }
+  for (const entry of fsMod.readdirSync(dir, { withFileTypes: true })) {
+    if (entry.name === "node_modules" || entry.name === ".next" || entry.name === ".git") continue;
     const full = path.join(dir, entry.name);
     if (entry.isDirectory()) out.push(...walk(full));
     else out.push(full);
@@ -40,6 +38,8 @@ const allowedExt = new Set([
   ".mjs",
   ".cjs",
   ".json",
+  ".yml",
+  ".yaml",
   ".md",
   ".css",
   ".scss",
@@ -52,7 +52,7 @@ const candidates = walk(ROOT).filter((p) => allowedExt.has(path.extname(p)));
 /** @type {string[]} */
 const nulFiles = [];
 for (const file of candidates) {
-  const buf = fs.readFileSync(file);
+  const buf = fsMod.readFileSync(file);
   if (buf.includes(0)) nulFiles.push(posix(path.relative(ROOT, file)));
 }
 
