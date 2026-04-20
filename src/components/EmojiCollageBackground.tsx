@@ -10,7 +10,7 @@ type Item = {
 };
 
 const ITEMS: Item[] = [
-  { emoji: "✨", top: "-3%", left: "4%", rotate: -18, size: 54, opacity: 0.46 },
+  { emoji: "🗺️", top: "-3%", left: "4%", rotate: -18, size: 54, opacity: 0.46 },
   { emoji: "☕️", top: "6%", left: "80%", rotate: 14, size: 44, opacity: 0.42 },
   { emoji: "🍳", top: "12%", left: "16%", rotate: 8, size: 46, opacity: 0.4 },
   { emoji: "🍝", top: "16%", left: "52%", rotate: -9, size: 58, opacity: 0.38 },
@@ -19,10 +19,10 @@ const ITEMS: Item[] = [
   { emoji: "🏨", top: "38%", left: "62%", rotate: 10, size: 64, opacity: 0.36 },
   { emoji: "🗽", top: "44%", left: "24%", rotate: -14, size: 60, opacity: 0.36 },
   { emoji: "🍻", top: "54%", left: "90%", rotate: 18, size: 48, opacity: 0.38 },
-  { emoji: "🎧", top: "62%", left: "9%", rotate: -10, size: 54, opacity: 0.34 },
+  { emoji: "🎧", top: "62%", left: "1%", rotate: -10, size: 54, opacity: 0.34 },
   { emoji: "🌆", top: "70%", left: "68%", rotate: 12, size: 62, opacity: 0.34 },
   { emoji: "🧁", top: "84%", left: "44%", rotate: -17, size: 50, opacity: 0.36 },
-  { emoji: "🥐", top: "4%", left: "36%", rotate: -6, size: 46, opacity: 0.34 },
+  { emoji: "🥐", top: "4%", left: "20%", rotate: -6, size: 46, opacity: 0.34 },
   { emoji: "🍜", top: "22%", left: "34%", rotate: 10, size: 52, opacity: 0.32 },
   { emoji: "🍣", top: "10%", left: "92%", rotate: -12, size: 48, opacity: 0.34 },
   { emoji: "🍷", top: "36%", left: "86%", rotate: 8, size: 46, opacity: 0.32 },
