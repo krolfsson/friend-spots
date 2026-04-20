@@ -38,6 +38,7 @@ export async function getDashboardDataForRoom(roomId: string) {
         emoji: s.emoji,
         lat: s.lat,
         lng: s.lng,
+        createdAt: s.createdAt.toISOString(),
         plusCount: s._count.plusses,
         recommendations: s.recommendations.map((r) => ({
           id: r.id,

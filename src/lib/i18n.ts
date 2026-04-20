@@ -28,6 +28,7 @@ export const MESSAGES: Record<Locale, Record<string, string>> = {
     "room.actions.directions": "Hitta",
     "room.view.map": "Karta",
     "room.view.list": "Topplista",
+    "room.view.latest": "Det senaste",
     "room.filter.allCategories": "Alla kategorier",
 
     "cat.frukost": "Frukost",
@@ -112,6 +113,7 @@ export const MESSAGES: Record<Locale, Record<string, string>> = {
     "room.actions.directions": "Directions",
     "room.view.map": "Map",
     "room.view.list": "Leaderboard",
+    "room.view.latest": "Latest",
     "room.filter.allCategories": "All categories",
 
     "cat.frukost": "Breakfast",

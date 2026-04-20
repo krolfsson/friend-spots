@@ -12,6 +12,7 @@ import type { DashboardBySlug, DashboardSpot } from "@/lib/dashboardTypes";
 import { mapsOpenForSpot } from "@/lib/mapsUrl";
 import { getOrCreateVoterToken } from "@/lib/voterClient";
 import { isMapViewConfigured, SpotsMap } from "@/components/SpotsMap";
+import { sortSpotsByCreatedAtNewestFirst } from "@/lib/sortSpots";
 
 type City = { id: string; name: string; slug: string; _count?: { spots: number } };
 
@@ -115,6 +116,8 @@ export function CityClient({
   const [category, setCategory] = useState<"alla" | CategoryId>("alla");
   const [neighborhood, setNeighborhood] = useState<string>("alla");
   const [viewMode, setViewMode] = useState<"list" | "map">("map");
+  /** Ordning i listvy: popularitet (server) eller nyast först. */
+  const [listSort, setListSort] = useState<"popular" | "recent">("popular");
   const [error, setError] = useState<string | null>(null);
   const [toast, setToast] = useState<{ message: string; tone?: ToastTone } | null>(null);
   const mapEnabled = isMapViewConfigured();
@@ -162,6 +165,11 @@ export function CityClient({
     }
     return filteredByCategory.filter((s) => s.neighborhood === neighborhood);
   }, [filteredByCategory, neighborhood]);
+
+  const spotsForListView = useMemo(() => {
+    if (listSort !== "recent") return displaySpots;
+    return [...displaySpots].sort(sortSpotsByCreatedAtNewestFirst);
+  }, [displaySpots, listSort]);
 
   const addTargetCity = useMemo(
     () => cityList.find((c) => c.slug === addTargetSlug) ?? activeCity,
@@ -403,9 +411,27 @@ export function CityClient({
               <span className="mr-1">🗺️</span>
               {t(locale, "room.view.map")}
             </Chip>
-            <Chip active={viewMode === "list"} onClick={() => setViewMode("list")} tone="violet">
+            <Chip
+              active={viewMode === "list" && listSort === "popular"}
+              onClick={() => {
+                setViewMode("list");
+                setListSort("popular");
+              }}
+              tone="violet"
+            >
               <span className="mr-1">🥇</span>
               {t(locale, "room.view.list")}
+            </Chip>
+            <Chip
+              active={viewMode === "list" && listSort === "recent"}
+              onClick={() => {
+                setViewMode("list");
+                setListSort("recent");
+              }}
+              tone="violet"
+            >
+              <span className="mr-1">🆕</span>
+              {t(locale, "room.view.latest")}
             </Chip>
           </FadingHorizontalChips>
         ) : null}
@@ -469,7 +495,7 @@ export function CityClient({
               />
             ) : displaySpots.length === 0 ? null : (
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                {displaySpots.map((s) => (
+                {spotsForListView.map((s) => (
                   <SpotCard
                     key={s.id}
                     roomSlug={roomSlug}

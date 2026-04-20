@@ -7,6 +7,8 @@ export type DashboardSpot = {
   emoji: string | null;
   lat?: number | null;
   lng?: number | null;
+  /** ISO-tid när tipset skapades (för “Det senaste”-sortering). */
+  createdAt: string;
   /** Anonym “plussa”; listan sorteras efter detta (sedan namn). */
   plusCount: number;
   /** Sätts när klienten skickar X-Voter-Token (samma webbläsare har redan plussat). */

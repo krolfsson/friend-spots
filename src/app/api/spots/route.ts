@@ -11,6 +11,7 @@ import { getRequestClientIp, isValidVoterToken, makeVoterKey } from "@/lib/voter
 function toDashboardSpot(
   s: {
     id: string;
+    createdAt: Date;
     googlePlaceId: string;
     name: string;
     neighborhood: string | null;
@@ -32,6 +33,7 @@ function toDashboardSpot(
     emoji: s.emoji,
     lat: s.lat,
     lng: s.lng,
+    createdAt: s.createdAt.toISOString(),
     plusCount: s._count.plusses,
     ...(viewerHasPlussed !== undefined ? { viewerHasPlussed } : {}),
     recommendations: s.recommendations.map((r) => ({
