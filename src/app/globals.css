@@ -214,6 +214,9 @@ body {
   width: 36px !important;
   height: 36px !important;
   border-radius: 9999px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
   background: rgba(255, 255, 255, 0.92) !important;
   border: 1.5px solid rgba(199, 210, 254, 0.65) !important;
   box-shadow:
@@ -222,5 +225,11 @@ body {
 }
 
 .gm-style .gm-ui-hover-effect > span {
-  margin: 8px !important;
+  display: none !important;
+}
+
+.gm-style .gm-ui-hover-effect::before {
+  content: "❌";
+  font-size: 16px;
+  line-height: 1;
 }
