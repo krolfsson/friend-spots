@@ -455,9 +455,8 @@ export function CityClient({
       <div className="relative">
         {/* Sticky header: stick to top edge (include safe-area padding). */}
         <div className="sticky top-0 z-40 -mx-[0.96rem] px-[0.96rem] pt-[max(0.75rem,env(safe-area-inset-top))]">
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(900px_520px_at_10%_0%,rgba(233,213,255,0.75),transparent_58%),radial-gradient(800px_500px_at_95%_10%,rgba(251,207,232,0.65),transparent_55%),linear-gradient(180deg,rgba(253,244,255,0.92),rgba(245,243,255,0.65),transparent)] backdrop-blur-md" />
-          {/* Fade out content behind pills, exactly at header bottom. */}
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-10 bg-gradient-to-b from-transparent via-[#fdf4ff]/25 to-[#fdf4ff]/70" />
+          {/* Samma bas som body (#fdf4ff) i botten — inget transparent + blur som ger raka “kantlinjer” mot bakgrunden. */}
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(900px_520px_at_10%_0%,rgba(233,213,255,0.82),transparent_58%),radial-gradient(800px_500px_at_95%_10%,rgba(251,207,232,0.72),transparent_55%),linear-gradient(180deg,rgba(253,244,255,0.96)_0%,rgba(245,243,255,0.78)_38%,rgba(253,244,255,0.55)_62%,#fdf4ff_88%,#fdf4ff_100%)]" />
 
           <div className="relative space-y-[0.6rem] pb-[0.6rem]">
             <FadingHorizontalChips rowClassName="py-0">
