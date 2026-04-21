@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 export default async function Home() {
   const locale = await getRequestLocale();
   return (
-    <div className="relative mx-auto flex min-h-dvh max-w-md flex-col justify-center px-4 py-6 sm:py-12">
+    <div className="relative mx-auto flex min-h-dvh max-w-md flex-col justify-center px-4 pt-3 pb-6 sm:pt-6 sm:pb-12">
       <EmojiCollageBackground />
       <div className="relative z-10 space-y-3 sm:space-y-4">
         <div className="-mt-[0.2rem] flex w-full justify-center overflow-visible pb-0.5">
