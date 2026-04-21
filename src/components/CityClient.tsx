@@ -18,11 +18,30 @@ type City = { id: string; name: string; slug: string; emoji?: string | null; _co
 
 type ToastTone = "success" | "info";
 
-function PillSectionLabel({ children }: { children: React.ReactNode }) {
+function NewTipPillButton({ locale, onClick }: { locale: Locale; onClick: () => void }) {
   return (
-    <div className="px-0.5 pt-0.5">
-      <p className="text-[10px] font-black uppercase tracking-[0.14em] text-indigo-900/40">{children}</p>
-    </div>
+    <button
+      type="button"
+      onClick={onClick}
+      className="pointer-events-auto inline-flex h-10 max-w-[min(100%,20rem)] shrink-0 items-center gap-2 rounded-full bg-gradient-to-r from-emerald-400 to-teal-500 pl-2.5 pr-3.5 text-sm font-extrabold leading-none tracking-tight text-white shadow-lg shadow-emerald-700/20 ring-1 ring-white/50 transition hover:brightness-110 active:scale-[0.97] focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-200/90"
+      aria-label={t(locale, "add.title")}
+    >
+      <span
+        className="grid h-7 w-7 shrink-0 place-items-center rounded-full border border-white/40 bg-white/15"
+        aria-hidden
+      >
+        <svg viewBox="0 0 24 24" className="h-4 w-4" aria-hidden>
+          <path
+            d="M12 7v10M7 12h10"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.2"
+            strokeLinecap="round"
+          />
+        </svg>
+      </span>
+      <span className="min-w-0 truncate">{t(locale, "add.title")}</span>
+    </button>
   );
 }
 
@@ -347,29 +366,7 @@ export function CityClient({
           <div className="pointer-events-none absolute inset-x-0 bottom-0 h-10 bg-gradient-to-b from-transparent via-[#fdf4ff]/25 to-[#fdf4ff]/70" />
 
           <div className="relative space-y-[0.55rem] pb-2">
-            <div>
-              <PillSectionLabel>{t(locale, "room.cityHeading")}</PillSectionLabel>
-              <FadingHorizontalChips rowClassName="py-0">
-              <button
-                type="button"
-                aria-label={t(locale, "add.openFabTitle")}
-                title={t(locale, "add.openFabTitle")}
-                onClick={() => {
-                  setAddTargetSlug(activeCity.slug);
-                  setAddOpen(true);
-                }}
-                className="pointer-events-auto y2k-fab-sm grid h-9 min-h-9 w-9 shrink-0 place-items-center rounded-full text-white transition hover:brightness-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/80 active:scale-95"
-              >
-                <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden>
-                  <path
-                    d="M12 5v14M5 12h14"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2.4"
-                    strokeLinecap="round"
-                  />
-                </svg>
-              </button>
+            <FadingHorizontalChips rowClassName="py-0">
               {cityList.map((c) => {
                 const active = c.slug === activeCity.slug;
                 return (
@@ -386,11 +383,9 @@ export function CityClient({
                   </button>
                 );
               })}
-              </FadingHorizontalChips>
-            </div>
+            </FadingHorizontalChips>
 
             <div>
-              <PillSectionLabel>{t(locale, "room.filtersHeading")}</PillSectionLabel>
               <FadingHorizontalChips rowClassName="py-0">
               <Chip active={category === "alla"} onClick={() => setCategory("alla")} tone="violet">
                 <span className="mr-1">✨</span>
@@ -428,14 +423,9 @@ export function CityClient({
             </div>
 
             {mapEnabled ? (
-              <div className="rounded-2xl border border-sky-200/65 bg-gradient-to-br from-sky-50/95 via-white/75 to-indigo-50/55 p-2 shadow-[0_12px_34px_rgba(14,165,233,0.10)]">
-                <div className="px-1 pb-1">
-                  <p className="text-[10px] font-black uppercase tracking-[0.14em] text-sky-900/50">
-                    {t(locale, "room.viewAsLabel")}
-                  </p>
-                </div>
+              <div className="rounded-2xl border border-indigo-100/90 bg-white p-2 shadow-sm shadow-indigo-950/[0.04]">
                 <FadingHorizontalChips rowClassName="py-0">
-                  <Chip active={viewMode === "map"} onClick={() => setViewMode("map")} tone="sky">
+                  <Chip active={viewMode === "map"} onClick={() => setViewMode("map")} tone="violet">
                     <span className="mr-1">🗺️</span>
                     {t(locale, "room.view.map")}
                   </Chip>
@@ -445,7 +435,7 @@ export function CityClient({
                       setViewMode("list");
                       setListSort("popular");
                     }}
-                    tone="sky"
+                    tone="violet"
                   >
                     <span className="mr-1">🥇</span>
                     {t(locale, "room.view.list")}
@@ -456,14 +446,35 @@ export function CityClient({
                       setViewMode("list");
                       setListSort("recent");
                     }}
-                    tone="sky"
+                    tone="violet"
                   >
                     <span className="mr-1">🆕</span>
                     {t(locale, "room.view.latest")}
                   </Chip>
                 </FadingHorizontalChips>
+                {viewMode === "list" ? (
+                  <div className="pt-2">
+                    <NewTipPillButton
+                      locale={locale}
+                      onClick={() => {
+                        setAddTargetSlug(activeCity.slug);
+                        setAddOpen(true);
+                      }}
+                    />
+                  </div>
+                ) : null}
               </div>
-            ) : null}
+            ) : (
+              <div className="pt-0.5">
+                <NewTipPillButton
+                  locale={locale}
+                  onClick={() => {
+                    setAddTargetSlug(activeCity.slug);
+                    setAddOpen(true);
+                  }}
+                />
+              </div>
+            )}
           </div>
         </div>
 
@@ -483,46 +494,54 @@ export function CityClient({
                 roomSlug={roomSlug}
                 userHereOn={hereOn}
                 onUserHereError={(msg) => showToast(msg, "info")}
-                overlayPosition="right"
                 overlay={
-                  <div className="flex flex-col items-end gap-[0.6rem]">
-                    <div className="inline-flex h-9 min-h-9 max-w-[min(70vw,18rem)] items-center gap-2 rounded-full bg-white/85 px-[0.84rem] text-sm font-extrabold leading-none tracking-tight text-indigo-950 shadow-sm shadow-indigo-500/10 ring-1 ring-white/60 backdrop-blur-sm">
-                      <span className="truncate">{roomTitleLive}</span>
+                  <>
+                    <NewTipPillButton
+                      locale={locale}
+                      onClick={() => {
+                        setAddTargetSlug(activeCity.slug);
+                        setAddOpen(true);
+                      }}
+                    />
+                    <div className="pointer-events-auto flex min-w-0 flex-col items-end gap-[0.6rem]">
+                      <div className="inline-flex h-9 min-h-9 max-w-[min(70vw,18rem)] items-center gap-2 rounded-full bg-white/85 px-[0.84rem] text-sm font-extrabold leading-none tracking-tight text-indigo-950 shadow-sm shadow-indigo-500/10 ring-1 ring-white/60 backdrop-blur-sm">
+                        <span className="truncate">{roomTitleLive}</span>
+                        <button
+                          type="button"
+                          onClick={() => setRenameOpen(true)}
+                          className="grid h-7 w-7 shrink-0 place-items-center rounded-full border border-indigo-200/70 bg-white/85 text-indigo-900/80 shadow-sm transition hover:bg-indigo-50 active:scale-95"
+                          aria-label={t(locale, "rename.title")}
+                          title={t(locale, "rename.title")}
+                        >
+                          <span aria-hidden className="text-[15px] leading-none">
+                            ⚙️
+                          </span>
+                        </button>
+                      </div>
+
                       <button
                         type="button"
-                        onClick={() => setRenameOpen(true)}
-                        className="grid h-7 w-7 shrink-0 place-items-center rounded-full border border-indigo-200/70 bg-white/85 text-indigo-900/80 shadow-sm transition hover:bg-indigo-50 active:scale-95"
-                        aria-label={t(locale, "rename.title")}
-                        title={t(locale, "rename.title")}
+                        onClick={() => setHereOn((v) => !v)}
+                        className="inline-flex h-9 min-h-9 flex-row items-center gap-2 rounded-full bg-white/85 px-[0.84rem] text-sm font-extrabold leading-none tracking-tight text-indigo-950 shadow-sm shadow-indigo-500/10 ring-1 ring-white/60 backdrop-blur-sm transition hover:brightness-105 active:scale-95"
+                        aria-label={locale === "en" ? "You are here" : "Här är du"}
+                        title={locale === "en" ? "You are here" : "Här är du"}
                       >
-                        <span aria-hidden className="text-[15px] leading-none">
-                          ⚙️
+                        <span className="whitespace-nowrap">
+                          {locale === "en" ? "You are here" : "Här är du"}
+                        </span>
+                        <span
+                          aria-hidden
+                          className={`grid h-7 w-7 shrink-0 place-items-center rounded-full border shadow-sm transition ${
+                            hereOn
+                              ? "border-sky-200/70 bg-sky-500 text-white shadow-sky-500/20"
+                              : "border-indigo-200/70 bg-white/85 text-indigo-900/80"
+                          }`}
+                        >
+                          📍
                         </span>
                       </button>
                     </div>
-
-                    <button
-                      type="button"
-                      onClick={() => setHereOn((v) => !v)}
-                      className="inline-flex h-9 min-h-9 flex-row items-center gap-2 rounded-full bg-white/85 px-[0.84rem] text-sm font-extrabold leading-none tracking-tight text-indigo-950 shadow-sm shadow-indigo-500/10 ring-1 ring-white/60 backdrop-blur-sm transition hover:brightness-105 active:scale-95"
-                      aria-label={locale === "en" ? "You are here" : "Här är du"}
-                      title={locale === "en" ? "You are here" : "Här är du"}
-                    >
-                      <span className="whitespace-nowrap">
-                        {locale === "en" ? "You are here" : "Här är du"}
-                      </span>
-                      <span
-                        aria-hidden
-                        className={`grid h-7 w-7 shrink-0 place-items-center rounded-full border shadow-sm transition ${
-                          hereOn
-                            ? "border-sky-200/70 bg-sky-500 text-white shadow-sky-500/20"
-                            : "border-indigo-200/70 bg-white/85 text-indigo-900/80"
-                        }`}
-                      >
-                        📍
-                      </span>
-                    </button>
-                  </div>
+                  </>
                 }
               />
             ) : displaySpots.length === 0 ? null : (
@@ -737,7 +756,7 @@ export function CityClient({
           className="fixed inset-0 z-50 flex touch-manipulation items-end justify-center overflow-x-hidden bg-indigo-950/30 p-2 sm:items-center sm:p-3"
           role="dialog"
           aria-modal="true"
-          aria-label={locale === "en" ? "Add tip" : "Lägg till tips"}
+          aria-label={t(locale, "add.title")}
           onPointerDown={(e) => {
             if (e.target === e.currentTarget) setAddOpen(false);
           }}
@@ -836,21 +855,16 @@ function Chip({
   children: React.ReactNode;
   active: boolean;
   onClick: () => void;
-  tone?: "violet" | "pink" | "muted" | "sky";
+  tone?: "violet" | "pink" | "muted";
 }) {
   const activeClass =
     tone === "pink"
       ? "y2k-chip-active"
       : tone === "muted"
         ? "y2k-chip-active-muted"
-        : tone === "sky"
-          ? "border border-transparent bg-gradient-to-r from-sky-500 to-indigo-600 text-white shadow-md shadow-sky-500/20"
-          : "y2k-chip-active";
+        : "y2k-chip-active";
 
-  const inactiveClass =
-    tone === "sky"
-      ? "border border-sky-200/70 bg-white/90 text-indigo-950 shadow-sm shadow-sky-500/10 hover:-translate-y-0.5 hover:brightness-[1.02]"
-      : "y2k-chip text-indigo-950 hover:-translate-y-0.5";
+  const inactiveClass = "y2k-chip text-indigo-950 hover:-translate-y-0.5";
 
   return (
     <button

@@ -95,7 +95,6 @@ export function SpotsMap({
   userHereOn = false,
   onUserHereError,
   overlay,
-  overlayPosition = "left",
 }: {
   spots: DashboardSpot[];
   cityName: string;
@@ -103,8 +102,8 @@ export function SpotsMap({
   roomSlug: string;
   userHereOn?: boolean;
   onUserHereError?: (message: string) => void;
+  /** Lägg t.ex. vänster knapp + höger kolumn som syskon — raden är `justify-between`. */
   overlay?: React.ReactNode;
-  overlayPosition?: "left" | "right";
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<google.maps.Map | null>(null);
@@ -452,9 +451,7 @@ export function SpotsMap({
           </div>
         ) : null}
         {overlay ? (
-          <div
-            className={`absolute top-2 z-20 ${overlayPosition === "right" ? "right-2" : "left-2"}`}
-          >
+          <div className="pointer-events-none absolute inset-x-2 top-2 z-20 flex items-start justify-between gap-2">
             {overlay}
           </div>
         ) : null}
