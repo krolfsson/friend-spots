@@ -167,7 +167,11 @@ export function CityClient({
   }, [activeCity.slug, category]);
 
   const baseSpots = useMemo(() => bundle[activeCity.slug]?.spots ?? [], [bundle, activeCity.slug]);
-  const categoryCounts = bundle[activeCity.slug]?.categoryCounts ?? {};
+
+  const categoryCounts = useMemo(
+    () => bundle[activeCity.slug]?.categoryCounts ?? {},
+    [bundle, activeCity.slug],
+  );
 
   const filteredByCategory = useMemo(() => {
     if (category === "alla") return baseSpots;
@@ -423,9 +427,9 @@ export function CityClient({
             </div>
 
             {mapEnabled ? (
-              <div className="rounded-2xl border border-indigo-100/90 bg-white p-2 shadow-sm shadow-indigo-950/[0.04]">
+              <div className="rounded-xl border border-slate-200/85 bg-white px-1.5 py-1 shadow-sm shadow-slate-900/[0.04]">
                 <FadingHorizontalChips rowClassName="py-0">
-                  <Chip active={viewMode === "map"} onClick={() => setViewMode("map")} tone="violet">
+                  <Chip active={viewMode === "map"} onClick={() => setViewMode("map")} tone="sky">
                     <span className="mr-1">🗺️</span>
                     {t(locale, "room.view.map")}
                   </Chip>
@@ -435,7 +439,7 @@ export function CityClient({
                       setViewMode("list");
                       setListSort("popular");
                     }}
-                    tone="violet"
+                    tone="sky"
                   >
                     <span className="mr-1">🥇</span>
                     {t(locale, "room.view.list")}
@@ -446,7 +450,7 @@ export function CityClient({
                       setViewMode("list");
                       setListSort("recent");
                     }}
-                    tone="violet"
+                    tone="sky"
                   >
                     <span className="mr-1">🆕</span>
                     {t(locale, "room.view.latest")}
@@ -855,16 +859,21 @@ function Chip({
   children: React.ReactNode;
   active: boolean;
   onClick: () => void;
-  tone?: "violet" | "pink" | "muted";
+  tone?: "violet" | "pink" | "muted" | "sky";
 }) {
   const activeClass =
     tone === "pink"
       ? "y2k-chip-active"
       : tone === "muted"
         ? "y2k-chip-active-muted"
-        : "y2k-chip-active";
+        : tone === "sky"
+          ? "border border-transparent bg-gradient-to-r from-sky-500 to-indigo-600 text-white shadow-md shadow-sky-500/20"
+          : "y2k-chip-active";
 
-  const inactiveClass = "y2k-chip text-indigo-950 hover:-translate-y-0.5";
+  const inactiveClass =
+    tone === "sky"
+      ? "border border-sky-200/70 bg-white/90 text-indigo-950 shadow-sm shadow-sky-500/10 hover:-translate-y-0.5 hover:brightness-[1.02]"
+      : "y2k-chip text-indigo-950 hover:-translate-y-0.5";
 
   return (
     <button
