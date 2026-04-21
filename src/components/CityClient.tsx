@@ -570,7 +570,7 @@ export function CityClient({
           <div className="grid grid-cols-2 gap-[0.6rem] sm:gap-3">
             <Link
               href="/"
-              className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-full border border-amber-200/85 bg-gradient-to-r from-amber-100/95 via-yellow-50/92 to-amber-50/95 px-[0.55rem] text-center text-sm font-extrabold text-amber-950 shadow-sm shadow-amber-900/10 ring-1 ring-white/55 transition hover:brightness-[1.04] active:scale-[0.99] sm:h-11 sm:px-[0.75rem]"
+              className="inline-flex h-10 w-full cursor-pointer items-center justify-center gap-2 rounded-full border border-amber-200/85 bg-gradient-to-r from-amber-100/95 via-yellow-50/92 to-amber-50/95 px-[0.55rem] text-center text-sm font-extrabold text-amber-950 shadow-sm shadow-amber-900/10 ring-1 ring-white/55 transition hover:brightness-[1.04] active:scale-[0.99] sm:h-11 sm:px-[0.75rem]"
             >
               <span
                 className="grid h-7 w-7 shrink-0 place-items-center rounded-full border border-amber-300/60 bg-white/75 text-[15px] leading-none"
@@ -583,7 +583,7 @@ export function CityClient({
             <button
               type="button"
               onClick={() => void shareRoom()}
-              className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-full border border-sky-200/80 bg-gradient-to-r from-sky-100/92 via-cyan-50/88 to-indigo-100/88 px-[0.55rem] text-center text-sm font-extrabold text-indigo-950 shadow-sm shadow-sky-500/12 ring-1 ring-white/55 transition hover:brightness-[1.04] active:scale-[0.99] sm:h-11 sm:px-[0.75rem]"
+              className="inline-flex h-10 w-full cursor-pointer items-center justify-center gap-2 rounded-full border border-sky-200/80 bg-gradient-to-r from-sky-100/92 via-cyan-50/88 to-indigo-100/88 px-[0.55rem] text-center text-sm font-extrabold text-indigo-950 shadow-sm shadow-sky-500/12 ring-1 ring-white/55 transition hover:brightness-[1.04] active:scale-[0.99] sm:h-11 sm:px-[0.75rem]"
             >
               <span
                 className="grid h-7 w-7 shrink-0 place-items-center rounded-full border border-sky-300/55 bg-white/75 text-[15px] leading-none"
