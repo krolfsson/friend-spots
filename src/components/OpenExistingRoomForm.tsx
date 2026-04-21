@@ -4,18 +4,13 @@ import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import type { Locale } from "@/lib/i18n";
 import { t } from "@/lib/i18n";
-
-function normalizeSlug(raw: string): string {
-  const v = raw.trim();
-  if (!v) return "";
-  return v.replace(/^\/+/, "").trim();
-}
+import { normalizeRoomSlugInput } from "@/lib/roomSlugInput";
 
 export function OpenExistingRoomForm({ locale }: { locale: Locale }) {
   const router = useRouter();
   const [value, setValue] = useState("");
 
-  const slug = useMemo(() => normalizeSlug(value), [value]);
+  const slug = useMemo(() => normalizeRoomSlugInput(value), [value]);
 
   return (
     <form

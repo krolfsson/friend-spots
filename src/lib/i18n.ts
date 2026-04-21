@@ -23,6 +23,26 @@ export const MESSAGES: Record<Locale, Record<string, string>> = {
     "home.open.placeholder": "t.ex. /rolfsson",
     "home.open.cta": "Öppna karta",
 
+    "home.tagline": "Små pärlor på kartan — tillsammans.",
+    "home.flair": "Tips, +1:or och en soft vibe. Inga konton, bara er länk.",
+    "home.cta.create": "Skapa ny karta",
+    "home.cta.open": "Öppna min karta",
+    "home.step.back": "Tillbaka",
+    "home.step.closeOverlayAria": "Stäng",
+    "home.step.create.title": "Ny karta — nice!",
+    "home.step.create.lede":
+      "Välj ett namn som känns rätt (ni kan byta sen) och en pinkod som bara gänget fattar. Sen får ni en länk att slänga i chatten.",
+    "home.step.create.pinHint":
+      "Pinkoden är bara så inte helt random folk råkar in i er karta. Tänk «lås på kylskåpet» fast digitalt. Sparas som kaka i typ 90 dagar.",
+    "home.step.mapNameLabel": "Namn på kartan",
+    "home.step.open.title": "Välkommen tillbaka",
+    "home.step.open.lede":
+      "Skriv samma sista bit som i länken (t.ex. rolfsson om det står mapsies…/rolfsson) och er pinkod. Klart.",
+    "home.step.open.slugLabel": "Sista biten av länken",
+    "home.step.open.slugPlaceholder": "t.ex. rolfsson",
+    "home.step.open.pinHint": "Samma pinkod som när kartan skapades — den som bara ni vet.",
+    "home.step.open.submit": "Öppna kartan",
+
     "room.actions.newMap": "Skapa ny karta",
     "room.actions.shareMap": "Dela med vänner",
     "room.actions.directions": "Hitta",
@@ -108,6 +128,26 @@ export const MESSAGES: Record<Locale, Record<string, string>> = {
     "home.open.title": "Already have a map?",
     "home.open.placeholder": "e.g. /rolfsson",
     "home.open.cta": "Open map",
+
+    "home.tagline": "Little gems on the map — together.",
+    "home.flair": "Tips, +1s, good vibes. No accounts, just your link.",
+    "home.cta.create": "Create a new map",
+    "home.cta.open": "Open my map",
+    "home.step.back": "Back",
+    "home.step.closeOverlayAria": "Close",
+    "home.step.create.title": "New map — let’s go",
+    "home.step.create.lede":
+      "Pick a name that feels right (you can change it later) and a PIN your crew will remember. You’ll get a link to drop in the group chat.",
+    "home.step.create.pinHint":
+      "The PIN keeps random strangers from wandering into your map. Think «fridge lock», but online. Saved as a cookie for ~90 days.",
+    "home.step.mapNameLabel": "Map name",
+    "home.step.open.title": "Welcome back",
+    "home.step.open.lede":
+      "Type the last part of your link (e.g. rolfsson if it’s mapsies…/rolfsson) and your PIN. That’s it.",
+    "home.step.open.slugLabel": "Last part of the link",
+    "home.step.open.slugPlaceholder": "e.g. rolfsson",
+    "home.step.open.pinHint": "Same PIN as when the map was made — the one only you lot know.",
+    "home.step.open.submit": "Open map",
 
     "room.actions.newMap": "Create new map",
     "room.actions.shareMap": "Share with friends",

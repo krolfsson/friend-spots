@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import { CATEGORIES } from "@/lib/categories";
 
 type Item = {
@@ -52,14 +53,17 @@ export function EmojiCollageBackground() {
         return (
           <span
             key={`${emoji}-${i}`}
-            className="absolute select-none"
-            style={{
-              top: `calc(${it.top} + ${topOffset})`,
-              left: it.left,
-              transform: `rotate(${it.rotate}deg)`,
-              fontSize: `${it.size}px`,
-              opacity: it.opacity,
-            }}
+            className="mapsies-emoji-drift absolute select-none"
+            style={
+              {
+                top: `calc(${it.top} + ${topOffset})`,
+                left: it.left,
+                ["--emoji-rot" as string]: `${it.rotate}deg`,
+                fontSize: `${it.size}px`,
+                opacity: it.opacity,
+                animationDelay: `${(i % 12) * 0.18}s`,
+              } as CSSProperties
+            }
           >
             {emoji}
           </span>
