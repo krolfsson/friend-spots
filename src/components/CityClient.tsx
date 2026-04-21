@@ -331,110 +331,117 @@ export function CityClient({
 
   return (
     <div className="relative mx-auto max-w-5xl px-[0.96rem] pb-[4.2rem] pt-6">
-      <div className="space-y-[0.6rem]">
-        <FadingHorizontalChips rowClassName="py-0">
-          <button
-            type="button"
-            aria-label="Öppna meny: stad och nytt tips"
-            onClick={() => {
-              setAddTargetSlug(activeCity.slug);
-              setAddOpen(true);
-            }}
-            className="y2k-fab-sm grid h-9 min-h-9 w-9 shrink-0 place-items-center rounded-full text-white transition hover:brightness-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/80 active:scale-95"
-          >
-            <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden>
-              <path
-                d="M12 5v14M5 12h14"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.4"
-                strokeLinecap="round"
-              />
-            </svg>
-          </button>
-          {cityList.map((c) => {
-            const active = c.slug === activeCity.slug;
-            return (
-                <button
-                key={c.id}
+      <div className="relative">
+        <div className="sticky top-0 z-40 -mx-[0.96rem] px-[0.96rem] pt-1">
+          <div className="pointer-events-none absolute inset-x-0 top-0 h-[10.5rem] bg-[radial-gradient(900px_520px_at_10%_0%,rgba(233,213,255,0.75),transparent_58%),radial-gradient(800px_500px_at_95%_10%,rgba(251,207,232,0.65),transparent_55%),linear-gradient(180deg,rgba(253,244,255,0.92),rgba(245,243,255,0.65),transparent)] backdrop-blur-md" />
+          <div className="pointer-events-none absolute inset-x-0 top-[9.4rem] h-10 bg-gradient-to-b from-transparent via-[#fdf4ff]/30 to-transparent opacity-70" />
+
+          <div className="relative space-y-[0.6rem] pb-2">
+            <FadingHorizontalChips rowClassName="py-0">
+              <button
                 type="button"
-                onClick={() => setActiveCity(c)}
-                  className={`inline-flex h-9 min-h-9 shrink-0 items-center justify-center gap-[0.45rem] rounded-full px-[0.84rem] text-sm font-extrabold leading-none tracking-tight transition active:scale-95 ${
-                  active ? "y2k-chip-active text-white" : "y2k-chip text-indigo-950 hover:-translate-y-0.5"
-                }`}
+                aria-label="Öppna meny: stad och nytt tips"
+                onClick={() => {
+                  setAddTargetSlug(activeCity.slug);
+                  setAddOpen(true);
+                }}
+                className="pointer-events-auto y2k-fab-sm grid h-9 min-h-9 w-9 shrink-0 place-items-center rounded-full text-white transition hover:brightness-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/80 active:scale-95"
               >
-                <span aria-hidden>{c.emoji?.trim() || "🌃"}</span>
-                <span className="max-w-[11rem] truncate">{c.name}</span>
+                <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden>
+                  <path
+                    d="M12 5v14M5 12h14"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.4"
+                    strokeLinecap="round"
+                  />
+                </svg>
               </button>
-            );
-          })}
-        </FadingHorizontalChips>
+              {cityList.map((c) => {
+                const active = c.slug === activeCity.slug;
+                return (
+                  <button
+                    key={c.id}
+                    type="button"
+                    onClick={() => setActiveCity(c)}
+                    className={`pointer-events-auto inline-flex h-9 min-h-9 shrink-0 items-center justify-center gap-[0.45rem] rounded-full px-[0.84rem] text-sm font-extrabold leading-none tracking-tight transition active:scale-95 ${
+                      active ? "y2k-chip-active text-white" : "y2k-chip text-indigo-950 hover:-translate-y-0.5"
+                    }`}
+                  >
+                    <span aria-hidden>{c.emoji?.trim() || "🌃"}</span>
+                    <span className="max-w-[11rem] truncate">{c.name}</span>
+                  </button>
+                );
+              })}
+            </FadingHorizontalChips>
 
-        <FadingHorizontalChips rowClassName="py-0">
-          <Chip active={category === "alla"} onClick={() => setCategory("alla")} tone="violet">
-            <span className="mr-1">✨</span>
-            {t(locale, "room.filter.allCategories")}
-          </Chip>
-          {categoryItems.map((c) => (
-            <Chip key={c.id} active={category === c.id} onClick={() => setCategory(c.id)} tone="pink">
-              <span className="mr-1">{c.emoji}</span>
-              {t(locale, `cat.${c.id}`)}
-              <span
-                className={`ml-1 text-[11px] font-black leading-none tabular-nums ${
-                  category === c.id ? "text-white/80" : "text-indigo-950/35"
-                }`}
-              >
-                {categoryCounts[c.id] ?? 0}
-              </span>
-            </Chip>
-          ))}
-        </FadingHorizontalChips>
+            <FadingHorizontalChips rowClassName="py-0">
+              <Chip active={category === "alla"} onClick={() => setCategory("alla")} tone="violet">
+                <span className="mr-1">✨</span>
+                {t(locale, "room.filter.allCategories")}
+              </Chip>
+              {categoryItems.map((c) => (
+                <Chip key={c.id} active={category === c.id} onClick={() => setCategory(c.id)} tone="pink">
+                  <span className="mr-1">{c.emoji}</span>
+                  {t(locale, `cat.${c.id}`)}
+                  <span
+                    className={`ml-1 text-[11px] font-black leading-none tabular-nums ${
+                      category === c.id ? "text-white/80" : "text-indigo-950/35"
+                    }`}
+                  >
+                    {categoryCounts[c.id] ?? 0}
+                  </span>
+                </Chip>
+              ))}
+            </FadingHorizontalChips>
 
-        <FadingHorizontalChips rowClassName="py-0">
-          <Chip active={neighborhood === "alla"} onClick={() => setNeighborhood("alla")} tone="violet">
-            <span className="mr-1">🗺️</span>
-            {locale === "en" ? "All areas" : "Alla områden"}
-          </Chip>
-          {neighborhoods.map((n) => (
-            <Chip key={n} active={neighborhood === n} onClick={() => setNeighborhood(n)} tone="violet">
-              {n}
-            </Chip>
-          ))}
-          <Chip active={neighborhood === "ovrigt"} onClick={() => setNeighborhood("ovrigt")} tone="muted">
-            {locale === "en" ? "Other" : "Övrigt"}
-          </Chip>
-        </FadingHorizontalChips>
+            <FadingHorizontalChips rowClassName="py-0">
+              <Chip active={neighborhood === "alla"} onClick={() => setNeighborhood("alla")} tone="violet">
+                <span className="mr-1">🗺️</span>
+                {locale === "en" ? "All areas" : "Alla områden"}
+              </Chip>
+              {neighborhoods.map((n) => (
+                <Chip key={n} active={neighborhood === n} onClick={() => setNeighborhood(n)} tone="violet">
+                  {n}
+                </Chip>
+              ))}
+              <Chip active={neighborhood === "ovrigt"} onClick={() => setNeighborhood("ovrigt")} tone="muted">
+                {locale === "en" ? "Other" : "Övrigt"}
+              </Chip>
+            </FadingHorizontalChips>
 
-        {mapEnabled ? (
-          <FadingHorizontalChips rowClassName="py-0">
-            <Chip active={viewMode === "map"} onClick={() => setViewMode("map")} tone="violet">
-              <span className="mr-1">🗺️</span>
-              {t(locale, "room.view.map")}
-            </Chip>
-            <Chip
-              active={viewMode === "list" && listSort === "popular"}
-              onClick={() => {
-                setViewMode("list");
-                setListSort("popular");
-              }}
-              tone="violet"
-            >
-              <span className="mr-1">🥇</span>
-              {t(locale, "room.view.list")}
-            </Chip>
-            <Chip
-              active={viewMode === "list" && listSort === "recent"}
-              onClick={() => {
-                setViewMode("list");
-                setListSort("recent");
-              }}
-              tone="violet"
-            >
-              <span className="mr-1">🆕</span>
-              {t(locale, "room.view.latest")}
-            </Chip>
-          </FadingHorizontalChips>
-        ) : null}
+            {mapEnabled ? (
+              <FadingHorizontalChips rowClassName="py-0">
+                <Chip active={viewMode === "map"} onClick={() => setViewMode("map")} tone="violet">
+                  <span className="mr-1">🗺️</span>
+                  {t(locale, "room.view.map")}
+                </Chip>
+                <Chip
+                  active={viewMode === "list" && listSort === "popular"}
+                  onClick={() => {
+                    setViewMode("list");
+                    setListSort("popular");
+                  }}
+                  tone="violet"
+                >
+                  <span className="mr-1">🥇</span>
+                  {t(locale, "room.view.list")}
+                </Chip>
+                <Chip
+                  active={viewMode === "list" && listSort === "recent"}
+                  onClick={() => {
+                    setViewMode("list");
+                    setListSort("recent");
+                  }}
+                  tone="violet"
+                >
+                  <span className="mr-1">🆕</span>
+                  {t(locale, "room.view.latest")}
+                </Chip>
+              </FadingHorizontalChips>
+            ) : null}
+          </div>
+        </div>
 
         {error ? (
           <p className="rounded-2xl border border-rose-200/80 bg-rose-50/90 px-4 py-3 text-sm font-bold text-rose-800">
