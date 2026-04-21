@@ -526,13 +526,7 @@ export function CityClient({
                       onSegment={onRoomViewSegment}
                     />
                   </div>
-                  <div
-                    className={
-                      viewMode === "list"
-                        ? "w-full sm:w-auto sm:shrink-0"
-                        : "hidden w-full sm:block sm:w-auto sm:shrink-0"
-                    }
-                  >
+                  <div className="w-full sm:w-auto sm:shrink-0">
                     <NewTipPillButton
                       fullWidthMaxSm={viewMode === "list"}
                       locale={locale}
@@ -576,15 +570,6 @@ export function CityClient({
                 onUserHereError={(msg) => showToast(msg, "info")}
                 overlay={
                   <>
-                    <div className="pointer-events-auto sm:hidden">
-                      <NewTipPillButton
-                        locale={locale}
-                        onClick={() => {
-                          setAddTargetSlug(activeCity.slug);
-                          setAddOpen(true);
-                        }}
-                      />
-                    </div>
                     <div className="pointer-events-auto flex min-w-0 flex-col items-end gap-[0.6rem]">
                       <div className="inline-flex h-9 min-h-9 max-w-[min(70vw,18rem)] items-center gap-2 rounded-full bg-white/85 px-[0.84rem] text-sm font-extrabold leading-none tracking-tight text-indigo-950 shadow-sm shadow-indigo-500/10 ring-1 ring-white/60 backdrop-blur-sm">
                         <span className="truncate">{roomTitleLive}</span>
