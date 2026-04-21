@@ -197,7 +197,7 @@ export function SpotsMap({
             plusBtn.type = "button";
             plusBtn.className =
               "inline-flex h-9 items-center justify-center rounded-full bg-gradient-to-r from-emerald-400 to-teal-500 px-4 text-[12px] font-extrabold text-white shadow-sm shadow-emerald-500/15 ring-1 ring-white/70 transition hover:brightness-110 active:scale-[0.99]";
-            plusBtn.textContent = locale === "en" ? "+1" : "Plussa";
+            plusBtn.textContent = "👍 +1";
             plusBtn.addEventListener("click", async (e) => {
               e.preventDefault();
               e.stopPropagation();
