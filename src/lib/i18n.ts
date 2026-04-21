@@ -24,9 +24,9 @@ export const MESSAGES: Record<Locale, Record<string, string>> = {
     "home.open.cta": "Öppna karta",
 
     "home.hero.lead":
-      "Inga konton, inga onödiga integreringar (eller jo, en – Google Maps).",
+      "Inga konton, inga onödiga integreringar (eller jo, en – Google Maps). Inga dashboards eller andra saker ni aldrig bad om.",
     "home.hero.sub":
-      "Inga dashboards eller andra saker ni aldrig bad om. Ni samlar era favoritställen på en karta, likear det ni gillar, lägger till fler städer när ni vill – och en pinkod så inte halva internet snubblar in av misstag. Och massa emojis.",
+      "Ni samlar era favoritställen på en karta, likear det ni gillar, lägger till fler städer när ni vill – och en pinkod så inte halva internet snubblar in av misstag. Och massa emojis.",
     "home.stats.line": "{count} tips sparade på kartor hittills.",
     "home.cta.create": "Skapa ny karta",
     "home.cta.open": "Öppna min karta",
@@ -133,9 +133,9 @@ export const MESSAGES: Record<Locale, Record<string, string>> = {
     "home.open.cta": "Open map",
 
     "home.hero.lead":
-      "No accounts, no pointless integrations (okay, one — Google Maps).",
+      "No accounts, no pointless integrations (okay, one — Google Maps). No dashboards or anything else you never asked for.",
     "home.hero.sub":
-      "No dashboards or anything else you never asked for. You save your favorite spots on one map, like what you like, add more cities whenever you want — and a PIN so half the internet doesn’t stumble in by mistake. And tons of emojis.",
+      "You save your favorite spots on one map, like what you like, add more cities whenever you want — and a PIN so half the internet doesn’t stumble in by mistake. And tons of emojis.",
     "home.stats.line": "{count} tips saved on maps so far.",
     "home.cta.create": "Create a new map",
     "home.cta.open": "Open my map",
