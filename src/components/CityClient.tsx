@@ -18,12 +18,27 @@ type City = { id: string; name: string; slug: string; emoji?: string | null; _co
 
 type ToastTone = "success" | "info";
 
-function NewTipPillButton({ locale, onClick }: { locale: Locale; onClick: () => void }) {
+const NEW_TIP_PILL_BASE =
+  "pointer-events-auto inline-flex h-10 items-center gap-2 rounded-full bg-gradient-to-r from-emerald-400 to-teal-500 pl-2.5 pr-3.5 text-sm font-extrabold leading-none tracking-tight text-white shadow-lg shadow-emerald-700/20 ring-1 ring-white/50 transition hover:brightness-110 active:scale-[0.97] focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-200/90";
+
+function NewTipPillButton({
+  locale,
+  onClick,
+  /** Mobil: samma bredd som tredelstogglen (listvy under header). */
+  fullWidthMaxSm = false,
+}: {
+  locale: Locale;
+  onClick: () => void;
+  fullWidthMaxSm?: boolean;
+}) {
+  const widthCls = fullWidthMaxSm
+    ? "w-full max-w-none shrink-0 justify-center sm:w-auto sm:max-w-[min(100%,20rem)] sm:justify-start"
+    : "max-w-[min(100%,20rem)] shrink-0";
   return (
     <button
       type="button"
       onClick={onClick}
-      className="pointer-events-auto inline-flex h-10 max-w-[min(100%,20rem)] shrink-0 items-center gap-2 rounded-full bg-gradient-to-r from-emerald-400 to-teal-500 pl-2.5 pr-3.5 text-sm font-extrabold leading-none tracking-tight text-white shadow-lg shadow-emerald-700/20 ring-1 ring-white/50 transition hover:brightness-110 active:scale-[0.97] focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-200/90"
+      className={`${NEW_TIP_PILL_BASE} ${widthCls}`}
       aria-label={t(locale, "add.title")}
     >
       <span
@@ -513,8 +528,9 @@ export function CityClient({
                         onSegment={onRoomViewSegment}
                       />
                     </div>
-                    <div className="shrink-0">
+                    <div className="w-full sm:w-auto sm:shrink-0">
                       <NewTipPillButton
+                        fullWidthMaxSm
                         locale={locale}
                         onClick={() => {
                           setAddTargetSlug(activeCity.slug);
