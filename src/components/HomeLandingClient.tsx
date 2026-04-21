@@ -1,14 +1,38 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import type { Locale } from "@/lib/i18n";
-import { t } from "@/lib/i18n";
+import { t, tReplace } from "@/lib/i18n";
 import { normalizeRoomSlugInput } from "@/lib/roomSlugInput";
 
 type Step = null | "create" | "open";
 
-export function HomeLandingClient({ locale }: { locale: Locale }) {
+function useCountUp(target: number, durationMs: number) {
+  const [value, setValue] = useState(0);
+
+  useEffect(() => {
+    const t = Math.max(0, Math.floor(target));
+    if (t === 0) {
+      setValue(0);
+      return;
+    }
+    const start = performance.now();
+    let frame = 0;
+    const tick = (now: number) => {
+      const p = Math.min(1, (now - start) / durationMs);
+      const eased = 1 - (1 - p) ** 3;
+      setValue(Math.round(eased * t));
+      if (p < 1) frame = requestAnimationFrame(tick);
+    };
+    frame = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frame);
+  }, [target, durationMs]);
+
+  return value;
+}
+
+export function HomeLandingClient({ locale, totalSpots }: { locale: Locale; totalSpots: number }) {
   const router = useRouter();
   const [step, setStep] = useState<Step>(null);
   const [name, setName] = useState("");
@@ -16,6 +40,8 @@ export function HomeLandingClient({ locale }: { locale: Locale }) {
   const [slugInput, setSlugInput] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const animatedTotal = useCountUp(totalSpots, 1100);
+  const totalFmt = new Intl.NumberFormat(locale === "sv" ? "sv-SE" : "en-US").format(animatedTotal);
 
   const resetForms = useCallback(() => {
     setName("");
@@ -94,9 +120,11 @@ export function HomeLandingClient({ locale }: { locale: Locale }) {
       <main className="flex flex-1 flex-col items-center justify-center px-4 pb-10 pt-8 sm:pb-14 sm:pt-10">
         <div className="flex w-full justify-center overflow-visible px-2 sm:px-4">
           <div
-            className="select-none whitespace-nowrap bg-gradient-to-r from-fuchsia-500 via-violet-500 to-sky-500 bg-clip-text pb-1.5 text-[clamp(3.1rem,15vw,4.6rem)] font-extrabold leading-[0.92] tracking-tight text-transparent drop-shadow-[0_14px_38px_rgba(236,72,153,0.24)] sm:text-[clamp(3.6rem,13vw,5.25rem)]"
+            className="select-none whitespace-nowrap bg-gradient-to-r from-fuchsia-500 via-violet-500 to-sky-500 bg-clip-text px-1 pb-2.5 pt-0.5 text-[clamp(3.1rem,15vw,4.6rem)] font-extrabold leading-[1.02] tracking-tight text-transparent drop-shadow-[0_14px_38px_rgba(236,72,153,0.24)] sm:text-[clamp(3.6rem,13vw,5.25rem)]"
             style={{
               fontFamily: "var(--font-logo), var(--font-y2k), system-ui, sans-serif",
+              WebkitBackgroundClip: "text",
+              backgroundClip: "text",
             }}
           >
             Mapsies
@@ -143,11 +171,18 @@ export function HomeLandingClient({ locale }: { locale: Locale }) {
             {t(locale, "home.cta.open")}
           </button>
         </div>
+
+        <p
+          className="mt-5 max-w-sm px-2 text-center text-[0.7rem] font-extrabold uppercase tracking-[0.18em] text-indigo-900/40 tabular-nums sm:mt-6 sm:text-[0.72rem]"
+          aria-live="polite"
+        >
+          {tReplace(locale, "home.stats.line", { count: totalFmt })}
+        </p>
       </main>
 
       {step ? (
         <div
-          className="fixed inset-0 z-40 flex items-end justify-center bg-indigo-950/45 p-3 pt-14 backdrop-blur-[3px] sm:items-center sm:p-4"
+          className="mapsies-home-modal-backdrop-in fixed inset-0 z-40 flex items-end justify-center bg-indigo-950/45 p-3 pt-14 backdrop-blur-[3px] sm:items-center sm:p-4"
           role="dialog"
           aria-modal="true"
           aria-labelledby="home-step-title"
@@ -158,7 +193,7 @@ export function HomeLandingClient({ locale }: { locale: Locale }) {
             aria-label={t(locale, "home.step.closeOverlayAria")}
             onClick={closePanel}
           />
-          <div className="relative z-10 w-full max-w-md overflow-hidden rounded-[1.75rem] border border-indigo-200/75 bg-white/92 shadow-2xl shadow-indigo-950/20">
+          <div className="mapsies-home-modal-panel-in relative z-10 w-full max-w-md overflow-hidden rounded-[1.75rem] border border-indigo-200/75 bg-white/92 shadow-2xl shadow-indigo-950/20">
             <div className="max-h-[min(88dvh,34rem)] overflow-y-auto overscroll-contain px-5 pb-6 pt-4 sm:px-6 sm:pb-7 sm:pt-5">
               <div className="mb-4 flex items-center gap-2">
                 <button

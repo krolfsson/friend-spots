@@ -24,9 +24,10 @@ export const MESSAGES: Record<Locale, Record<string, string>> = {
     "home.open.cta": "Öppna karta",
 
     "home.hero.lead":
-      "Inga konton, inga onödiga integreringar (eller jo, en – Google Maps), inga dashboards och inga grejer ni aldrig bad om.",
+      "Inga konton, inga onödiga integreringar (eller jo, en – Google Maps).",
     "home.hero.sub":
-      "Ni samlar era favoritställen på en karta, likear det ni gillar, lägger till fler städer när ni vill – och en pinkod så inte halva internet snubblar in av misstag. Och massa emojis.",
+      "Inga dashboards eller andra saker ni aldrig bad om. Ni samlar era favoritställen på en karta, likear det ni gillar, lägger till fler städer när ni vill – och en pinkod så inte halva internet snubblar in av misstag. Och massa emojis.",
+    "home.stats.line": "{count} tips sparade på kartor hittills.",
     "home.cta.create": "Skapa ny karta",
     "home.cta.open": "Öppna min karta",
     "home.step.back": "Tillbaka",
@@ -35,7 +36,7 @@ export const MESSAGES: Record<Locale, Record<string, string>> = {
     "home.step.create.lede":
       "Välj ett namn som känns rätt (ni kan byta sen) och en pinkod som bara gänget fattar. Sen får ni en länk att slänga i chatten.",
     "home.step.create.pinHint":
-      "Pinkoden är bara så inte helt random folk råkar in i er karta. Tänk «lås på kylskåpet» fast digitalt. Sparas som kaka i typ 90 dagar.",
+      "Pinkoden är bara så inte helt random folk råkar in i er karta. Sparas som kaka i typ 90 dagar.",
     "home.step.mapNameLabel": "Namn på kartan",
     "home.step.open.title": "Välkommen tillbaka",
     "home.step.open.lede":
@@ -132,9 +133,10 @@ export const MESSAGES: Record<Locale, Record<string, string>> = {
     "home.open.cta": "Open map",
 
     "home.hero.lead":
-      "No accounts, no pointless integrations (okay, one — Google Maps), no dashboards, and none of the stuff you never asked for.",
+      "No accounts, no pointless integrations (okay, one — Google Maps).",
     "home.hero.sub":
-      "You save your favorite spots on one map, like what you like, add more cities whenever you want — and a PIN so half the internet doesn’t stumble in by mistake. And tons of emojis.",
+      "No dashboards or anything else you never asked for. You save your favorite spots on one map, like what you like, add more cities whenever you want — and a PIN so half the internet doesn’t stumble in by mistake. And tons of emojis.",
+    "home.stats.line": "{count} tips saved on maps so far.",
     "home.cta.create": "Create a new map",
     "home.cta.open": "Open my map",
     "home.step.back": "Back",
@@ -143,7 +145,7 @@ export const MESSAGES: Record<Locale, Record<string, string>> = {
     "home.step.create.lede":
       "Pick a name that feels right (you can change it later) and a PIN your crew will remember. You’ll get a link to drop in the group chat.",
     "home.step.create.pinHint":
-      "The PIN keeps random strangers from wandering into your map. Think «fridge lock», but online. Saved as a cookie for ~90 days.",
+      "The PIN keeps random strangers from wandering into your map. Saved as a cookie for ~90 days.",
     "home.step.mapNameLabel": "Map name",
     "home.step.open.title": "Welcome back",
     "home.step.open.lede":
@@ -230,6 +232,15 @@ export const MESSAGES: Record<Locale, Record<string, string>> = {
 
 export function t(locale: Locale, key: string): string {
   return MESSAGES[locale]?.[key] ?? MESSAGES.sv[key] ?? key;
+}
+
+/** Ersätter `{namn}` i meddelandesträngar, t.ex. `{count}`. */
+export function tReplace(locale: Locale, key: string, vars: Record<string, string | number>): string {
+  let s = t(locale, key);
+  for (const [k, v] of Object.entries(vars)) {
+    s = s.split(`{${k}}`).join(String(v));
+  }
+  return s;
 }
 
 export function localeCookieName() {
