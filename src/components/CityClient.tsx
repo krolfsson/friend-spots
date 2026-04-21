@@ -444,7 +444,7 @@ export function CityClient({
           {/* Fade out content behind pills, exactly at header bottom. */}
           <div className="pointer-events-none absolute inset-x-0 bottom-0 h-10 bg-gradient-to-b from-transparent via-[#fdf4ff]/25 to-[#fdf4ff]/70" />
 
-          <div className="relative space-y-[0.55rem] pb-2">
+          <div className="relative space-y-[0.6rem] pb-[0.6rem]">
             <FadingHorizontalChips rowClassName="py-0">
               {cityList.map((c) => {
                 const active = c.slug === activeCity.slug;
@@ -464,7 +464,7 @@ export function CityClient({
               })}
             </FadingHorizontalChips>
 
-            <div>
+            <div className="flex flex-col gap-[0.6rem]">
               <FadingHorizontalChips rowClassName="py-0">
               <Chip active={category === "alla"} onClick={() => setCategory("alla")} tone="violet">
                 <span className="mr-1">✨</span>
@@ -485,7 +485,7 @@ export function CityClient({
               ))}
               </FadingHorizontalChips>
 
-              <FadingHorizontalChips rowClassName="py-0 pt-[0.45rem]">
+              <FadingHorizontalChips rowClassName="py-0">
               <Chip active={neighborhood === "alla"} onClick={() => setNeighborhood("alla")} tone="violet">
                 <span className="mr-1">🗺️</span>
                 {locale === "en" ? "All areas" : "Alla områden"}
@@ -502,9 +502,9 @@ export function CityClient({
             </div>
 
             {mapEnabled ? (
-              <div className="w-full space-y-2">
+              <div className="w-full">
                 {viewMode === "list" ? (
-                  <div className="flex w-full flex-col gap-2 sm:flex-row sm:items-center sm:gap-2.5">
+                  <div className="flex w-full flex-col gap-[0.6rem] sm:flex-row sm:items-center sm:gap-[0.6rem]">
                     <div className="min-w-0 w-full max-w-md sm:flex-1">
                       <RoomViewSegmentedToggle
                         locale={locale}
@@ -513,7 +513,7 @@ export function CityClient({
                         onSegment={onRoomViewSegment}
                       />
                     </div>
-                    <div className="shrink-0 pt-0.5 sm:pt-0">
+                    <div className="shrink-0">
                       <NewTipPillButton
                         locale={locale}
                         onClick={() => {
@@ -533,7 +533,7 @@ export function CityClient({
                 )}
               </div>
             ) : (
-              <div className="pt-0.5">
+              <div>
                 <NewTipPillButton
                   locale={locale}
                   onClick={() => {
@@ -553,7 +553,7 @@ export function CityClient({
         ) : null}
 
         <div className="space-y-[0.6rem]">
-          <div className="min-h-[100px]">
+          <div>
             {mapEnabled && viewMode === "map" ? (
               <SpotsMap
                 spots={displaySpots}
