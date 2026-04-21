@@ -18,6 +18,14 @@ type City = { id: string; name: string; slug: string; emoji?: string | null; _co
 
 type ToastTone = "success" | "info";
 
+function PillSectionLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="px-0.5 pt-0.5">
+      <p className="text-[10px] font-black uppercase tracking-[0.14em] text-indigo-900/40">{children}</p>
+    </div>
+  );
+}
+
 function FadingHorizontalChips({
   children,
   rowClassName = "py-2",
@@ -338,11 +346,14 @@ export function CityClient({
           {/* Fade out content behind pills, exactly at header bottom. */}
           <div className="pointer-events-none absolute inset-x-0 bottom-0 h-10 bg-gradient-to-b from-transparent via-[#fdf4ff]/25 to-[#fdf4ff]/70" />
 
-          <div className="relative space-y-[0.6rem] pb-2">
-            <FadingHorizontalChips rowClassName="py-0">
+          <div className="relative space-y-[0.55rem] pb-2">
+            <div>
+              <PillSectionLabel>{t(locale, "room.cityHeading")}</PillSectionLabel>
+              <FadingHorizontalChips rowClassName="py-0">
               <button
                 type="button"
-                aria-label="Öppna meny: stad och nytt tips"
+                aria-label={t(locale, "add.openFabTitle")}
+                title={t(locale, "add.openFabTitle")}
                 onClick={() => {
                   setAddTargetSlug(activeCity.slug);
                   setAddOpen(true);
@@ -375,9 +386,12 @@ export function CityClient({
                   </button>
                 );
               })}
-            </FadingHorizontalChips>
+              </FadingHorizontalChips>
+            </div>
 
-            <FadingHorizontalChips rowClassName="py-0">
+            <div>
+              <PillSectionLabel>{t(locale, "room.filtersHeading")}</PillSectionLabel>
+              <FadingHorizontalChips rowClassName="py-0">
               <Chip active={category === "alla"} onClick={() => setCategory("alla")} tone="violet">
                 <span className="mr-1">✨</span>
                 {t(locale, "room.filter.allCategories")}
@@ -395,9 +409,9 @@ export function CityClient({
                   </span>
                 </Chip>
               ))}
-            </FadingHorizontalChips>
+              </FadingHorizontalChips>
 
-            <FadingHorizontalChips rowClassName="py-0">
+              <FadingHorizontalChips rowClassName="py-0 pt-[0.45rem]">
               <Chip active={neighborhood === "alla"} onClick={() => setNeighborhood("alla")} tone="violet">
                 <span className="mr-1">🗺️</span>
                 {locale === "en" ? "All areas" : "Alla områden"}
@@ -410,37 +424,45 @@ export function CityClient({
               <Chip active={neighborhood === "ovrigt"} onClick={() => setNeighborhood("ovrigt")} tone="muted">
                 {locale === "en" ? "Other" : "Övrigt"}
               </Chip>
-            </FadingHorizontalChips>
+              </FadingHorizontalChips>
+            </div>
 
             {mapEnabled ? (
-              <FadingHorizontalChips rowClassName="py-0">
-                <Chip active={viewMode === "map"} onClick={() => setViewMode("map")} tone="violet">
-                  <span className="mr-1">🗺️</span>
-                  {t(locale, "room.view.map")}
-                </Chip>
-                <Chip
-                  active={viewMode === "list" && listSort === "popular"}
-                  onClick={() => {
-                    setViewMode("list");
-                    setListSort("popular");
-                  }}
-                  tone="violet"
-                >
-                  <span className="mr-1">🥇</span>
-                  {t(locale, "room.view.list")}
-                </Chip>
-                <Chip
-                  active={viewMode === "list" && listSort === "recent"}
-                  onClick={() => {
-                    setViewMode("list");
-                    setListSort("recent");
-                  }}
-                  tone="violet"
-                >
-                  <span className="mr-1">🆕</span>
-                  {t(locale, "room.view.latest")}
-                </Chip>
-              </FadingHorizontalChips>
+              <div className="rounded-2xl border border-sky-200/65 bg-gradient-to-br from-sky-50/95 via-white/75 to-indigo-50/55 p-2 shadow-[0_12px_34px_rgba(14,165,233,0.10)]">
+                <div className="px-1 pb-1">
+                  <p className="text-[10px] font-black uppercase tracking-[0.14em] text-sky-900/50">
+                    {t(locale, "room.viewAsLabel")}
+                  </p>
+                </div>
+                <FadingHorizontalChips rowClassName="py-0">
+                  <Chip active={viewMode === "map"} onClick={() => setViewMode("map")} tone="sky">
+                    <span className="mr-1">🗺️</span>
+                    {t(locale, "room.view.map")}
+                  </Chip>
+                  <Chip
+                    active={viewMode === "list" && listSort === "popular"}
+                    onClick={() => {
+                      setViewMode("list");
+                      setListSort("popular");
+                    }}
+                    tone="sky"
+                  >
+                    <span className="mr-1">🥇</span>
+                    {t(locale, "room.view.list")}
+                  </Chip>
+                  <Chip
+                    active={viewMode === "list" && listSort === "recent"}
+                    onClick={() => {
+                      setViewMode("list");
+                      setListSort("recent");
+                    }}
+                    tone="sky"
+                  >
+                    <span className="mr-1">🆕</span>
+                    {t(locale, "room.view.latest")}
+                  </Chip>
+                </FadingHorizontalChips>
+              </div>
             ) : null}
           </div>
         </div>
@@ -814,21 +836,28 @@ function Chip({
   children: React.ReactNode;
   active: boolean;
   onClick: () => void;
-  tone?: "violet" | "pink" | "muted";
+  tone?: "violet" | "pink" | "muted" | "sky";
 }) {
   const activeClass =
     tone === "pink"
       ? "y2k-chip-active"
       : tone === "muted"
         ? "y2k-chip-active-muted"
-        : "y2k-chip-active";
+        : tone === "sky"
+          ? "border border-transparent bg-gradient-to-r from-sky-500 to-indigo-600 text-white shadow-md shadow-sky-500/20"
+          : "y2k-chip-active";
+
+  const inactiveClass =
+    tone === "sky"
+      ? "border border-sky-200/70 bg-white/90 text-indigo-950 shadow-sm shadow-sky-500/10 hover:-translate-y-0.5 hover:brightness-[1.02]"
+      : "y2k-chip text-indigo-950 hover:-translate-y-0.5";
 
   return (
     <button
       type="button"
       onClick={onClick}
       className={`inline-flex h-9 min-h-9 shrink-0 items-center justify-center rounded-full px-[0.84rem] text-sm font-extrabold leading-none tracking-tight transition active:scale-95 ${
-        active ? activeClass : "y2k-chip text-indigo-950 hover:-translate-y-0.5"
+        active ? activeClass : inactiveClass
       }`}
     >
       {children}

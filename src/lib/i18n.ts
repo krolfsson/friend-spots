@@ -29,6 +29,9 @@ export const MESSAGES: Record<Locale, Record<string, string>> = {
     "room.view.map": "Karta",
     "room.view.list": "Topplista",
     "room.view.latest": "Det senaste",
+    "room.viewAsLabel": "Visa som",
+    "room.cityHeading": "Stad",
+    "room.filtersHeading": "Filter",
     "room.filter.allCategories": "Alla kategorier",
 
     "cat.frukost": "Frukost",
@@ -61,6 +64,7 @@ export const MESSAGES: Record<Locale, Record<string, string>> = {
     "rename.errorDefault": "Kunde inte spara namn",
 
     "add.title": "Nytt tips",
+    "add.openFabTitle": "Lägg till tips",
     "add.cityLabel": "Stad",
     "add.placeCategoryLabel": "Plats & kategori",
     "add.searchPlaceholder": "Sök upp ditt tips",
@@ -114,6 +118,9 @@ export const MESSAGES: Record<Locale, Record<string, string>> = {
     "room.view.map": "Map",
     "room.view.list": "Leaderboard",
     "room.view.latest": "Latest",
+    "room.viewAsLabel": "View as",
+    "room.cityHeading": "City",
+    "room.filtersHeading": "Filters",
     "room.filter.allCategories": "All categories",
 
     "cat.frukost": "Breakfast",
@@ -146,6 +153,7 @@ export const MESSAGES: Record<Locale, Record<string, string>> = {
     "rename.errorDefault": "Could not save name",
 
     "add.title": "New tip",
+    "add.openFabTitle": "Add a tip",
     "add.cityLabel": "City",
     "add.placeCategoryLabel": "Place & category",
     "add.searchPlaceholder": "Search for your tip",
