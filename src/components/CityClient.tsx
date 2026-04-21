@@ -113,6 +113,16 @@ function FadingHorizontalChips({
 
 type RoomViewSegment = "map" | "popular" | "recent";
 
+const ROOM_VIEW_SEGMENTS: {
+  id: RoomViewSegment;
+  emoji: string;
+  labelKey: "room.view.map" | "room.view.list" | "room.view.latest";
+}[] = [
+  { id: "map", emoji: "🗺️", labelKey: "room.view.map" },
+  { id: "popular", emoji: "🥇", labelKey: "room.view.list" },
+  { id: "recent", emoji: "🆕", labelKey: "room.view.latest" },
+];
+
 function RoomViewSegmentedToggle({
   locale,
   viewMode,
@@ -127,38 +137,42 @@ function RoomViewSegmentedToggle({
   const segment: RoomViewSegment =
     viewMode === "map" ? "map" : listSort === "popular" ? "popular" : "recent";
 
-  const segBtn = (id: RoomViewSegment, emoji: string, labelKey: "room.view.map" | "room.view.list" | "room.view.latest") => {
-    const active = segment === id;
-    return (
-      <button
-        key={id}
-        type="button"
-        role="tab"
-        aria-selected={active}
-        className={`flex min-h-9 min-w-0 flex-1 items-center justify-center gap-0.5 rounded-full px-1 py-1 text-[11px] font-extrabold leading-none tracking-tight transition sm:gap-1 sm:px-2 sm:text-sm ${
-          active
-            ? "y2k-chip-sky-active text-white shadow-sm"
-            : "text-indigo-900/72 hover:bg-white/30 hover:text-indigo-950"
-        }`}
-        onClick={() => onSegment(id)}
-      >
-        <span aria-hidden className="shrink-0">
-          {emoji}
-        </span>
-        <span className="min-w-0 truncate">{t(locale, labelKey)}</span>
-      </button>
-    );
-  };
+  const activeIndex = ROOM_VIEW_SEGMENTS.findIndex((s) => s.id === segment);
 
   return (
     <div
-      className="flex w-full min-w-0 max-w-full gap-0.5 rounded-full border border-indigo-200/45 bg-gradient-to-b from-white/22 to-violet-50/14 p-0.5 shadow-sm shadow-indigo-900/[0.05] backdrop-blur-sm sm:max-w-md"
+      className="relative flex w-full min-w-0 max-w-full rounded-full border border-indigo-200/45 bg-gradient-to-b from-white/22 to-violet-50/14 p-0.5 shadow-sm shadow-indigo-900/[0.05] backdrop-blur-sm sm:max-w-md"
       role="tablist"
       aria-label={locale === "en" ? "View mode" : "Vy"}
     >
-      {segBtn("map", "🗺️", "room.view.map")}
-      {segBtn("popular", "🥇", "room.view.list")}
-      {segBtn("recent", "🆕", "room.view.latest")}
+      {/* Sliding active pill — translate % is relative to this element’s width (one third of track). */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute left-[2px] top-[2px] bottom-[2px] z-0 w-[calc((100%-4px)/3)] rounded-full y2k-chip-sky-active shadow-sm transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]"
+        style={{ transform: `translateX(calc(${Math.max(0, activeIndex)} * 100%))` }}
+      />
+      {ROOM_VIEW_SEGMENTS.map(({ id, emoji, labelKey }) => {
+        const active = segment === id;
+        return (
+          <button
+            key={id}
+            type="button"
+            role="tab"
+            aria-selected={active}
+            className={`relative z-10 flex h-9 min-h-9 min-w-0 flex-1 items-center justify-center gap-1 rounded-full px-1.5 text-sm font-extrabold leading-none tracking-tight transition-colors sm:gap-1.5 sm:px-2 ${
+              active
+                ? "text-white"
+                : "text-indigo-900/72 hover:bg-white/30 hover:text-indigo-950"
+            } focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400/50 focus-visible:ring-offset-1 focus-visible:ring-offset-transparent`}
+            onClick={() => onSegment(id)}
+          >
+            <span aria-hidden className="shrink-0">
+              {emoji}
+            </span>
+            <span className="min-w-0 truncate">{t(locale, labelKey)}</span>
+          </button>
+        );
+      })}
     </div>
   );
 }
