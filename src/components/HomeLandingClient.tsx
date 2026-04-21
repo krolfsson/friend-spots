@@ -132,10 +132,10 @@ export function HomeLandingClient({ locale }: { locale: Locale }) {
           <button
             type="button"
             onClick={openExisting}
-            className="ui-press inline-flex h-12 w-full cursor-default items-center justify-center gap-2.5 rounded-full border border-indigo-200/80 bg-white/90 px-5 text-sm font-extrabold tracking-tight text-indigo-950 shadow-md shadow-indigo-500/10 ring-1 ring-white/70 transition hover:brightness-105 active:scale-[0.99] sm:h-14 sm:text-base"
+            className="ui-press inline-flex h-12 w-full cursor-default items-center justify-center gap-2 rounded-full border border-indigo-200/80 bg-white/90 px-5 text-sm font-extrabold tracking-tight text-indigo-950 shadow-md shadow-indigo-500/10 transition hover:brightness-105 active:scale-[0.99] sm:h-14 sm:text-base"
           >
             <span
-              className="grid h-9 w-9 shrink-0 place-items-center rounded-full border-2 border-violet-200/90 bg-gradient-to-br from-white to-violet-50/90 text-lg leading-none shadow-inner shadow-violet-200/50 ring-2 ring-fuchsia-200/50 ring-offset-2 ring-offset-white/80"
+              className="grid h-8 w-8 shrink-0 place-items-center rounded-full border border-indigo-200/55 bg-indigo-50/45 text-[1.05rem] leading-none"
               aria-hidden
             >
               🔑
