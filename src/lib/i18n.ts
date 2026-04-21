@@ -85,6 +85,7 @@ export const MESSAGES: Record<Locale, Record<string, string>> = {
     "spots.menu.close": "Stäng meny",
     "spots.menu.delete": "Ta bort",
     "spots.menu.edit": "Redigera",
+    "spots.actionsMenuAria": "Redigera eller ta bort tips",
 
     "add.closeAria": "Stäng lägg till",
 
@@ -170,6 +171,7 @@ export const MESSAGES: Record<Locale, Record<string, string>> = {
     "spots.menu.close": "Close menu",
     "spots.menu.delete": "Delete",
     "spots.menu.edit": "Edit",
+    "spots.actionsMenuAria": "Edit or delete tip",
 
     "add.closeAria": "Close add tip",
 

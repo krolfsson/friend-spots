@@ -997,19 +997,6 @@ function SpotCard({
     setDomReady(true);
   }, []);
 
-  const longPressTimerRef = useRef<number | null>(null);
-  const longPressStartRef = useRef<{ x: number; y: number; pointerId: number } | null>(null);
-
-  const clearLongPress = useCallback(() => {
-    if (longPressTimerRef.current !== null) {
-      window.clearTimeout(longPressTimerRef.current);
-      longPressTimerRef.current = null;
-    }
-    longPressStartRef.current = null;
-  }, []);
-
-  useEffect(() => () => clearLongPress(), [clearLongPress]);
-
   const articleRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
@@ -1066,114 +1053,12 @@ function SpotCard({
     setMenu({ x, y });
   }, []);
 
-  const openContextMenu = useCallback(
-    (e: React.MouseEvent) => {
-      e.preventDefault();
-      if (menu) return;
-      openMenuAt(e.clientX, e.clientY);
+  const openActionsMenuFromAnchor = useCallback(
+    (el: HTMLElement) => {
+      const r = el.getBoundingClientRect();
+      openMenuAt(r.left + r.width / 2, r.bottom);
     },
-    [menu, openMenuAt],
-  );
-
-  const beginLongPress = useCallback(
-    (e: React.PointerEvent) => {
-      /* Touch hanteras av dedikerade touch-listeners (pointer + touch dubbelväg ger konflikt). */
-      if (e.pointerType === "touch") return;
-      if (e.pointerType !== "pen") return;
-      if (menu || editing) return;
-      if (isInteractiveSpotTarget(e.target)) return;
-      clearLongPress();
-      const x = e.clientX;
-      const y = e.clientY;
-      longPressStartRef.current = { x, y, pointerId: e.pointerId };
-      longPressTimerRef.current = window.setTimeout(() => {
-        longPressTimerRef.current = null;
-        longPressStartRef.current = null;
-        openMenuAt(x, y);
-      }, 550);
-    },
-    [clearLongPress, editing, menu, openMenuAt],
-  );
-
-  useEffect(() => {
-    const el = articleRef.current;
-    if (!el) return;
-
-    let start: { x: number; y: number } | null = null;
-    let timer: number | null = null;
-
-    const clearTouch = () => {
-      if (timer != null) {
-        window.clearTimeout(timer);
-        timer = null;
-      }
-      start = null;
-    };
-
-    const onTouchStart = (e: TouchEvent) => {
-      if (menu || editing) return;
-      if (isInteractiveSpotTarget(e.target)) return;
-      /* Ingen preventDefault — annars kan man inte scrolla sidan när fingret börjar på kortet. */
-      clearTouch();
-      const t = e.touches[0];
-      if (!t) return;
-      start = { x: t.clientX, y: t.clientY };
-      timer = window.setTimeout(() => {
-        timer = null;
-        if (!start) return;
-        openMenuAt(start.x, start.y);
-        try {
-          window.navigator.vibrate?.(12);
-        } catch {
-          /* ignore */
-        }
-      }, 480);
-    };
-
-    const onTouchMove = (e: TouchEvent) => {
-      if (!start) return;
-      const t = e.touches[0];
-      if (!t) return;
-      const dx = t.clientX - start.x;
-      const dy = t.clientY - start.y;
-      if (dx * dx + dy * dy > 400) clearTouch();
-    };
-
-    const onTouchEnd = () => {
-      clearTouch();
-    };
-
-    el.addEventListener("touchstart", onTouchStart, { passive: true });
-    el.addEventListener("touchmove", onTouchMove, { passive: true });
-    el.addEventListener("touchend", onTouchEnd);
-    el.addEventListener("touchcancel", onTouchEnd);
-
-    return () => {
-      clearTouch();
-      el.removeEventListener("touchstart", onTouchStart);
-      el.removeEventListener("touchmove", onTouchMove);
-      el.removeEventListener("touchend", onTouchEnd);
-      el.removeEventListener("touchcancel", onTouchEnd);
-    };
-  }, [editing, menu, openMenuAt]);
-
-  const onLongPressMove = useCallback(
-    (e: React.PointerEvent) => {
-      const st = longPressStartRef.current;
-      if (!st || st.pointerId !== e.pointerId) return;
-      const dx = e.clientX - st.x;
-      const dy = e.clientY - st.y;
-      if (dx * dx + dy * dy > 120) clearLongPress();
-    },
-    [clearLongPress],
-  );
-
-  const endLongPress = useCallback(
-    (e: React.PointerEvent) => {
-      if (longPressStartRef.current?.pointerId !== e.pointerId) return;
-      clearLongPress();
-    },
-    [clearLongPress],
+    [openMenuAt],
   );
 
   const deleteSpot = useCallback(async () => {
@@ -1276,11 +1161,6 @@ function SpotCard({
             WebkitTouchCallout: "none",
           } as React.CSSProperties
         }
-        onContextMenu={openContextMenu}
-        onPointerDown={beginLongPress}
-        onPointerMove={onLongPressMove}
-        onPointerUp={endLongPress}
-        onPointerCancel={endLongPress}
       >
         <div
           className="flex h-14 w-14 shrink-0 select-none items-center justify-center rounded-2xl bg-gradient-to-br from-white/90 to-fuchsia-50/80 text-[2.1rem] leading-none shadow-inner shadow-fuchsia-100"
@@ -1303,16 +1183,36 @@ function SpotCard({
               <span>{cat.emoji}</span>
               <span>{t(locale, `cat.${cat.id}`)}</span>
             </span>
-            <a
-              className="inline-flex h-8 min-h-8 shrink-0 select-none items-center rounded-full bg-gradient-to-r from-sky-400 to-cyan-400 px-2.5 text-[11px] font-extrabold leading-none text-indigo-950 shadow-sm shadow-cyan-500/20 ring-1 ring-white/60 hover:brightness-110 lg:h-7 lg:min-h-7 lg:px-2 lg:text-[10px]"
-              href={mapsOpenForSpot(spot, { cityName: mapsCityName, locale })}
-              target="_blank"
-              rel="noopener noreferrer"
-              onPointerDown={(e) => e.stopPropagation()}
-              onClick={(e) => e.stopPropagation()}
-            >
-              {t(locale, "room.actions.directions")}
-            </a>
+            <div className="flex shrink-0 items-center gap-1.5">
+              <a
+                className="inline-flex h-8 min-h-8 select-none items-center rounded-full bg-gradient-to-r from-sky-400 to-cyan-400 px-2.5 text-[11px] font-extrabold leading-none text-indigo-950 shadow-sm shadow-cyan-500/20 ring-1 ring-white/60 hover:brightness-110 lg:h-7 lg:min-h-7 lg:px-2 lg:text-[10px]"
+                href={mapsOpenForSpot(spot, { cityName: mapsCityName, locale })}
+                target="_blank"
+                rel="noopener noreferrer"
+                onPointerDown={(e) => e.stopPropagation()}
+                onClick={(e) => e.stopPropagation()}
+              >
+                {t(locale, "room.actions.directions")}
+              </a>
+              <button
+                type="button"
+                className="grid h-8 w-8 shrink-0 select-none place-items-center rounded-full border border-indigo-200/70 bg-white/85 text-[15px] leading-none text-indigo-900/85 shadow-sm ring-1 ring-white/55 transition hover:bg-indigo-50/90 active:scale-95 lg:h-7 lg:w-7 lg:text-[13px]"
+                aria-label={t(locale, "spots.actionsMenuAria")}
+                aria-haspopup="menu"
+                aria-expanded={Boolean(menu)}
+                onPointerDown={(e) => e.stopPropagation()}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (menu) {
+                    setMenu(null);
+                    return;
+                  }
+                  openActionsMenuFromAnchor(e.currentTarget);
+                }}
+              >
+                <span aria-hidden>⚙️</span>
+              </button>
+            </div>
           </div>
         </div>
         <div className="flex min-h-14 shrink-0 select-none items-center justify-end self-center">
