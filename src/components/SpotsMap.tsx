@@ -83,10 +83,6 @@ function describeMapLoadError(err: unknown): string {
   return msg || "Kunde inte ladda Google Maps.";
 }
 
-export function isMapViewConfigured(): boolean {
-  return Boolean(process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY?.trim());
-}
-
 export function SpotsMap({
   spots,
   cityName,

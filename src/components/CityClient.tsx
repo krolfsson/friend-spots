@@ -1,5 +1,6 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { Locale } from "@/lib/i18n";
@@ -11,8 +12,24 @@ import { CATEGORIES, categoryMeta, isCategoryId, type CategoryId } from "@/lib/c
 import type { DashboardBySlug, DashboardSpot } from "@/lib/dashboardTypes";
 import { mapsOpenForSpot } from "@/lib/mapsUrl";
 import { getOrCreateVoterToken } from "@/lib/voterClient";
-import { isMapViewConfigured, SpotsMap } from "@/components/SpotsMap";
+import { isMapViewConfigured } from "@/lib/mapEnv";
 import { sortSpotsByCreatedAtNewestFirst } from "@/lib/sortSpots";
+
+const SpotsMap = dynamic(
+  () => import("@/components/SpotsMap").then((m) => m.SpotsMap),
+  {
+    ssr: false,
+    loading: () => (
+      <div
+        className="relative flex h-[min(472px,calc(55dvh+3rem))] w-full items-center justify-center overflow-hidden rounded-2xl border border-indigo-200/70 bg-indigo-50/40 text-sm font-bold text-indigo-900/60 md:h-[min(420px,55dvh)]"
+        role="status"
+        aria-live="polite"
+      >
+        Laddar karta…
+      </div>
+    ),
+  },
+);
 
 type City = { id: string; name: string; slug: string; emoji?: string | null; _count?: { spots: number } };
 
@@ -966,10 +983,10 @@ function Chip({
 }) {
   const activeClass =
     tone === "pink"
-      ? "y2k-chip-active"
+      ? "y2k-chip-active text-white"
       : tone === "muted"
-        ? "y2k-chip-active-muted"
-        : "y2k-chip-active";
+        ? "y2k-chip-active-muted text-white"
+        : "y2k-chip-active text-white";
 
   const inactiveClass = "y2k-chip text-indigo-950 hover:-translate-y-0.5";
 

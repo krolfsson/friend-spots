@@ -22,7 +22,8 @@ body {
     radial-gradient(800px 480px at 95% 10%, rgba(251, 207, 232, 0.9), transparent 50%),
     radial-gradient(700px 500px at 50% 100%, rgba(167, 243, 208, 0.55), transparent 55%),
     linear-gradient(180deg, #fff7fb 0%, #f5f3ff 45%, #ecfeff 100%);
-  background-attachment: fixed;
+  /* scroll: mindre jank än fixed på mobil, samma färger vid normal scroll */
+  background-attachment: scroll;
 }
 
 .y2k-card {
@@ -32,11 +33,13 @@ body {
     0 1px 0 rgba(255, 255, 255, 0.9) inset,
     0 10px 30px rgba(99, 102, 241, 0.12),
     0 2px 0 rgba(167, 139, 250, 0.25);
-  backdrop-filter: blur(8px);
+  /* Lättare blur = snabbare första paint på listor med många kort */
+  backdrop-filter: blur(4px);
 }
 
 .y2k-chip {
   /* Vit glas + svag indigokant så pillen syns även mot ljusa partier i gradienten */
+  color: var(--y2k-ink);
   border: 1.5px solid rgba(199, 210, 254, 0.65);
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.65));
   box-shadow:
