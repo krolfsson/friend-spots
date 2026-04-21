@@ -518,35 +518,32 @@ export function CityClient({
 
             {mapEnabled ? (
               <div className="w-full">
-                {viewMode === "list" ? (
-                  <div className="flex w-full flex-col gap-[0.6rem] sm:flex-row sm:items-center sm:gap-[0.6rem]">
-                    <div className="min-w-0 w-full max-w-md sm:flex-1">
-                      <RoomViewSegmentedToggle
-                        locale={locale}
-                        viewMode={viewMode}
-                        listSort={listSort}
-                        onSegment={onRoomViewSegment}
-                      />
-                    </div>
-                    <div className="w-full sm:w-auto sm:shrink-0">
-                      <NewTipPillButton
-                        fullWidthMaxSm
-                        locale={locale}
-                        onClick={() => {
-                          setAddTargetSlug(activeCity.slug);
-                          setAddOpen(true);
-                        }}
-                      />
-                    </div>
+                <div className="flex w-full flex-col gap-[0.6rem] sm:flex-row sm:items-center sm:gap-[0.6rem]">
+                  <div className="min-w-0 w-full max-w-md sm:flex-1">
+                    <RoomViewSegmentedToggle
+                      locale={locale}
+                      viewMode={viewMode}
+                      listSort={listSort}
+                      onSegment={onRoomViewSegment}
+                    />
                   </div>
-                ) : (
-                  <RoomViewSegmentedToggle
-                    locale={locale}
-                    viewMode={viewMode}
-                    listSort={listSort}
-                    onSegment={onRoomViewSegment}
-                  />
-                )}
+                  <div
+                    className={
+                      viewMode === "list"
+                        ? "w-full sm:w-auto sm:shrink-0"
+                        : "hidden w-full sm:block sm:w-auto sm:shrink-0"
+                    }
+                  >
+                    <NewTipPillButton
+                      fullWidthMaxSm={viewMode === "list"}
+                      locale={locale}
+                      onClick={() => {
+                        setAddTargetSlug(activeCity.slug);
+                        setAddOpen(true);
+                      }}
+                    />
+                  </div>
+                </div>
               </div>
             ) : (
               <div>
@@ -580,13 +577,15 @@ export function CityClient({
                 onUserHereError={(msg) => showToast(msg, "info")}
                 overlay={
                   <>
-                    <NewTipPillButton
-                      locale={locale}
-                      onClick={() => {
-                        setAddTargetSlug(activeCity.slug);
-                        setAddOpen(true);
-                      }}
-                    />
+                    <div className="pointer-events-auto sm:hidden">
+                      <NewTipPillButton
+                        locale={locale}
+                        onClick={() => {
+                          setAddTargetSlug(activeCity.slug);
+                          setAddOpen(true);
+                        }}
+                      />
+                    </div>
                     <div className="pointer-events-auto flex min-w-0 flex-col items-end gap-[0.6rem]">
                       <div className="inline-flex h-9 min-h-9 max-w-[min(70vw,18rem)] items-center gap-2 rounded-full bg-white/85 px-[0.84rem] text-sm font-extrabold leading-none tracking-tight text-indigo-950 shadow-sm shadow-indigo-500/10 ring-1 ring-white/60 backdrop-blur-sm">
                         <span className="truncate">{roomTitleLive}</span>
