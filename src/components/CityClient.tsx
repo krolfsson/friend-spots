@@ -544,7 +544,17 @@ export function CityClient({
                         }}
                       />
                     </div>
-                  ) : null}
+                  ) : (
+                    <div className="hidden w-full sm:block sm:w-auto sm:shrink-0">
+                      <NewTipPillButton
+                        locale={locale}
+                        onClick={() => {
+                          setAddTargetSlug(activeCity.slug);
+                          setAddOpen(true);
+                        }}
+                      />
+                    </div>
+                  )}
                 </div>
               </div>
             ) : (
@@ -579,7 +589,7 @@ export function CityClient({
                 onUserHereError={(msg) => showToast(msg, "info")}
                 overlay={
                   <>
-                    <div className="pointer-events-auto">
+                    <div className="pointer-events-auto sm:hidden">
                       <NewTipPillButton
                         locale={locale}
                         onClick={() => {
