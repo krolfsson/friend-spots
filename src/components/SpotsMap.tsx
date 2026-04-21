@@ -163,18 +163,40 @@ export function SpotsMap({
             if (!map || !iw) return;
             const url = mapsOpenForSpot(spot, { cityName, locale });
             const wrap = document.createElement("div");
-            wrap.className = "p-2 max-w-[220px]";
+            wrap.className = "p-0 max-w-[260px]";
+
+            const card = document.createElement("div");
+            card.className =
+              "rounded-2xl border border-indigo-200/70 bg-white/95 px-4 py-3 shadow-lg shadow-indigo-900/10";
+
             const titleEl = document.createElement("div");
             titleEl.className =
-              "mb-1.5 text-sm font-extrabold leading-snug text-indigo-950";
+              "text-[15px] font-extrabold leading-snug tracking-tight text-indigo-950";
             titleEl.textContent = spot.name;
+
+            const meta = document.createElement("div");
+            meta.className = "mt-1 text-[12px] font-bold text-indigo-900/55";
+            const parts: string[] = [];
+            const nb = spot.neighborhood?.trim();
+            if (nb) parts.push(nb);
+            if (spot.category) parts.push(spot.category);
+            meta.textContent = parts.join(" · ");
+            if (!meta.textContent) meta.style.display = "none";
+
+            const actions = document.createElement("div");
+            actions.className = "mt-3 flex items-center gap-2";
+
             const a = document.createElement("a");
             a.href = url;
             a.target = "_blank";
             a.rel = "noopener noreferrer";
-            a.className = "text-xs font-bold text-fuchsia-700 underline";
-            a.textContent = locale === "en" ? "Open in Directions" : "Öppna i Hitta";
-            wrap.append(titleEl, a);
+            a.className =
+              "inline-flex h-9 items-center justify-center rounded-full bg-gradient-to-r from-fuchsia-500 to-violet-600 px-4 text-[12px] font-extrabold text-white shadow-sm shadow-fuchsia-500/15 ring-1 ring-white/70 transition hover:brightness-110 active:scale-[0.99]";
+            a.textContent = locale === "en" ? "Open directions" : "Öppna i Hitta";
+
+            actions.append(a);
+            card.append(titleEl, meta, actions);
+            wrap.append(card);
             iw.setContent(wrap);
             iw.open({ map, anchor: marker });
           });
