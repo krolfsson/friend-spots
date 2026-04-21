@@ -21,6 +21,21 @@ type ToastTone = "success" | "info";
 const NEW_TIP_PILL_BASE =
   "pointer-events-auto inline-flex h-10 items-center gap-2 rounded-full bg-gradient-to-r from-emerald-400 to-teal-500 pl-2.5 pr-3.5 text-sm font-extrabold leading-none tracking-tight text-white shadow-lg shadow-emerald-700/20 ring-1 ring-white/50 transition hover:brightness-110 active:scale-[0.97] focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-200/90";
 
+/** Samma plus-ikon som i Nytt tips-pillen (stroke). */
+function NewTipPlusIcon({ className = "h-4 w-4" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} aria-hidden>
+      <path
+        d="M12 7v10M7 12h10"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2.2"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
 function NewTipPillButton({
   locale,
   onClick,
@@ -45,15 +60,7 @@ function NewTipPillButton({
         className="grid h-7 w-7 shrink-0 place-items-center rounded-full border border-white/40 bg-white/15"
         aria-hidden
       >
-        <svg viewBox="0 0 24 24" className="h-4 w-4" aria-hidden>
-          <path
-            d="M12 7v10M7 12h10"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2.2"
-            strokeLinecap="round"
-          />
-        </svg>
+        <NewTipPlusIcon />
       </span>
       <span className="min-w-0 truncate">{t(locale, "add.title")}</span>
     </button>
@@ -526,16 +533,18 @@ export function CityClient({
                       onSegment={onRoomViewSegment}
                     />
                   </div>
-                  <div className="w-full sm:w-auto sm:shrink-0">
-                    <NewTipPillButton
-                      fullWidthMaxSm={viewMode === "list"}
-                      locale={locale}
-                      onClick={() => {
-                        setAddTargetSlug(activeCity.slug);
-                        setAddOpen(true);
-                      }}
-                    />
-                  </div>
+                  {viewMode === "list" ? (
+                    <div className="w-full sm:w-auto sm:shrink-0">
+                      <NewTipPillButton
+                        fullWidthMaxSm
+                        locale={locale}
+                        onClick={() => {
+                          setAddTargetSlug(activeCity.slug);
+                          setAddOpen(true);
+                        }}
+                      />
+                    </div>
+                  ) : null}
                 </div>
               </div>
             ) : (
@@ -570,6 +579,15 @@ export function CityClient({
                 onUserHereError={(msg) => showToast(msg, "info")}
                 overlay={
                   <>
+                    <div className="pointer-events-auto">
+                      <NewTipPillButton
+                        locale={locale}
+                        onClick={() => {
+                          setAddTargetSlug(activeCity.slug);
+                          setAddOpen(true);
+                        }}
+                      />
+                    </div>
                     <div className="pointer-events-auto flex min-w-0 flex-col items-end gap-[0.6rem]">
                       <div className="inline-flex h-9 min-h-9 max-w-[min(70vw,18rem)] items-center gap-2 rounded-full bg-white/85 px-[0.84rem] text-sm font-extrabold leading-none tracking-tight text-indigo-950 shadow-sm shadow-indigo-500/10 ring-1 ring-white/60 backdrop-blur-sm">
                         <span className="truncate">{roomTitleLive}</span>
@@ -634,10 +652,10 @@ export function CityClient({
               className="inline-flex h-10 w-full cursor-default items-center justify-center gap-2 rounded-full border border-amber-200/85 bg-gradient-to-r from-amber-100/95 via-yellow-50/92 to-amber-50/95 px-[0.55rem] text-center text-sm font-extrabold text-amber-950 shadow-sm shadow-amber-900/10 ring-1 ring-white/55 transition hover:brightness-[1.04] active:scale-[0.99] sm:h-11 sm:px-[0.75rem]"
             >
               <span
-                className="grid h-7 w-7 shrink-0 cursor-default place-items-center rounded-full border border-amber-300/60 bg-white/75 text-[15px] leading-none"
+                className="grid h-7 w-7 shrink-0 cursor-default place-items-center rounded-full border border-amber-300/60 bg-white/75 text-amber-950"
                 aria-hidden
               >
-                ➕
+                <NewTipPlusIcon />
               </span>
               <span className="min-w-0 cursor-default truncate">{t(locale, "room.actions.newMap")}</span>
             </Link>
@@ -706,10 +724,10 @@ export function CityClient({
               <button
                 type="button"
                 onClick={() => setRenameOpen(false)}
-                className="ui-press grid h-9 w-9 shrink-0 place-items-center rounded-full border border-indigo-200/60 bg-white/90 text-lg font-bold leading-none text-indigo-950 shadow-sm transition hover:bg-indigo-50/90"
+                className="ui-press grid h-9 w-9 shrink-0 place-items-center rounded-full border border-indigo-200/60 bg-white/90 text-lg leading-none shadow-sm transition hover:bg-indigo-50/90"
                 aria-label={t(locale, "common.close")}
               >
-                ×
+                <span aria-hidden>❌</span>
               </button>
             </header>
 
@@ -772,10 +790,10 @@ export function CityClient({
               <button
                 type="button"
                 onClick={() => setShareOpen(false)}
-                className="ui-press grid h-9 w-9 shrink-0 place-items-center rounded-full border border-indigo-200/60 bg-white/90 text-lg font-bold leading-none text-indigo-950 shadow-sm transition hover:bg-indigo-50/90"
+                className="ui-press grid h-9 w-9 shrink-0 place-items-center rounded-full border border-indigo-200/60 bg-white/90 text-lg leading-none shadow-sm transition hover:bg-indigo-50/90"
                 aria-label={t(locale, "common.close")}
               >
-                ×
+                <span aria-hidden>❌</span>
               </button>
             </header>
 
@@ -851,10 +869,10 @@ export function CityClient({
                 <button
                   type="button"
                   onClick={() => setAddOpen(false)}
-                  className="ui-press grid h-9 w-9 shrink-0 place-items-center rounded-full border border-indigo-200/60 bg-white/90 text-lg font-bold leading-none text-indigo-950 shadow-sm backdrop-blur-sm transition hover:bg-indigo-50/90 sm:h-10 sm:w-10"
+                  className="ui-press grid h-9 w-9 shrink-0 place-items-center rounded-full border border-indigo-200/60 bg-white/90 text-lg leading-none shadow-sm backdrop-blur-sm transition hover:bg-indigo-50/90 sm:h-10 sm:w-10"
                   aria-label={t(locale, "common.close")}
                 >
-                  ×
+                  <span aria-hidden>❌</span>
                 </button>
               </header>
               <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden overscroll-contain">
@@ -1319,11 +1337,11 @@ function SpotCard({
               <p className="text-sm font-extrabold tracking-tight text-indigo-950">{t(locale, "edit.title")}</p>
               <button
                 type="button"
-                className="ui-press grid h-10 w-10 place-items-center rounded-full border border-white/70 bg-white/70 text-lg font-bold text-indigo-950 shadow-sm hover:bg-white"
+                className="ui-press grid h-10 w-10 place-items-center rounded-full border border-white/70 bg-white/70 text-lg leading-none shadow-sm hover:bg-white"
                 aria-label="Stäng"
                 onClick={() => setEditing(false)}
               >
-                ×
+                <span aria-hidden>❌</span>
               </button>
             </div>
             <label className="mb-3 block text-xs font-extrabold text-indigo-900/80">

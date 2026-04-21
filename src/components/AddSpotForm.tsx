@@ -256,10 +256,10 @@ export function AddSpotForm({
           <button
             type="button"
             onClick={() => onRequestClose?.()}
-            className="ui-press grid h-10 w-10 place-items-center rounded-full border border-white/70 bg-white/70 text-lg font-bold text-indigo-950 shadow-sm hover:bg-white"
+            className="ui-press grid h-10 w-10 place-items-center rounded-full border border-white/70 bg-white/70 text-lg leading-none shadow-sm hover:bg-white"
             aria-label="Stäng lägg till"
           >
-            ×
+            <span aria-hidden>❌</span>
           </button>
         </div>
       ) : null}
