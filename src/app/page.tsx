@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 export default async function Home() {
   const locale = await getRequestLocale();
   return (
-    <div className="relative mx-auto min-h-dvh max-w-lg px-4 pt-3 pb-8 sm:mx-auto sm:max-w-md sm:pt-6 sm:pb-12">
+    <div className="relative mx-auto min-h-dvh max-w-lg overflow-x-visible px-4 pt-3 pb-8 sm:mx-auto sm:max-w-md sm:pt-6 sm:pb-12">
       <EmojiCollageBackground />
       <HomeLandingClient locale={locale} />
     </div>

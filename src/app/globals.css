@@ -14,43 +14,6 @@ body {
   height: 100%;
 }
 
-@keyframes mapsies-emoji-drift {
-  0%,
-  100% {
-    transform: rotate(var(--emoji-rot, 0deg)) translateY(0);
-  }
-  50% {
-    transform: rotate(var(--emoji-rot, 0deg)) translateY(-9px);
-  }
-}
-
-.mapsies-emoji-drift {
-  animation: mapsies-emoji-drift 4.2s ease-in-out infinite;
-}
-
-@keyframes mapsies-hero-emoji {
-  0%,
-  100% {
-    transform: translateY(0) rotate(-4deg);
-  }
-  50% {
-    transform: translateY(-8px) rotate(5deg);
-  }
-}
-
-.mapsies-hero-emoji {
-  display: inline-block;
-  animation: mapsies-hero-emoji 2.9s ease-in-out infinite;
-  will-change: transform;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .mapsies-emoji-drift,
-  .mapsies-hero-emoji {
-    animation: none;
-  }
-}
-
 body {
   color: var(--y2k-ink);
   background-color: #fdf4ff;

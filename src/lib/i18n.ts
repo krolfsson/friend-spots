@@ -23,8 +23,9 @@ export const MESSAGES: Record<Locale, Record<string, string>> = {
     "home.open.placeholder": "t.ex. /rolfsson",
     "home.open.cta": "Öppna karta",
 
-    "home.tagline": "Små pärlor på kartan — tillsammans.",
-    "home.flair": "Tips, +1:or och en soft vibe. Inga konton, bara er länk.",
+    "home.hero.lead": "Inget inlogg, inget stök — bara tips du vill dela med kompisarna.",
+    "home.hero.sub":
+      "Ni samlar favoritställen på en karta, plussar det ni gillar, och en pinkod så inte halva internet snubblar in av misstag.",
     "home.cta.create": "Skapa ny karta",
     "home.cta.open": "Öppna min karta",
     "home.step.back": "Tillbaka",
@@ -129,8 +130,9 @@ export const MESSAGES: Record<Locale, Record<string, string>> = {
     "home.open.placeholder": "e.g. /rolfsson",
     "home.open.cta": "Open map",
 
-    "home.tagline": "Little gems on the map — together.",
-    "home.flair": "Tips, +1s, good vibes. No accounts, just your link.",
+    "home.hero.lead": "No logins, no fuss — just the tips you want to share with your friends.",
+    "home.hero.sub":
+      "Save your favorite spots on one map, +1 what you agree with, and a PIN so half the internet doesn’t wander in by mistake.",
     "home.cta.create": "Create a new map",
     "home.cta.open": "Open my map",
     "home.step.back": "Back",

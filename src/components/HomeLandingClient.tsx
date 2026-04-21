@@ -8,8 +8,6 @@ import { normalizeRoomSlugInput } from "@/lib/roomSlugInput";
 
 type Step = null | "create" | "open";
 
-const HERO_FLOAT = ["🍕", "📍", "🍜", "☕️", "🎉", "🗺️", "✨", "🥐", "🍸", "💜", "🧋", "🏝️", "🥡"];
-
 export function HomeLandingClient({ locale }: { locale: Locale }) {
   const router = useRouter();
   const [step, setStep] = useState<Step>(null);
@@ -94,9 +92,9 @@ export function HomeLandingClient({ locale }: { locale: Locale }) {
   return (
     <div className="relative z-10 flex min-h-dvh flex-col">
       <main className="flex flex-1 flex-col items-center justify-center px-4 pb-10 pt-8 sm:pb-14 sm:pt-10">
-        <div className="-mt-1 flex w-full justify-center px-1">
+        <div className="flex w-full justify-center overflow-visible px-2 sm:px-4">
           <div
-            className="select-none bg-gradient-to-r from-fuchsia-500 via-violet-500 to-sky-500 bg-clip-text text-[40px] font-extrabold leading-none tracking-tight text-transparent drop-shadow-[0_12px_34px_rgba(236,72,153,0.22)] sm:text-[46px]"
+            className="select-none whitespace-nowrap bg-gradient-to-r from-fuchsia-500 via-violet-500 to-sky-500 bg-clip-text pb-1.5 text-[clamp(3.1rem,15vw,4.6rem)] font-extrabold leading-[0.92] tracking-tight text-transparent drop-shadow-[0_14px_38px_rgba(236,72,153,0.24)] sm:text-[clamp(3.6rem,13vw,5.25rem)]"
             style={{
               fontFamily: "var(--font-logo), var(--font-y2k), system-ui, sans-serif",
             }}
@@ -105,25 +103,12 @@ export function HomeLandingClient({ locale }: { locale: Locale }) {
           </div>
         </div>
 
-        <p className="mt-4 max-w-xs text-center text-[0.95rem] font-extrabold leading-snug tracking-tight text-indigo-950 sm:max-w-sm sm:text-base">
-          {t(locale, "home.tagline")}
+        <p className="mt-6 max-w-[min(100%,22rem)] text-center text-[0.98rem] font-extrabold leading-snug tracking-tight text-indigo-950 sm:mt-7 sm:max-w-md sm:text-lg">
+          {t(locale, "home.hero.lead")}
         </p>
-        <p className="mt-2 max-w-sm text-center text-xs font-semibold leading-relaxed text-indigo-900/55 sm:text-sm">
-          {t(locale, "home.flair")}
+        <p className="mt-3 max-w-[min(100%,24rem)] px-1 text-center text-[0.8125rem] font-semibold leading-relaxed text-indigo-900/58 sm:mt-4 sm:max-w-lg sm:text-sm">
+          {t(locale, "home.hero.sub")}
         </p>
-
-        <div className="mt-7 flex max-w-[min(100%,20rem)] flex-wrap justify-center gap-x-3 gap-y-2 sm:mt-8 sm:gap-x-4 sm:gap-y-3">
-          {HERO_FLOAT.map((e, i) => (
-            <span
-              key={`${e}-${i}`}
-              className="mapsies-hero-emoji select-none text-[2rem] sm:text-[2.25rem]"
-              style={{ animationDelay: `${i * 0.11}s` }}
-              aria-hidden
-            >
-              {e}
-            </span>
-          ))}
-        </div>
 
         <div className="mt-12 flex w-full max-w-sm flex-col gap-3 sm:mt-14">
           <button
@@ -147,9 +132,12 @@ export function HomeLandingClient({ locale }: { locale: Locale }) {
           <button
             type="button"
             onClick={openExisting}
-            className="ui-press inline-flex h-12 w-full cursor-default items-center justify-center gap-2 rounded-full border border-indigo-200/80 bg-white/90 px-5 text-sm font-extrabold tracking-tight text-indigo-950 shadow-md shadow-indigo-500/10 ring-1 ring-white/70 transition hover:brightness-105 active:scale-[0.99] sm:h-14 sm:text-base"
+            className="ui-press inline-flex h-12 w-full cursor-default items-center justify-center gap-2.5 rounded-full border border-indigo-200/80 bg-white/90 px-5 text-sm font-extrabold tracking-tight text-indigo-950 shadow-md shadow-indigo-500/10 ring-1 ring-white/70 transition hover:brightness-105 active:scale-[0.99] sm:h-14 sm:text-base"
           >
-            <span className="text-lg leading-none" aria-hidden>
+            <span
+              className="grid h-9 w-9 shrink-0 place-items-center rounded-full border-2 border-violet-200/90 bg-gradient-to-br from-white to-violet-50/90 text-lg leading-none shadow-inner shadow-violet-200/50 ring-2 ring-fuchsia-200/50 ring-offset-2 ring-offset-white/80"
+              aria-hidden
+            >
               🔑
             </span>
             {t(locale, "home.cta.open")}
