@@ -444,7 +444,7 @@ export function SpotsMap({
           visas inte på kartan.
         </p>
       ) : null}
-      <div className="relative h-[min(420px,55dvh)] w-full overflow-hidden rounded-2xl border border-indigo-200/70 bg-indigo-50/30 shadow-inner shadow-indigo-100/80">
+      <div className="relative h-[min(472px,calc(55dvh+3rem))] w-full overflow-hidden rounded-2xl border border-indigo-200/70 bg-indigo-50/30 shadow-inner shadow-indigo-100/80 md:h-[min(420px,55dvh)]">
         {loading && !loadError ? (
           <div className="absolute inset-0 z-10 flex items-center justify-center bg-indigo-50/80 text-sm font-bold text-indigo-900/70">
             Laddar karta…

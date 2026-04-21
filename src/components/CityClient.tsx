@@ -427,37 +427,39 @@ export function CityClient({
             </div>
 
             {mapEnabled ? (
-              <div className="rounded-xl border border-slate-200/85 bg-white px-1.5 py-1 shadow-sm shadow-slate-900/[0.04]">
-                <FadingHorizontalChips rowClassName="py-0">
-                  <Chip active={viewMode === "map"} onClick={() => setViewMode("map")} tone="sky">
-                    <span className="mr-1">🗺️</span>
-                    {t(locale, "room.view.map")}
-                  </Chip>
-                  <Chip
-                    active={viewMode === "list" && listSort === "popular"}
-                    onClick={() => {
-                      setViewMode("list");
-                      setListSort("popular");
-                    }}
-                    tone="sky"
-                  >
-                    <span className="mr-1">🥇</span>
-                    {t(locale, "room.view.list")}
-                  </Chip>
-                  <Chip
-                    active={viewMode === "list" && listSort === "recent"}
-                    onClick={() => {
-                      setViewMode("list");
-                      setListSort("recent");
-                    }}
-                    tone="sky"
-                  >
-                    <span className="mr-1">🆕</span>
-                    {t(locale, "room.view.latest")}
-                  </Chip>
-                </FadingHorizontalChips>
+              <div className="w-full space-y-2">
+                <div className="w-full rounded-xl border border-slate-200/85 bg-white px-1.5 py-1 shadow-sm shadow-slate-900/[0.04] sm:w-fit sm:max-w-full">
+                  <FadingHorizontalChips rowClassName="py-0">
+                    <Chip active={viewMode === "map"} onClick={() => setViewMode("map")} tone="sky">
+                      <span className="mr-1">🗺️</span>
+                      {t(locale, "room.view.map")}
+                    </Chip>
+                    <Chip
+                      active={viewMode === "list" && listSort === "popular"}
+                      onClick={() => {
+                        setViewMode("list");
+                        setListSort("popular");
+                      }}
+                      tone="sky"
+                    >
+                      <span className="mr-1">🥇</span>
+                      {t(locale, "room.view.list")}
+                    </Chip>
+                    <Chip
+                      active={viewMode === "list" && listSort === "recent"}
+                      onClick={() => {
+                        setViewMode("list");
+                        setListSort("recent");
+                      }}
+                      tone="sky"
+                    >
+                      <span className="mr-1">🆕</span>
+                      {t(locale, "room.view.latest")}
+                    </Chip>
+                  </FadingHorizontalChips>
+                </div>
                 {viewMode === "list" ? (
-                  <div className="pt-2">
+                  <div className="pt-0.5">
                     <NewTipPillButton
                       locale={locale}
                       onClick={() => {
@@ -568,20 +570,32 @@ export function CityClient({
           <div className="grid grid-cols-2 gap-[0.6rem] sm:gap-3">
             <Link
               href="/"
-              className="y2k-chip inline-flex h-10 w-full items-center justify-center rounded-full px-[0.6rem] text-center text-sm font-extrabold text-indigo-950 transition hover:-translate-y-0.5 active:scale-[0.99] sm:h-11 sm:px-[0.8rem]"
+              className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-full border border-amber-200/85 bg-gradient-to-r from-amber-100/95 via-yellow-50/92 to-amber-50/95 px-[0.55rem] text-center text-sm font-extrabold text-amber-950 shadow-sm shadow-amber-900/10 ring-1 ring-white/55 transition hover:brightness-[1.04] active:scale-[0.99] sm:h-11 sm:px-[0.75rem]"
             >
-              {t(locale, "room.actions.newMap")}
+              <span
+                className="grid h-7 w-7 shrink-0 place-items-center rounded-full border border-amber-300/60 bg-white/75 text-[15px] leading-none"
+                aria-hidden
+              >
+                ➕
+              </span>
+              <span className="min-w-0 truncate">{t(locale, "room.actions.newMap")}</span>
             </Link>
             <button
               type="button"
               onClick={() => void shareRoom()}
-              className="y2k-chip-active inline-flex h-10 w-full items-center justify-center rounded-full px-[0.6rem] text-center text-sm font-extrabold text-white transition hover:-translate-y-0.5 active:scale-[0.99] sm:h-11 sm:px-[0.8rem]"
+              className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-full border border-sky-200/80 bg-gradient-to-r from-sky-100/92 via-cyan-50/88 to-indigo-100/88 px-[0.55rem] text-center text-sm font-extrabold text-indigo-950 shadow-sm shadow-sky-500/12 ring-1 ring-white/55 transition hover:brightness-[1.04] active:scale-[0.99] sm:h-11 sm:px-[0.75rem]"
             >
-              {t(locale, "room.actions.shareMap")}
+              <span
+                className="grid h-7 w-7 shrink-0 place-items-center rounded-full border border-sky-300/55 bg-white/75 text-[15px] leading-none"
+                aria-hidden
+              >
+                ✈️
+              </span>
+              <span className="min-w-0 truncate">{t(locale, "room.actions.shareMap")}</span>
             </button>
           </div>
 
-          <div className="flex justify-center pt-1">
+          <div className="hidden justify-center pt-1 sm:flex">
             <div
               className="select-none bg-gradient-to-r from-fuchsia-500 via-violet-500 to-sky-500 bg-clip-text text-[22px] font-extrabold leading-none tracking-tight text-transparent drop-shadow-[0_10px_26px_rgba(236,72,153,0.18)]"
               style={{ fontFamily: "var(--font-logo), var(--font-y2k), system-ui, sans-serif" }}
@@ -867,12 +881,12 @@ function Chip({
       : tone === "muted"
         ? "y2k-chip-active-muted"
         : tone === "sky"
-          ? "border border-transparent bg-gradient-to-r from-sky-500 to-indigo-600 text-white shadow-md shadow-sky-500/20"
+          ? "y2k-chip-sky-active overflow-hidden"
           : "y2k-chip-active";
 
   const inactiveClass =
     tone === "sky"
-      ? "border border-sky-200/70 bg-white/90 text-indigo-950 shadow-sm shadow-sky-500/10 hover:-translate-y-0.5 hover:brightness-[1.02]"
+      ? "overflow-hidden border border-sky-200/70 bg-white/90 text-indigo-950 shadow-sm shadow-sky-500/10 hover:-translate-y-0.5 hover:brightness-[1.02]"
       : "y2k-chip text-indigo-950 hover:-translate-y-0.5";
 
   return (
