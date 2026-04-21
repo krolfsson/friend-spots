@@ -332,9 +332,11 @@ export function CityClient({
   return (
     <div className="relative mx-auto max-w-5xl px-[0.96rem] pb-[4.2rem] pt-6">
       <div className="relative">
-        <div className="sticky top-0 z-40 -mx-[0.96rem] px-[0.96rem] pt-1">
-          <div className="pointer-events-none absolute inset-x-0 top-0 h-[10.5rem] bg-[radial-gradient(900px_520px_at_10%_0%,rgba(233,213,255,0.75),transparent_58%),radial-gradient(800px_500px_at_95%_10%,rgba(251,207,232,0.65),transparent_55%),linear-gradient(180deg,rgba(253,244,255,0.92),rgba(245,243,255,0.65),transparent)] backdrop-blur-md" />
-          <div className="pointer-events-none absolute inset-x-0 top-[9.4rem] h-10 bg-gradient-to-b from-transparent via-[#fdf4ff]/30 to-transparent opacity-70" />
+        {/* Sticky header: use top-6 so it “locks” immediately (matches container pt-6). */}
+        <div className="sticky top-6 z-40 -mx-[0.96rem] px-[0.96rem] pt-0">
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(900px_520px_at_10%_0%,rgba(233,213,255,0.75),transparent_58%),radial-gradient(800px_500px_at_95%_10%,rgba(251,207,232,0.65),transparent_55%),linear-gradient(180deg,rgba(253,244,255,0.92),rgba(245,243,255,0.65),transparent)] backdrop-blur-md" />
+          {/* Fade out content behind pills, exactly at header bottom. */}
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-10 bg-gradient-to-b from-transparent via-[#fdf4ff]/25 to-[#fdf4ff]/70" />
 
           <div className="relative space-y-[0.6rem] pb-2">
             <FadingHorizontalChips rowClassName="py-0">
