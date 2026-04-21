@@ -111,6 +111,58 @@ function FadingHorizontalChips({
   );
 }
 
+type RoomViewSegment = "map" | "popular" | "recent";
+
+function RoomViewSegmentedToggle({
+  locale,
+  viewMode,
+  listSort,
+  onSegment,
+}: {
+  locale: Locale;
+  viewMode: "list" | "map";
+  listSort: "popular" | "recent";
+  onSegment: (s: RoomViewSegment) => void;
+}) {
+  const segment: RoomViewSegment =
+    viewMode === "map" ? "map" : listSort === "popular" ? "popular" : "recent";
+
+  const segBtn = (id: RoomViewSegment, emoji: string, labelKey: "room.view.map" | "room.view.list" | "room.view.latest") => {
+    const active = segment === id;
+    return (
+      <button
+        key={id}
+        type="button"
+        role="tab"
+        aria-selected={active}
+        className={`flex min-h-9 min-w-0 flex-1 items-center justify-center gap-0.5 rounded-full px-1 py-1 text-[11px] font-extrabold leading-none tracking-tight transition sm:gap-1 sm:px-2 sm:text-sm ${
+          active
+            ? "y2k-chip-sky-active text-white shadow-sm"
+            : "text-indigo-900/72 hover:bg-white/30 hover:text-indigo-950"
+        }`}
+        onClick={() => onSegment(id)}
+      >
+        <span aria-hidden className="shrink-0">
+          {emoji}
+        </span>
+        <span className="min-w-0 truncate">{t(locale, labelKey)}</span>
+      </button>
+    );
+  };
+
+  return (
+    <div
+      className="flex w-full min-w-0 max-w-full gap-0.5 rounded-full border border-indigo-200/45 bg-gradient-to-b from-white/22 to-violet-50/14 p-0.5 shadow-sm shadow-indigo-900/[0.05] backdrop-blur-sm sm:max-w-md"
+      role="tablist"
+      aria-label={locale === "en" ? "View mode" : "Vy"}
+    >
+      {segBtn("map", "🗺️", "room.view.map")}
+      {segBtn("popular", "🥇", "room.view.list")}
+      {segBtn("recent", "🆕", "room.view.latest")}
+    </div>
+  );
+}
+
 export function CityClient({
   roomSlug,
   roomTitle,
@@ -428,36 +480,19 @@ export function CityClient({
 
             {mapEnabled ? (
               <div className="w-full space-y-2">
-                <div className="w-full rounded-xl border border-slate-200/85 bg-white px-1.5 py-1 shadow-sm shadow-slate-900/[0.04] sm:w-fit sm:max-w-full">
-                  <FadingHorizontalChips rowClassName="py-0">
-                    <Chip active={viewMode === "map"} onClick={() => setViewMode("map")} tone="sky">
-                      <span className="mr-1">🗺️</span>
-                      {t(locale, "room.view.map")}
-                    </Chip>
-                    <Chip
-                      active={viewMode === "list" && listSort === "popular"}
-                      onClick={() => {
-                        setViewMode("list");
-                        setListSort("popular");
-                      }}
-                      tone="sky"
-                    >
-                      <span className="mr-1">🥇</span>
-                      {t(locale, "room.view.list")}
-                    </Chip>
-                    <Chip
-                      active={viewMode === "list" && listSort === "recent"}
-                      onClick={() => {
-                        setViewMode("list");
-                        setListSort("recent");
-                      }}
-                      tone="sky"
-                    >
-                      <span className="mr-1">🆕</span>
-                      {t(locale, "room.view.latest")}
-                    </Chip>
-                  </FadingHorizontalChips>
-                </div>
+                <RoomViewSegmentedToggle
+                  locale={locale}
+                  viewMode={viewMode}
+                  listSort={listSort}
+                  onSegment={(s) => {
+                    if (s === "map") {
+                      setViewMode("map");
+                      return;
+                    }
+                    setViewMode("list");
+                    setListSort(s === "popular" ? "popular" : "recent");
+                  }}
+                />
                 {viewMode === "list" ? (
                   <div className="pt-0.5">
                     <NewTipPillButton
@@ -873,21 +908,16 @@ function Chip({
   children: React.ReactNode;
   active: boolean;
   onClick: () => void;
-  tone?: "violet" | "pink" | "muted" | "sky";
+  tone?: "violet" | "pink" | "muted";
 }) {
   const activeClass =
     tone === "pink"
       ? "y2k-chip-active"
       : tone === "muted"
         ? "y2k-chip-active-muted"
-        : tone === "sky"
-          ? "y2k-chip-sky-active overflow-hidden"
-          : "y2k-chip-active";
+        : "y2k-chip-active";
 
-  const inactiveClass =
-    tone === "sky"
-      ? "overflow-hidden border border-sky-200/70 bg-white/90 text-indigo-950 shadow-sm shadow-sky-500/10 hover:-translate-y-0.5 hover:brightness-[1.02]"
-      : "y2k-chip text-indigo-950 hover:-translate-y-0.5";
+  const inactiveClass = "y2k-chip text-indigo-950 hover:-translate-y-0.5";
 
   return (
     <button
