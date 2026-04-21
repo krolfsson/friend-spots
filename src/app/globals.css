@@ -195,3 +195,32 @@ body {
   mask-repeat: no-repeat;
   mask-size: 100% 100%;
 }
+
+/* Google Maps InfoWindow: tight brand styling (content remains ours). */
+.gm-style .gm-style-iw-c {
+  padding: 0 !important;
+  border-radius: 1.25rem !important;
+  box-shadow: 0 18px 50px rgba(99, 102, 241, 0.16) !important;
+}
+
+.gm-style .gm-style-iw-d {
+  overflow: hidden !important;
+}
+
+/* Close button: circle + brand-ish border, less “default” look. */
+.gm-style .gm-ui-hover-effect {
+  top: 10px !important;
+  right: 10px !important;
+  width: 36px !important;
+  height: 36px !important;
+  border-radius: 9999px !important;
+  background: rgba(255, 255, 255, 0.92) !important;
+  border: 1.5px solid rgba(199, 210, 254, 0.65) !important;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.85) inset,
+    0 10px 30px rgba(99, 102, 241, 0.12) !important;
+}
+
+.gm-style .gm-ui-hover-effect > span {
+  margin: 8px !important;
+}

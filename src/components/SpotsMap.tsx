@@ -94,7 +94,6 @@ export function SpotsMap({
   roomSlug,
   userHereOn = false,
   onUserHereError,
-  onPlusChanged,
   overlay,
   overlayPosition = "left",
 }: {
@@ -104,7 +103,6 @@ export function SpotsMap({
   roomSlug: string;
   userHereOn?: boolean;
   onUserHereError?: (message: string) => void;
-  onPlusChanged?: () => void;
   overlay?: React.ReactNode;
   overlayPosition?: "left" | "right";
 }) {
@@ -169,11 +167,11 @@ export function SpotsMap({
             if (!map || !iw) return;
             const url = mapsOpenForSpot(spot, { cityName, locale });
             const wrap = document.createElement("div");
-            wrap.className = "p-0 max-w-[236px]";
+            wrap.className = "p-0 max-w-[220px]";
 
             const card = document.createElement("div");
             card.className =
-              "rounded-2xl bg-white/95 px-4 py-3 shadow-lg shadow-indigo-900/10";
+              "rounded-2xl bg-white/95 px-3.5 py-3 shadow-lg shadow-indigo-900/10";
 
             const titleEl = document.createElement("div");
             titleEl.className =
@@ -193,32 +191,83 @@ export function SpotsMap({
             const actions = document.createElement("div");
             actions.className = "mt-3 flex items-center gap-2";
 
-            const plusBtn = document.createElement("button");
-            plusBtn.type = "button";
-            plusBtn.className =
-              "inline-flex h-9 items-center justify-center rounded-full bg-gradient-to-r from-emerald-400 to-teal-500 px-4 text-[12px] font-extrabold text-white shadow-sm shadow-emerald-500/15 ring-1 ring-white/70 transition hover:brightness-110 active:scale-[0.99]";
-            plusBtn.textContent = "👍 +1";
-            plusBtn.addEventListener("click", async (e) => {
+            // Local state inside this InfoWindow instance:
+            let viewerHasPlussed = Boolean(spot.viewerHasPlussed);
+            let plusCount = spot.plusCount;
+
+            const plusWrap = document.createElement("button");
+            plusWrap.type = "button";
+            plusWrap.className =
+              "ui-press inline-flex h-9 items-stretch overflow-hidden rounded-full border border-emerald-200/70 bg-white/90 text-[12px] font-extrabold leading-none text-emerald-950 shadow-sm shadow-emerald-500/10 ring-1 ring-white/70";
+
+            const plusLeft = document.createElement("span");
+            plusLeft.className =
+              "inline-flex min-w-[3.4rem] items-center justify-center bg-gradient-to-b from-emerald-400 to-teal-500 px-3 text-white";
+
+            const plusRight = document.createElement("span");
+            plusRight.className =
+              "inline-flex items-center justify-center gap-1 bg-emerald-50/80 px-3 text-emerald-950 tabular-nums";
+
+            const plusEmoji = document.createElement("span");
+            plusEmoji.setAttribute("aria-hidden", "true");
+            plusEmoji.textContent = "👍";
+
+            const plusNum = document.createElement("span");
+
+            const setPlusUi = () => {
+              plusLeft.textContent = viewerHasPlussed ? "✓" : "+1";
+              plusNum.textContent = String(1 + plusCount);
+            };
+            setPlusUi();
+
+            plusRight.append(plusEmoji, plusNum);
+            plusWrap.append(plusLeft, plusRight);
+
+            // Prevent clicks from bubbling to the map (Google listens aggressively).
+            for (const ev of ["pointerdown", "mousedown", "touchstart", "click"] as const) {
+              plusWrap.addEventListener(ev, (e) => {
+                e.stopPropagation();
+              });
+            }
+
+            plusWrap.addEventListener("click", async (e) => {
               e.preventDefault();
               e.stopPropagation();
-              if (plusBtn.disabled) return;
-              plusBtn.disabled = true;
+              if (plusWrap.disabled) return;
+              plusWrap.disabled = true;
               try {
                 const tok = getOrCreateVoterToken();
-                const res = await fetch("/api/spots/plus", {
-                  method: "POST",
-                  headers: {
-                    "Content-Type": "application/json",
-                    "X-Room-Slug": roomSlug,
-                    "X-Voter-Token": tok,
-                  },
-                  body: JSON.stringify({ spotId: spot.id }),
+                const isUndo = viewerHasPlussed;
+                const endpoint = isUndo
+                  ? `/api/spots/plus?spotId=${encodeURIComponent(spot.id)}`
+                  : "/api/spots/plus";
+
+                const res = await fetch(endpoint, {
+                  method: isUndo ? "DELETE" : "POST",
+                  headers: isUndo
+                    ? { "X-Room-Slug": roomSlug, "X-Voter-Token": tok }
+                    : {
+                        "Content-Type": "application/json",
+                        "X-Room-Slug": roomSlug,
+                        "X-Voter-Token": tok,
+                      },
+                  ...(isUndo ? {} : { body: JSON.stringify({ spotId: spot.id }) }),
                 });
+                const data = (await res.json().catch(() => ({}))) as {
+                  plusCount?: number;
+                  viewerHasPlussed?: boolean;
+                };
                 if (!res.ok) throw new Error("plus_failed");
-                plusBtn.textContent = "✓";
-                onPlusChanged?.();
-              } catch {
-                plusBtn.disabled = false;
+                if (typeof data.plusCount === "number") plusCount = data.plusCount;
+                if (typeof data.viewerHasPlussed === "boolean") viewerHasPlussed = data.viewerHasPlussed;
+                else viewerHasPlussed = !isUndo;
+
+                setPlusUi();
+                marker.setIcon(
+                  buildSpotMarkerIcon(spotMapEmoji(spot), 1 + plusCount, emojiIconCache),
+                );
+              } finally {
+                plusWrap.disabled = false;
               }
             });
 
@@ -230,7 +279,11 @@ export function SpotsMap({
               "inline-flex h-9 items-center justify-center rounded-full bg-gradient-to-r from-fuchsia-500 to-violet-600 px-4 text-[12px] font-extrabold text-white shadow-sm shadow-fuchsia-500/15 ring-1 ring-white/70 transition hover:brightness-110 active:scale-[0.99]";
             a.textContent = locale === "en" ? "Directions" : "Hitta";
 
-            actions.append(plusBtn, a);
+            for (const ev of ["pointerdown", "mousedown", "touchstart", "click"] as const) {
+              a.addEventListener(ev, (e) => e.stopPropagation());
+            }
+
+            actions.append(plusWrap, a);
             card.append(titleEl, meta, actions);
             wrap.append(card);
             iw.setContent(wrap);
