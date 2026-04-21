@@ -4,7 +4,9 @@ import { importLibrary, setOptions } from "@googlemaps/js-api-loader";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { DashboardSpot } from "@/lib/dashboardTypes";
 import { categoryMeta } from "@/lib/categories";
+import { t, type Locale } from "@/lib/i18n";
 import { mapsOpenForSpot } from "@/lib/mapsUrl";
+import { getOrCreateVoterToken } from "@/lib/voterClient";
 
 const DEFAULT_CENTER = { lat: 59.33, lng: 18.07 };
 
@@ -89,16 +91,20 @@ export function SpotsMap({
   spots,
   cityName,
   locale = "sv",
+  roomSlug,
   userHereOn = false,
   onUserHereError,
+  onPlusChanged,
   overlay,
   overlayPosition = "left",
 }: {
   spots: DashboardSpot[];
   cityName: string;
-  locale?: "sv" | "en";
+  locale?: Locale;
+  roomSlug: string;
   userHereOn?: boolean;
   onUserHereError?: (message: string) => void;
+  onPlusChanged?: () => void;
   overlay?: React.ReactNode;
   overlayPosition?: "left" | "right";
 }) {
@@ -163,11 +169,11 @@ export function SpotsMap({
             if (!map || !iw) return;
             const url = mapsOpenForSpot(spot, { cityName, locale });
             const wrap = document.createElement("div");
-            wrap.className = "p-0 max-w-[260px]";
+            wrap.className = "p-0 max-w-[236px]";
 
             const card = document.createElement("div");
             card.className =
-              "rounded-2xl border border-indigo-200/70 bg-white/95 px-4 py-3 shadow-lg shadow-indigo-900/10";
+              "rounded-2xl bg-white/95 px-4 py-3 shadow-lg shadow-indigo-900/10";
 
             const titleEl = document.createElement("div");
             titleEl.className =
@@ -179,12 +185,42 @@ export function SpotsMap({
             const parts: string[] = [];
             const nb = spot.neighborhood?.trim();
             if (nb) parts.push(nb);
-            if (spot.category) parts.push(spot.category);
+            const cat = categoryMeta(spot.category);
+            parts.push(`${cat.emoji} ${t(locale, `cat.${cat.id}`)}`);
             meta.textContent = parts.join(" · ");
             if (!meta.textContent) meta.style.display = "none";
 
             const actions = document.createElement("div");
             actions.className = "mt-3 flex items-center gap-2";
+
+            const plusBtn = document.createElement("button");
+            plusBtn.type = "button";
+            plusBtn.className =
+              "inline-flex h-9 items-center justify-center rounded-full bg-gradient-to-r from-emerald-400 to-teal-500 px-4 text-[12px] font-extrabold text-white shadow-sm shadow-emerald-500/15 ring-1 ring-white/70 transition hover:brightness-110 active:scale-[0.99]";
+            plusBtn.textContent = locale === "en" ? "+1" : "Plussa";
+            plusBtn.addEventListener("click", async (e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              if (plusBtn.disabled) return;
+              plusBtn.disabled = true;
+              try {
+                const tok = getOrCreateVoterToken();
+                const res = await fetch("/api/spots/plus", {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                    "X-Room-Slug": roomSlug,
+                    "X-Voter-Token": tok,
+                  },
+                  body: JSON.stringify({ spotId: spot.id }),
+                });
+                if (!res.ok) throw new Error("plus_failed");
+                plusBtn.textContent = "✓";
+                onPlusChanged?.();
+              } catch {
+                plusBtn.disabled = false;
+              }
+            });
 
             const a = document.createElement("a");
             a.href = url;
@@ -192,9 +228,9 @@ export function SpotsMap({
             a.rel = "noopener noreferrer";
             a.className =
               "inline-flex h-9 items-center justify-center rounded-full bg-gradient-to-r from-fuchsia-500 to-violet-600 px-4 text-[12px] font-extrabold text-white shadow-sm shadow-fuchsia-500/15 ring-1 ring-white/70 transition hover:brightness-110 active:scale-[0.99]";
-            a.textContent = locale === "en" ? "Open directions" : "Öppna i Hitta";
+            a.textContent = locale === "en" ? "Directions" : "Hitta";
 
-            actions.append(a);
+            actions.append(plusBtn, a);
             card.append(titleEl, meta, actions);
             wrap.append(card);
             iw.setContent(wrap);

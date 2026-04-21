@@ -449,8 +449,10 @@ export function CityClient({
                 spots={displaySpots}
                 cityName={activeCity.name}
                 locale={locale}
+                roomSlug={roomSlug}
                 userHereOn={hereOn}
                 onUserHereError={(msg) => showToast(msg, "info")}
+                onPlusChanged={() => void refreshCity(activeCity.slug)}
                 overlayPosition="right"
                 overlay={
                   <div className="flex flex-col items-end gap-[0.6rem]">
