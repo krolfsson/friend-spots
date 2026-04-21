@@ -215,6 +215,15 @@ export function CityClient({
   const [toast, setToast] = useState<{ message: string; tone?: ToastTone } | null>(null);
   const mapEnabled = isMapViewConfigured();
 
+  const onRoomViewSegment = useCallback((s: RoomViewSegment) => {
+    if (s === "map") {
+      setViewMode("map");
+      return;
+    }
+    setViewMode("list");
+    setListSort(s === "popular" ? "popular" : "recent");
+  }, []);
+
   useEffect(() => {
     setRoomTitleLive(roomTitle);
     setRenameValue(roomTitle);
@@ -494,30 +503,34 @@ export function CityClient({
 
             {mapEnabled ? (
               <div className="w-full space-y-2">
-                <RoomViewSegmentedToggle
-                  locale={locale}
-                  viewMode={viewMode}
-                  listSort={listSort}
-                  onSegment={(s) => {
-                    if (s === "map") {
-                      setViewMode("map");
-                      return;
-                    }
-                    setViewMode("list");
-                    setListSort(s === "popular" ? "popular" : "recent");
-                  }}
-                />
                 {viewMode === "list" ? (
-                  <div className="pt-0.5">
-                    <NewTipPillButton
-                      locale={locale}
-                      onClick={() => {
-                        setAddTargetSlug(activeCity.slug);
-                        setAddOpen(true);
-                      }}
-                    />
+                  <div className="flex w-full flex-col gap-2 sm:flex-row sm:items-center sm:gap-2.5">
+                    <div className="min-w-0 w-full max-w-md sm:flex-1">
+                      <RoomViewSegmentedToggle
+                        locale={locale}
+                        viewMode={viewMode}
+                        listSort={listSort}
+                        onSegment={onRoomViewSegment}
+                      />
+                    </div>
+                    <div className="shrink-0 pt-0.5 sm:pt-0">
+                      <NewTipPillButton
+                        locale={locale}
+                        onClick={() => {
+                          setAddTargetSlug(activeCity.slug);
+                          setAddOpen(true);
+                        }}
+                      />
+                    </div>
                   </div>
-                ) : null}
+                ) : (
+                  <RoomViewSegmentedToggle
+                    locale={locale}
+                    viewMode={viewMode}
+                    listSort={listSort}
+                    onSegment={onRoomViewSegment}
+                  />
+                )}
               </div>
             ) : (
               <div className="pt-0.5">
