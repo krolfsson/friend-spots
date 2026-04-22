@@ -2,7 +2,7 @@
 
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import type { Locale } from "@/lib/i18n";
 import { t } from "@/lib/i18n";
 import { createPortal } from "react-dom";
@@ -21,7 +21,7 @@ const SpotsMap = dynamic(
     ssr: false,
     loading: () => (
       <div
-        className="relative flex h-[min(472px,calc(55dvh+3rem))] w-full items-center justify-center overflow-hidden rounded-2xl border border-indigo-200/70 bg-indigo-50/40 text-sm font-bold text-indigo-900/60 md:h-[min(420px,55dvh)]"
+        className="flex h-full min-h-[12rem] w-full flex-1 items-center justify-center rounded-2xl border border-indigo-200/70 bg-indigo-50/40 text-sm font-bold text-indigo-900/60"
         role="status"
         aria-live="polite"
       >
@@ -474,15 +474,22 @@ export function CityClient({
     return () => window.removeEventListener("keydown", onKey);
   }, [addOpen]);
 
-  return (
-    <div className="relative mx-auto max-w-5xl px-[0.96rem] pb-[4.2rem] pt-0">
-      <div className="relative">
-        {/* Sticky header: stick to top edge (include safe-area padding). */}
-        <div className="sticky top-0 z-40 -mx-[0.96rem] px-[0.96rem] pt-[max(0.75rem,env(safe-area-inset-top))]">
-          {/* Samma bas som body (#fdf4ff) i botten — inget transparent + blur som ger raka “kantlinjer” mot bakgrunden. */}
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(900px_520px_at_10%_0%,rgba(233,213,255,0.82),transparent_58%),radial-gradient(800px_500px_at_95%_10%,rgba(251,207,232,0.72),transparent_55%),linear-gradient(180deg,rgba(253,244,255,0.96)_0%,rgba(245,243,255,0.78)_38%,rgba(253,244,255,0.55)_62%,#fdf4ff_88%,#fdf4ff_100%)]" />
+  useLayoutEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
-          <div className="relative space-y-[0.6rem] pb-[0.6rem]">
+  const mapScrollShell =
+    mapEnabled && viewMode === "map"
+      ? "flex min-h-0 flex-1 flex-col overflow-hidden overscroll-y-contain"
+      : "flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-y-contain";
+
+  return (
+    <div className="relative mx-auto flex h-dvh max-h-dvh w-full max-w-5xl flex-col overflow-hidden px-[0.96rem] pb-[max(0.25rem,env(safe-area-inset-bottom))] pt-[max(0.5rem,env(safe-area-inset-top))]">
+      <div className="relative z-40 shrink-0">
+        {/* Samma bas som body (#fdf4ff) i botten — inget transparent + blur som ger raka “kantlinjer” mot bakgrunden. */}
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(900px_520px_at_10%_0%,rgba(233,213,255,0.82),transparent_58%),radial-gradient(800px_500px_at_95%_10%,rgba(251,207,232,0.72),transparent_55%),linear-gradient(180deg,rgba(253,244,255,0.96)_0%,rgba(245,243,255,0.78)_38%,rgba(253,244,255,0.55)_62%,#fdf4ff_88%,#fdf4ff_100%)]" />
+
+        <div className="relative space-y-[0.6rem] pb-[0.6rem]">
             <FadingHorizontalChips rowClassName="py-0">
               {cityList.map((c) => {
                 const active = c.slug === activeCity.slug;
@@ -589,22 +596,30 @@ export function CityClient({
         </div>
 
         {error ? (
-          <p className="rounded-2xl border border-rose-200/80 bg-rose-50/90 px-4 py-3 text-sm font-bold text-rose-800">
+          <p className="shrink-0 rounded-2xl border border-rose-200/80 bg-rose-50/90 px-4 py-2 text-sm font-bold text-rose-800">
             {error}
           </p>
         ) : null}
 
-        <div className="space-y-[0.6rem]">
-          <div>
-            {mapEnabled && viewMode === "map" ? (
-              <SpotsMap
-                spots={displaySpots}
-                cityName={activeCity.name}
-                locale={locale}
-                roomSlug={roomSlug}
-                userHereOn={hereOn}
-                onUserHereError={(msg) => showToast(msg, "info")}
-                overlay={
+        <div className="flex min-h-0 flex-1 flex-col gap-[0.6rem] overflow-hidden">
+          <div className={mapScrollShell}>
+            <div
+              className={
+                mapEnabled && viewMode === "map"
+                  ? "flex min-h-0 flex-1 flex-col overflow-hidden"
+                  : "min-h-0 flex-1"
+              }
+            >
+              {mapEnabled && viewMode === "map" ? (
+                <SpotsMap
+                  fillHeight
+                  spots={displaySpots}
+                  cityName={activeCity.name}
+                  locale={locale}
+                  roomSlug={roomSlug}
+                  userHereOn={hereOn}
+                  onUserHereError={(msg) => showToast(msg, "info")}
+                  overlay={
                   <>
                     <div className="pointer-events-auto sm:hidden">
                       <NewTipPillButton
@@ -655,24 +670,26 @@ export function CityClient({
                     </div>
                   </>
                 }
-              />
-            ) : displaySpots.length === 0 ? null : (
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                {spotsForListView.map((s) => (
-                  <SpotCard
-                    key={s.id}
-                    roomSlug={roomSlug}
-                    spot={s}
-                    mapsCityName={activeCity.name}
-                    locale={locale}
-                    onPurge={() => removeSpot(s.id, activeCity.slug, s.category)}
-                    onEdited={() => void refreshCity(activeCity.slug)}
-                  />
-                ))}
-              </div>
-            )}
+                />
+              ) : displaySpots.length === 0 ? null : (
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                  {spotsForListView.map((s) => (
+                    <SpotCard
+                      key={s.id}
+                      roomSlug={roomSlug}
+                      spot={s}
+                      mapsCityName={activeCity.name}
+                      locale={locale}
+                      onPurge={() => removeSpot(s.id, activeCity.slug, s.category)}
+                      onEdited={() => void refreshCity(activeCity.slug)}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
+          <div className="shrink-0 space-y-[0.6rem]">
           <div className="grid grid-cols-2 gap-[0.6rem] sm:gap-3">
             <Link
               href="/"
@@ -709,8 +726,8 @@ export function CityClient({
               Mapsies
             </div>
           </div>
+          </div>
         </div>
-      </div>
 
       {toast ? (
         <div className="pointer-events-none fixed inset-x-0 bottom-0 z-[60] flex justify-center px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))]">

@@ -91,6 +91,8 @@ export function SpotsMap({
   userHereOn = false,
   onUserHereError,
   overlay,
+  /** Fyll återstående höjd i flex-layout (rumssidan) i stället för fast korthöjd. */
+  fillHeight = false,
 }: {
   spots: DashboardSpot[];
   cityName: string;
@@ -100,6 +102,7 @@ export function SpotsMap({
   onUserHereError?: (message: string) => void;
   /** Lägg t.ex. vänster knapp + höger kolumn som syskon — raden är `justify-between`. */
   overlay?: React.ReactNode;
+  fillHeight?: boolean;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<google.maps.Map | null>(null);
@@ -427,20 +430,27 @@ export function SpotsMap({
     );
   }
 
+  const shellClass = fillHeight
+    ? "flex h-full min-h-0 flex-1 flex-col gap-2 overflow-hidden"
+    : "space-y-2";
+  const mapFrameClass = fillHeight
+    ? "relative min-h-[12rem] w-full flex-1 overflow-hidden overscroll-y-contain rounded-2xl border border-indigo-200/70 bg-indigo-50/30 shadow-inner shadow-indigo-100/80"
+    : "relative h-[min(472px,calc(55dvh+3rem))] w-full overflow-hidden overscroll-y-contain rounded-2xl border border-indigo-200/70 bg-indigo-50/30 shadow-inner shadow-indigo-100/80 md:h-[min(420px,55dvh)]";
+
   return (
-    <div className="space-y-2">
+    <div className={shellClass}>
       {loadError ? (
-        <p className="rounded-2xl border border-rose-200/80 bg-rose-50/90 px-4 py-3 text-sm font-bold text-rose-900">
+        <p className="shrink-0 rounded-2xl border border-rose-200/80 bg-rose-50/90 px-4 py-3 text-sm font-bold text-rose-900">
           {loadError}
         </p>
       ) : null}
       {missingCount > 0 ? (
-        <p className="text-xs font-bold text-indigo-900/55">
+        <p className="shrink-0 text-xs font-bold text-indigo-900/55">
           {missingCount} ställe{missingCount === 1 ? "" : "n"} saknar koordinat och
           visas inte på kartan.
         </p>
       ) : null}
-      <div className="relative h-[min(472px,calc(55dvh+3rem))] w-full overflow-hidden rounded-2xl border border-indigo-200/70 bg-indigo-50/30 shadow-inner shadow-indigo-100/80 md:h-[min(420px,55dvh)]">
+      <div className={mapFrameClass}>
         {loading && !loadError ? (
           <div className="absolute inset-0 z-10 flex items-center justify-center bg-indigo-50/80 text-sm font-bold text-indigo-900/70">
             Laddar karta…
