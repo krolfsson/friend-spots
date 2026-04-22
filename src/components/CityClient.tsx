@@ -1256,22 +1256,22 @@ function SpotCard({
           }
         >
           <p className="truncate text-[0.95rem] font-extrabold tracking-tight text-indigo-950">{spot.name}</p>
-          <div className="mt-1.5 flex flex-wrap items-center gap-1.5 lg:gap-1.5">
+          <div className="mt-1 flex flex-wrap items-center gap-1">
             {sanitizeCategoryIds(spot.categories).map((cid) => {
               const c = categoryMeta(cid);
               return (
                 <span
                   key={cid}
-                  className="inline-flex h-8 shrink-0 select-none items-center gap-1 rounded-full border border-fuchsia-200/70 bg-white/70 px-2.5 text-[11px] font-extrabold leading-none text-indigo-900/80 lg:h-7 lg:gap-0.5 lg:px-2 lg:text-[10px]"
+                  className="inline-flex h-[1.4rem] min-h-[1.4rem] shrink-0 select-none items-center gap-0.5 rounded-full border border-fuchsia-200/70 bg-white/70 px-[7px] text-[8px] font-extrabold leading-none text-indigo-900/80"
                 >
-                  <span>{c.emoji}</span>
+                  <span className="text-[0.65rem] leading-none">{c.emoji}</span>
                   <span>{t(locale, `cat.${c.id}`)}</span>
                 </span>
               );
             })}
-            <div className="flex shrink-0 items-center gap-1.5">
+            <div className="flex shrink-0 items-center gap-1">
               <a
-                className="inline-flex h-8 min-h-8 select-none items-center rounded-full bg-gradient-to-r from-sky-400 to-cyan-400 px-2.5 text-[11px] font-extrabold leading-none text-indigo-950 shadow-sm shadow-cyan-500/20 ring-1 ring-white/60 hover:brightness-110 lg:h-7 lg:min-h-7 lg:px-2 lg:text-[10px]"
+                className="inline-flex h-[1.4rem] min-h-[1.4rem] shrink-0 select-none items-center rounded-full bg-gradient-to-r from-sky-400 to-cyan-400 px-[7px] text-[8px] font-extrabold leading-none text-indigo-950 shadow-sm shadow-cyan-500/20 ring-1 ring-white/60 hover:brightness-110"
                 href={mapsOpenForSpot(spot, { cityName: mapsCityName, locale })}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -1282,7 +1282,7 @@ function SpotCard({
               </a>
               <button
                 type="button"
-                className="grid h-8 w-8 shrink-0 select-none place-items-center rounded-full border border-indigo-200/70 bg-white/85 text-[15px] leading-none text-indigo-900/85 shadow-sm ring-1 ring-white/55 transition hover:bg-indigo-50/90 active:scale-95 lg:h-7 lg:w-7 lg:text-[13px]"
+                className="grid h-[1.4rem] w-[1.4rem] shrink-0 select-none place-items-center rounded-full border border-indigo-200/70 bg-white/85 text-[11px] leading-none text-indigo-900/85 shadow-sm ring-1 ring-white/55 transition hover:bg-indigo-50/90 active:scale-95"
                 aria-label={t(locale, "spots.actionsMenuAria")}
                 aria-haspopup="menu"
                 aria-expanded={Boolean(menu)}
