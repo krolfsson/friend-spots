@@ -6,6 +6,7 @@ import type { DashboardSpot } from "@/lib/dashboardTypes";
 import { categoryMeta, primaryCategoryId, sanitizeCategoryIds } from "@/lib/categories";
 import { t, type Locale } from "@/lib/i18n";
 import { mapsOpenForSpot } from "@/lib/mapsUrl";
+import { isSunUpAtSpot } from "@/lib/sunAtSpot";
 import { getOrCreateVoterToken } from "@/lib/voterClient";
 
 const DEFAULT_CENTER = { lat: 59.33, lng: 18.07 };
@@ -32,14 +33,16 @@ function spotDisplayScore(spot: DashboardSpot): number {
 function buildSpotMarkerIcon(
   emoji: string,
   score: number,
+  sunUp: boolean,
   cache: Map<string, google.maps.Icon>,
 ): google.maps.Icon {
   const scoreLabel = score > 99 ? "99+" : String(score);
-  const cacheKey = `${emoji}\0${scoreLabel}`;
+  const cacheKey = `${emoji}\0${scoreLabel}\0${sunUp ? "d" : "n"}`;
   const hit = cache.get(cacheKey);
   if (hit) return hit;
 
-  const size = 38;
+  const w = 38;
+  const h = 40;
   const mainCx = 18;
   const mainCy = 18;
   const mainR = 12.5;
@@ -48,12 +51,16 @@ function buildSpotMarkerIcon(
   const badgeCy = 25.5;
   const badgeR = scoreLabel.length > 2 ? 8.8 : 7.6;
   const badgeFont = scoreLabel.length > 2 ? 7.5 : 9;
+  const dayCx = 28.5;
+  const dayCy = 35;
+  const dayR = 4.85;
+  const dayGlyph = sunUp ? "☀️" : "🌙";
 
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}"><defs><filter id="s" x="-35%" y="-35%" width="170%" height="170%"><feDropShadow dx="0" dy="1" stdDeviation="1.2" flood-opacity="0.28"/></filter></defs><circle cx="${mainCx}" cy="${mainCy}" r="${mainR}" fill="#ffffff" stroke="#4f46e5" stroke-width="1.75" filter="url(#s)"/><text x="${mainCx}" y="${mainCy}" font-size="${emojiFont}" text-anchor="middle" dominant-baseline="central" font-family="system-ui,&quot;Apple Color Emoji&quot;,&quot;Segoe UI Emoji&quot;,&quot;Noto Color Emoji&quot;,sans-serif">${escapeSvgText(emoji)}</text><circle cx="${badgeCx}" cy="${badgeCy}" r="${badgeR}" fill="#10b981" stroke="#ffffff" stroke-width="1.75"/><text x="${badgeCx}" y="${badgeCy}" font-size="${badgeFont}" font-weight="800" text-anchor="middle" dominant-baseline="central" fill="#ffffff" font-family="system-ui,ui-sans-serif,sans-serif">${escapeSvgText(scoreLabel)}</text></svg>`;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><defs><filter id="s" x="-35%" y="-35%" width="170%" height="170%"><feDropShadow dx="0" dy="1" stdDeviation="1.2" flood-opacity="0.28"/></filter></defs><circle cx="${mainCx}" cy="${mainCy}" r="${mainR}" fill="#ffffff" stroke="#4f46e5" stroke-width="1.75" filter="url(#s)"/><text x="${mainCx}" y="${mainCy}" font-size="${emojiFont}" text-anchor="middle" dominant-baseline="central" font-family="system-ui,&quot;Apple Color Emoji&quot;,&quot;Segoe UI Emoji&quot;,&quot;Noto Color Emoji&quot;,sans-serif">${escapeSvgText(emoji)}</text><circle cx="${badgeCx}" cy="${badgeCy}" r="${badgeR}" fill="#10b981" stroke="#ffffff" stroke-width="1.75"/><text x="${badgeCx}" y="${badgeCy}" font-size="${badgeFont}" font-weight="800" text-anchor="middle" dominant-baseline="central" fill="#ffffff" font-family="system-ui,ui-sans-serif,sans-serif">${escapeSvgText(scoreLabel)}</text><circle cx="${dayCx}" cy="${dayCy}" r="${dayR}" fill="#ffffff" stroke="#a5b4fc" stroke-width="1.15"/><text x="${dayCx}" y="${dayCy}" font-size="8" text-anchor="middle" dominant-baseline="central" font-family="system-ui,&quot;Apple Color Emoji&quot;,&quot;Segoe UI Emoji&quot;,&quot;Noto Color Emoji&quot;,sans-serif">${escapeSvgText(dayGlyph)}</text></svg>`;
   const url = `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
   const icon: google.maps.Icon = {
     url,
-    scaledSize: new google.maps.Size(size, size),
+    scaledSize: new google.maps.Size(w, h),
     anchor: new google.maps.Point(mainCx, mainCy),
   };
   cache.set(cacheKey, icon);
@@ -105,6 +112,7 @@ export function SpotsMap({
   fillHeight?: boolean;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const spotMarkersRef = useRef<Array<{ marker: google.maps.Marker; spot: DashboardSpot }>>([]);
   const mapRef = useRef<google.maps.Map | null>(null);
   const hereMarkerRef = useRef<google.maps.Marker | null>(null);
   const hereCircleRef = useRef<google.maps.Circle | null>(null);
@@ -150,17 +158,22 @@ export function SpotsMap({
         });
         mapRef.current = map;
 
+        spotMarkersRef.current = [];
+
         iw = new google.maps.InfoWindow();
         const emojiIconCache = new Map<string, google.maps.Icon>();
 
         for (const spot of plotted) {
           if (cancelled) return;
+          const now = new Date();
+          const sunUp = isSunUpAtSpot(spot.lat!, spot.lng!, now);
           const marker = new google.maps.Marker({
             map,
             position: { lat: spot.lat!, lng: spot.lng! },
             title: spot.name,
-            icon: buildSpotMarkerIcon(spotMapEmoji(spot), spotDisplayScore(spot), emojiIconCache),
+            icon: buildSpotMarkerIcon(spotMapEmoji(spot), spotDisplayScore(spot), sunUp, emojiIconCache),
           });
+          spotMarkersRef.current.push({ marker, spot: { ...spot } });
           marker.addListener("click", () => {
             if (!map || !iw) return;
             const url = mapsOpenForSpot(spot, { cityName, locale });
@@ -263,8 +276,15 @@ export function SpotsMap({
                 else viewerHasPlussed = !isUndo;
 
                 setPlusUi();
+                const row = spotMarkersRef.current.find((e) => e.marker === marker);
+                if (row) row.spot = { ...row.spot, plusCount };
                 marker.setIcon(
-                  buildSpotMarkerIcon(spotMapEmoji(spot), 1 + plusCount, emojiIconCache),
+                  buildSpotMarkerIcon(
+                    spotMapEmoji(spot),
+                    1 + plusCount,
+                    isSunUpAtSpot(spot.lat!, spot.lng!),
+                    emojiIconCache,
+                  ),
                 );
               } finally {
                 plusWrap.disabled = false;
@@ -317,11 +337,34 @@ export function SpotsMap({
 
     return () => {
       cancelled = true;
+      spotMarkersRef.current = [];
       markers.forEach((m) => m.setMap(null));
       iw?.close();
       mapRef.current = null;
     };
   }, [apiKey, cityName, plotted, locale]);
+
+  /** Uppdatera sol/måne-bubblan ~varje minut (samma “nu” som användarens lokala klocka). */
+  useEffect(() => {
+    const tick = () => {
+      const now = new Date();
+      const cache = new Map<string, google.maps.Icon>();
+      for (const { marker, spot } of spotMarkersRef.current) {
+        if (!hasCoords(spot)) continue;
+        marker.setIcon(
+          buildSpotMarkerIcon(
+            spotMapEmoji(spot),
+            spotDisplayScore(spot),
+            isSunUpAtSpot(spot.lat!, spot.lng!, now),
+            cache,
+          ),
+        );
+      }
+    };
+    tick();
+    const id = window.setInterval(tick, 60_000);
+    return () => window.clearInterval(id);
+  }, [plotted]);
 
   useEffect(() => {
     const map = mapRef.current;
