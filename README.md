@@ -99,10 +99,11 @@ npx prisma migrate deploy
 npm run dev
 ```
 
-Appen: [http://localhost:3002](http://localhost:3002) (port satt i `package.json`).
+Appen: [http://localhost:3000](http://localhost:3000) (port satt i `package.json`).
 
 ## Felsökning
 
+- **Webbläsaren kan inte ansluta till dev-servern**: Kör `npm run dev` i projektroten och öppna exakt den URL som terminalen visar (standard är `http://localhost:3000`). Om porten redan är upptagen, stäng den andra processen eller starta med `npx next dev -p 3003` (byt siffra vid behov).
 - **Build faller på Prisma / DATABASE_URL**: Kontrollera att variabeln finns i Vercel *och* börjar med `postgresql://` eller `postgres://`.
 - **P1002 / advisory lock / timeout vid `migrate deploy`**: Lägg till `DIRECT_URL` i Vercel (Neons **direkta** Postgres-URL, inte poolern). Sätt samma värde som `DATABASE_URL` i `.env.local` om du kör utan pooler lokalt.
 - **Git hooks / Operation not permitted** (vissa miljöer): kör `git init` på din egen Mac-terminal i `~/friend-spots`, inte i sandlådor utan full filåtkomst.
