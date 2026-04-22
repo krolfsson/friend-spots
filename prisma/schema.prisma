@@ -42,14 +42,14 @@ model Spot {
   lat            Float?
   lng            Float?
   shortAddress   String?
-  category       String
+  /** En eller flera kategorier (t.ex. lunch + bar). */
+  categories     String[]           @default([])
   emoji          String?
   createdAt      DateTime           @default(now())
   recommendations Recommendation[]
   plusses        SpotPlus[]
 
   @@unique([cityId, googlePlaceId])
-  @@index([cityId, category])
   @@index([cityId, neighborhood])
 }
 

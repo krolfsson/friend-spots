@@ -85,14 +85,14 @@ export const MESSAGES: Record<Locale, Record<string, string>> = {
 
     "add.title": "Nytt tips",
     "add.cityLabel": "Stad",
-    "add.placeCategoryLabel": "Plats & kategori",
+    "add.placeCategoryLabel": "Plats & kategorier",
     "add.searchPlaceholder": "Sök upp ditt tips",
     "add.save": "Spara",
     "add.saving": "Sparar…",
     "add.savedToast": "Sparat ✨",
 
     "edit.title": "Redigera tips",
-    "edit.categoryLabel": "Kategori",
+    "edit.categoryLabel": "Kategorier",
 
     "common.close": "Stäng",
     "common.cancel": "Avbryt",
@@ -194,14 +194,14 @@ export const MESSAGES: Record<Locale, Record<string, string>> = {
 
     "add.title": "New tip",
     "add.cityLabel": "City",
-    "add.placeCategoryLabel": "Place & category",
+    "add.placeCategoryLabel": "Place & categories",
     "add.searchPlaceholder": "Search for your tip",
     "add.save": "Save",
     "add.saving": "Saving…",
     "add.savedToast": "Saved ✨",
 
     "edit.title": "Edit tip",
-    "edit.categoryLabel": "Category",
+    "edit.categoryLabel": "Categories",
 
     "common.close": "Close",
     "common.cancel": "Cancel",

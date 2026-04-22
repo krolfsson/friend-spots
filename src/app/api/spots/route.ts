@@ -1,6 +1,6 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
-import { isCategoryId } from "@/lib/categories";
+import { isCategoryId, mergeCategoryIds, sanitizeCategoryIds } from "@/lib/categories";
 import type { DashboardSpot } from "@/lib/dashboardTypes";
 import { fetchPlaceEssentials } from "@/lib/google/placesServer";
 import { prisma } from "@/lib/prisma";
@@ -15,7 +15,7 @@ function toDashboardSpot(
     googlePlaceId: string;
     name: string;
     neighborhood: string | null;
-    category: string;
+    categories: string[];
     emoji: string | null;
     lat: number | null;
     lng: number | null;
@@ -29,7 +29,7 @@ function toDashboardSpot(
     googlePlaceId: s.googlePlaceId,
     name: s.name,
     neighborhood: s.neighborhood,
-    category: s.category,
+    categories: sanitizeCategoryIds(s.categories),
     emoji: s.emoji,
     lat: s.lat,
     lng: s.lng,
@@ -65,7 +65,7 @@ export async function GET(req: NextRequest) {
 
   const baseWhere = {
     cityId: city.id,
-    ...(category !== "alla" && isCategoryId(category) ? { category } : {}),
+    ...(category !== "alla" && isCategoryId(category) ? { categories: { has: category } } : {}),
   };
 
   const spotWhere =
@@ -75,7 +75,7 @@ export async function GET(req: NextRequest) {
         : { ...baseWhere, neighborhood }
       : baseWhere;
 
-  const [spotsForNeighborhoods, spots, categoryStats] = await Promise.all([
+  const [spotsForNeighborhoods, spots, allForCounts] = await Promise.all([
     prisma.spot.findMany({
       where: baseWhere,
       select: { neighborhood: true },
@@ -87,10 +87,9 @@ export async function GET(req: NextRequest) {
         _count: { select: { plusses: true } },
       },
     }),
-    prisma.spot.groupBy({
-      by: ["category"],
+    prisma.spot.findMany({
       where: { cityId: city.id },
-      _count: { _all: true },
+      select: { categories: true },
     }),
   ]);
 
@@ -101,6 +100,13 @@ export async function GET(req: NextRequest) {
         .filter((n): n is string => Boolean(n && n.trim())),
     ),
   ).sort((a, b) => a.localeCompare(b, "sv"));
+
+  const categoryCounts: Record<string, number> = {};
+  for (const row of allForCounts) {
+    for (const c of sanitizeCategoryIds(row.categories)) {
+      categoryCounts[c] = (categoryCounts[c] ?? 0) + 1;
+    }
+  }
 
   const voterHeader = req.headers.get("x-voter-token");
   const voterKey =
@@ -123,10 +129,6 @@ export async function GET(req: NextRequest) {
   );
   mapped.sort(sortSpotsForDisplay);
 
-  const categoryCounts = Object.fromEntries(
-    categoryStats.map((c) => [c.category, c._count._all]),
-  ) as Record<string, number>;
-
   return NextResponse.json({ city, spots: mapped, neighborhoods, categoryCounts });
 }
 
@@ -139,6 +141,9 @@ export async function POST(req: NextRequest) {
       citySlug?: string;
       googlePlaceId?: string;
       displayName?: string;
+      /** Nytt: flera kategorier. */
+      categories?: string[];
+      /** Bakåtkomp: en kategori. */
       category?: string;
       emoji?: string;
       contributorName?: string;
@@ -214,8 +219,14 @@ export async function POST(req: NextRequest) {
       include: { recommendations: true },
     });
 
-    if (!body.category || !isCategoryId(body.category)) {
-      return NextResponse.json({ error: "Ogiltig kategori" }, { status: 400 });
+    const rawCats = Array.isArray(body.categories)
+      ? body.categories
+      : body.category
+        ? [body.category]
+        : [];
+    const categories = sanitizeCategoryIds(rawCats);
+    if (!categories.length) {
+      return NextResponse.json({ error: "Minst en kategori krävs" }, { status: 400 });
     }
 
     const emoji = body.emoji?.trim() || null;
@@ -230,6 +241,11 @@ export async function POST(req: NextRequest) {
           data: { spotId: existing.id, contributorName },
         });
       }
+
+      await prisma.spot.update({
+        where: { id: existing.id },
+        data: { categories: mergeCategoryIds(existing.categories, categories) },
+      });
 
       const spot = await prisma.spot.findUniqueOrThrow({
         where: { id: existing.id },
@@ -248,7 +264,7 @@ export async function POST(req: NextRequest) {
         lat: essentials.lat,
         lng: essentials.lng,
         shortAddress: essentials.shortAddress,
-        category: body.category,
+        categories,
         emoji,
         recommendations: {
           create: [{ contributorName }],
@@ -272,6 +288,7 @@ export async function PATCH(req: NextRequest) {
     const body = (await req.json()) as {
       spotId?: string;
       name?: string;
+      categories?: string[];
       category?: string;
       emoji?: string | null;
       neighborhood?: string | null;
@@ -291,7 +308,7 @@ export async function PATCH(req: NextRequest) {
 
     const data: {
       name?: string;
-      category?: string;
+      categories?: string[];
       emoji?: string | null;
       neighborhood?: string | null;
     } = {};
@@ -304,11 +321,17 @@ export async function PATCH(req: NextRequest) {
       data.name = n;
     }
 
-    if (body.category !== undefined) {
+    if (body.categories !== undefined) {
+      const next = sanitizeCategoryIds(body.categories);
+      if (!next.length) {
+        return NextResponse.json({ error: "Minst en kategori krävs" }, { status: 400 });
+      }
+      data.categories = next;
+    } else if (body.category !== undefined) {
       if (!isCategoryId(body.category)) {
         return NextResponse.json({ error: "Ogiltig kategori" }, { status: 400 });
       }
-      data.category = body.category;
+      data.categories = sanitizeCategoryIds([body.category]);
     }
 
     if (body.emoji !== undefined) {

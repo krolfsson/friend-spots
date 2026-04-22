@@ -22,3 +22,29 @@ export function categoryMeta(id: string) {
   const hit = CATEGORIES.find((c) => c.id === id);
   return hit ?? { id: "annat", label: "Annat", emoji: "✨" as const };
 }
+
+/** Unika giltiga kategorier i stabil ordning; tom lista → annat. */
+export function sanitizeCategoryIds(ids: readonly string[]): CategoryId[] {
+  const out: CategoryId[] = [];
+  const seen = new Set<string>();
+  for (const raw of ids) {
+    const id = String(raw).trim();
+    if (!isCategoryId(id) || seen.has(id)) continue;
+    seen.add(id);
+    out.push(id);
+  }
+  return out.length ? out : ["annat"];
+}
+
+/** Första träffen i CATEGORIES-ordning — t.ex. för emoji/markör. */
+export function primaryCategoryId(categories: readonly string[]): CategoryId {
+  const set = new Set(sanitizeCategoryIds([...categories]));
+  for (const c of CATEGORIES) {
+    if (set.has(c.id)) return c.id;
+  }
+  return "annat";
+}
+
+export function mergeCategoryIds(a: readonly string[], b: readonly string[]): CategoryId[] {
+  return sanitizeCategoryIds([...a, ...b]);
+}

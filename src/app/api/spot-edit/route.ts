@@ -1,6 +1,6 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
-import { isCategoryId } from "@/lib/categories";
+import { isCategoryId, sanitizeCategoryIds } from "@/lib/categories";
 import { prisma } from "@/lib/prisma";
 import { getAuthorizedRoomFromRequest } from "@/lib/roomAuth";
 
@@ -13,6 +13,7 @@ export async function POST(req: NextRequest) {
     const body = (await req.json()) as {
       spotId?: string;
       name?: string;
+      categories?: string[];
       category?: string;
       emoji?: string | null;
       neighborhood?: string | null;
@@ -32,7 +33,7 @@ export async function POST(req: NextRequest) {
 
     const data: {
       name?: string;
-      category?: string;
+      categories?: string[];
       emoji?: string | null;
       neighborhood?: string | null;
     } = {};
@@ -45,11 +46,17 @@ export async function POST(req: NextRequest) {
       data.name = n;
     }
 
-    if (body.category !== undefined) {
+    if (body.categories !== undefined) {
+      const next = sanitizeCategoryIds(body.categories);
+      if (!next.length) {
+        return NextResponse.json({ error: "Minst en kategori krävs" }, { status: 400 });
+      }
+      data.categories = next;
+    } else if (body.category !== undefined) {
       if (!isCategoryId(body.category)) {
         return NextResponse.json({ error: "Ogiltig kategori" }, { status: 400 });
       }
-      data.category = body.category;
+      data.categories = sanitizeCategoryIds([body.category]);
     }
 
     if (body.emoji !== undefined) {

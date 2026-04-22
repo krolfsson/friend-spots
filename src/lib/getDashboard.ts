@@ -1,3 +1,4 @@
+import { sanitizeCategoryIds } from "@/lib/categories";
 import type { DashboardBySlug, DashboardSpot } from "@/lib/dashboardTypes";
 import { prisma } from "@/lib/prisma";
 import { sortSpotsForDisplay } from "@/lib/sortSpots";
@@ -34,7 +35,7 @@ export async function getDashboardDataForRoom(roomId: string) {
         googlePlaceId: s.googlePlaceId,
         name: s.name,
         neighborhood: s.neighborhood,
-        category: s.category,
+        categories: sanitizeCategoryIds(s.categories),
         emoji: s.emoji,
         lat: s.lat,
         lng: s.lng,
@@ -50,7 +51,9 @@ export async function getDashboardDataForRoom(roomId: string) {
 
     const categoryCounts: Record<string, number> = {};
     for (const spot of list) {
-      categoryCounts[spot.category] = (categoryCounts[spot.category] ?? 0) + 1;
+      for (const c of spot.categories) {
+        categoryCounts[c] = (categoryCounts[c] ?? 0) + 1;
+      }
     }
 
     bySlug[city.slug] = { spots: list, categoryCounts };

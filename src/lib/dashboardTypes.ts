@@ -3,7 +3,7 @@ export type DashboardSpot = {
   googlePlaceId: string;
   name: string;
   neighborhood: string | null;
-  category: string;
+  categories: string[];
   emoji: string | null;
   lat?: number | null;
   lng?: number | null;

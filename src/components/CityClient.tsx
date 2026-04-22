@@ -8,7 +8,14 @@ import { t } from "@/lib/i18n";
 import { createPortal } from "react-dom";
 import { AddSpotForm } from "@/components/AddSpotForm";
 import { CityPickOrCreate } from "@/components/CityPickOrCreate";
-import { CATEGORIES, categoryMeta, isCategoryId, type CategoryId } from "@/lib/categories";
+import {
+  CATEGORIES,
+  categoryMeta,
+  isCategoryId,
+  primaryCategoryId,
+  sanitizeCategoryIds,
+  type CategoryId,
+} from "@/lib/categories";
 import type { DashboardBySlug, DashboardSpot } from "@/lib/dashboardTypes";
 import { mapsOpenForSpot } from "@/lib/mapsUrl";
 import { getOrCreateVoterToken } from "@/lib/voterClient";
@@ -290,7 +297,7 @@ export function CityClient({
   const filteredByCategory = useMemo(() => {
     if (category === "alla") return baseSpots;
     if (!isCategoryId(category)) return baseSpots;
-    return baseSpots.filter((s) => s.category === category);
+    return baseSpots.filter((s) => s.categories.includes(category));
   }, [baseSpots, category]);
 
   const neighborhoods = useMemo(() => {
@@ -445,15 +452,17 @@ export function CityClient({
     }
   }, [renameBusy, renameValue, roomSlug, showToast, locale]);
 
-  const removeSpot = useCallback((spotId: string, slug: string, spotCategory: string) => {
+  const removeSpot = useCallback((spotId: string, slug: string, spotCategories: string[]) => {
     setBundle((prev) => {
       const b = prev[slug];
       if (!b) return prev;
       const nextSpots = b.spots.filter((s) => s.id !== spotId);
       const nextCounts = { ...b.categoryCounts };
-      const cur = nextCounts[spotCategory] ?? 0;
-      if (cur <= 1) delete nextCounts[spotCategory];
-      else nextCounts[spotCategory] = cur - 1;
+      for (const catId of sanitizeCategoryIds(spotCategories)) {
+        const cur = nextCounts[catId] ?? 0;
+        if (cur <= 1) delete nextCounts[catId];
+        else nextCounts[catId] = cur - 1;
+      }
       return { ...prev, [slug]: { spots: nextSpots, categoryCounts: nextCounts } };
     });
     setCityList((prev) =>
@@ -680,7 +689,7 @@ export function CityClient({
                       spot={s}
                       mapsCityName={activeCity.name}
                       locale={locale}
-                      onPurge={() => removeSpot(s.id, activeCity.slug, s.category)}
+                      onPurge={() => removeSpot(s.id, activeCity.slug, s.categories)}
                       onEdited={() => void refreshCity(activeCity.slug)}
                     />
                   ))}
@@ -1040,15 +1049,16 @@ function SpotCard({
   onPurge: () => void;
   onEdited: () => void;
 }) {
-  const cat = categoryMeta(spot.category);
+  const primaryCat = primaryCategoryId(spot.categories);
+  const cat = categoryMeta(primaryCat);
   const big = (spot.emoji?.trim() || cat.emoji).slice(0, 8);
   const [menu, setMenu] = useState<{ x: number; y: number } | null>(null);
   const [editing, setEditing] = useState(false);
   const [editName, setEditName] = useState(spot.name);
   const [editNeighborhood, setEditNeighborhood] = useState(spot.neighborhood ?? "");
   const [editEmoji, setEditEmoji] = useState(spot.emoji ?? "");
-  const [editCategory, setEditCategory] = useState<CategoryId>(
-    isCategoryId(spot.category) ? spot.category : "annat",
+  const [editCategories, setEditCategories] = useState<Set<CategoryId>>(
+    () => new Set(sanitizeCategoryIds(spot.categories)),
   );
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
@@ -1058,6 +1068,12 @@ function SpotCard({
   useEffect(() => {
     setDomReady(true);
   }, []);
+
+  useEffect(() => {
+    if (!editing) {
+      setEditCategories(new Set(sanitizeCategoryIds(spot.categories)));
+    }
+  }, [spot.categories, spot.id, editing]);
 
   const articleRef = useRef<HTMLElement>(null);
 
@@ -1145,7 +1161,7 @@ function SpotCard({
     setEditName(spot.name);
     setEditNeighborhood(spot.neighborhood ?? "");
     setEditEmoji(spot.emoji ?? "");
-    setEditCategory(isCategoryId(spot.category) ? spot.category : "annat");
+    setEditCategories(new Set(sanitizeCategoryIds(spot.categories)));
     setSaveError(null);
     setEditing(true);
   }, [spot]);
@@ -1195,7 +1211,7 @@ function SpotCard({
         body: JSON.stringify({
           spotId: spot.id,
           name: editName.trim(),
-          category: editCategory,
+          categories: Array.from(editCategories),
           emoji: editEmoji.trim() || null,
           neighborhood: editNeighborhood.trim() || null,
         }),
@@ -1209,7 +1225,7 @@ function SpotCard({
     } finally {
       setSaving(false);
     }
-  }, [editCategory, editEmoji, editName, editNeighborhood, onEdited, roomSlug, spot.id, locale]);
+  }, [editCategories, editEmoji, editName, editNeighborhood, onEdited, roomSlug, spot.id, locale]);
 
   return (
     <>
@@ -1240,11 +1256,19 @@ function SpotCard({
           }
         >
           <p className="truncate text-[0.95rem] font-extrabold tracking-tight text-indigo-950">{spot.name}</p>
-          <div className="mt-1.5 flex flex-wrap items-center gap-2 lg:flex-nowrap lg:gap-1.5">
-            <span className="inline-flex h-8 shrink-0 select-none items-center gap-1 rounded-full border border-fuchsia-200/70 bg-white/70 px-2.5 text-[11px] font-extrabold leading-none text-indigo-900/80 lg:h-7 lg:gap-0.5 lg:px-2 lg:text-[10px]">
-              <span>{cat.emoji}</span>
-              <span>{t(locale, `cat.${cat.id}`)}</span>
-            </span>
+          <div className="mt-1.5 flex flex-wrap items-center gap-1.5 lg:gap-1.5">
+            {sanitizeCategoryIds(spot.categories).map((cid) => {
+              const c = categoryMeta(cid);
+              return (
+                <span
+                  key={cid}
+                  className="inline-flex h-8 shrink-0 select-none items-center gap-1 rounded-full border border-fuchsia-200/70 bg-white/70 px-2.5 text-[11px] font-extrabold leading-none text-indigo-900/80 lg:h-7 lg:gap-0.5 lg:px-2 lg:text-[10px]"
+                >
+                  <span>{c.emoji}</span>
+                  <span>{t(locale, `cat.${c.id}`)}</span>
+                </span>
+              );
+            })}
             <div className="flex shrink-0 items-center gap-1.5">
               <a
                 className="inline-flex h-8 min-h-8 select-none items-center rounded-full bg-gradient-to-r from-sky-400 to-cyan-400 px-2.5 text-[11px] font-extrabold leading-none text-indigo-950 shadow-sm shadow-cyan-500/20 ring-1 ring-white/60 hover:brightness-110 lg:h-7 lg:min-h-7 lg:px-2 lg:text-[10px]"
@@ -1420,9 +1444,20 @@ function SpotCard({
                 <button
                   key={c.id}
                   type="button"
-                  onClick={() => setEditCategory(c.id)}
+                  onClick={() => {
+                    setEditCategories((prev) => {
+                      const n = new Set(prev);
+                      if (n.has(c.id)) {
+                        if (n.size <= 1) return n;
+                        n.delete(c.id);
+                      } else {
+                        n.add(c.id);
+                      }
+                      return n;
+                    });
+                  }}
                   className={`ui-press rounded-full px-3 py-2 text-xs font-extrabold tracking-tight transition active:scale-[0.98] ${
-                    editCategory === c.id ? "y2k-chip-active" : "y2k-chip text-indigo-950 hover:-translate-y-0.5"
+                    editCategories.has(c.id) ? "y2k-chip-active" : "y2k-chip text-indigo-950 hover:-translate-y-0.5"
                   }`}
                 >
                   <span className="mr-1">{c.emoji}</span>
@@ -1436,7 +1471,7 @@ function SpotCard({
             <div className="flex flex-wrap items-center gap-2">
               <button
                 type="button"
-                disabled={saving || !editName.trim()}
+                disabled={saving || !editName.trim() || editCategories.size === 0}
                 onClick={() => void saveEdit()}
                 className="ui-press rounded-full bg-gradient-to-r from-fuchsia-500 to-violet-600 px-5 py-2.5 text-sm font-extrabold text-white transition enabled:hover:brightness-110 enabled:active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40"
               >

@@ -3,7 +3,7 @@
 import { importLibrary, setOptions } from "@googlemaps/js-api-loader";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { DashboardSpot } from "@/lib/dashboardTypes";
-import { categoryMeta } from "@/lib/categories";
+import { categoryMeta, primaryCategoryId, sanitizeCategoryIds } from "@/lib/categories";
 import { t, type Locale } from "@/lib/i18n";
 import { mapsOpenForSpot } from "@/lib/mapsUrl";
 import { getOrCreateVoterToken } from "@/lib/voterClient";
@@ -12,7 +12,7 @@ const DEFAULT_CENTER = { lat: 59.33, lng: 18.07 };
 
 /** Samma emoji som i listan: egen emoji eller kategorins standard. */
 function spotMapEmoji(spot: DashboardSpot): string {
-  const cat = categoryMeta(spot.category);
+  const cat = categoryMeta(primaryCategoryId(spot.categories));
   return (spot.emoji?.trim() || cat.emoji).slice(0, 8);
 }
 
@@ -181,8 +181,10 @@ export function SpotsMap({
             const parts: string[] = [];
             const nb = spot.neighborhood?.trim();
             if (nb) parts.push(nb);
-            const cat = categoryMeta(spot.category);
-            parts.push(`${cat.emoji} ${t(locale, `cat.${cat.id}`)}`);
+            const labels = sanitizeCategoryIds(spot.categories)
+              .map((id) => categoryMeta(id))
+              .map((c) => `${c.emoji} ${t(locale, `cat.${c.id}`)}`);
+            if (labels.length) parts.push(labels.join(" · "));
             meta.textContent = parts.join(" · ");
             if (!meta.textContent) meta.style.display = "none";
 

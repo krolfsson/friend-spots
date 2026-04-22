@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { CATEGORIES, type CategoryId, isCategoryId } from "@/lib/categories";
+import { CATEGORIES, type CategoryId } from "@/lib/categories";
 import type { Locale } from "@/lib/i18n";
 import { t } from "@/lib/i18n";
 
@@ -54,7 +54,7 @@ export function AddSpotForm({
 
   const categoryItems = CATEGORIES as readonly { id: CategoryId; label: string; emoji: string }[];
 
-  const [category, setCategory] = useState<CategoryId | "">("");
+  const [pickedCategories, setPickedCategories] = useState<Set<CategoryId>>(new Set());
   const [emoji, setEmoji] = useState("");
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
@@ -113,12 +113,24 @@ export function AddSpotForm({
   }, [query, selected, placeSearchBiasName]);
 
   const canSave = useMemo(() => {
-    return Boolean(selected && category && contributorName.trim());
-  }, [selected, category, contributorName]);
+    return Boolean(selected && pickedCategories.size > 0 && contributorName.trim());
+  }, [selected, pickedCategories, contributorName]);
+
+  function toggleCategory(id: CategoryId) {
+    setPickedCategories((prev) => {
+      const n = new Set(prev);
+      if (n.has(id)) {
+        if (n.size <= 1) return n;
+        n.delete(id);
+      } else {
+        n.add(id);
+      }
+      return n;
+    });
+  }
 
   async function save() {
     if (!canSave || !selected) return;
-    if (!isCategoryId(category)) return;
 
     setSaving(true);
     setNote(null);
@@ -130,7 +142,7 @@ export function AddSpotForm({
           citySlug,
           googlePlaceId: selected.placeId,
           displayName: selected.label,
-          category,
+          categories: Array.from(pickedCategories),
           emoji: emoji.trim() || null,
           contributorName: contributorName.trim(),
         }),
@@ -142,7 +154,7 @@ export function AddSpotForm({
       setSuggestions([]);
       setSelected(null);
       setEmoji("");
-      setCategory("");
+      setPickedCategories(new Set());
       setPickOpen(false);
       onSaved();
       setNote(t(locale, "add.savedToast"));
@@ -163,9 +175,9 @@ export function AddSpotForm({
           <button
             key={c.id}
             type="button"
-            onClick={() => setCategory(c.id)}
+            onClick={() => toggleCategory(c.id)}
             className={`ui-press rounded-full px-2.5 py-1.5 text-xs font-extrabold tracking-tight transition active:scale-95 sm:px-3 sm:py-2 sm:text-sm ${
-              category === c.id ? "y2k-chip-active" : "y2k-chip text-indigo-950 hover:-translate-y-0.5"
+              pickedCategories.has(c.id) ? "y2k-chip-active" : "y2k-chip text-indigo-950 hover:-translate-y-0.5"
             }`}
           >
             <span className="mr-0.5 sm:mr-1">{c.emoji}</span>
