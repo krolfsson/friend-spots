@@ -64,7 +64,7 @@ export const MESSAGES: Record<Locale, Record<string, string>> = {
     "cat.sevardhet": "Sevärdhet",
     "cat.shopping": "Shopping",
     "cat.boende": "Boende",
-    "cat.annat": "Annat",
+    "cat.annat": "Gå inte hit",
 
     "share.copy":
       "Låt dina kompisar fylla i sina bästa tips, eller plussa tips som de håller med om.",
@@ -173,7 +173,7 @@ export const MESSAGES: Record<Locale, Record<string, string>> = {
     "cat.sevardhet": "Sight",
     "cat.shopping": "Shopping",
     "cat.boende": "Stay",
-    "cat.annat": "Other",
+    "cat.annat": "Don't go here",
 
     "share.copy":
       "Let your friends add their best tips, or +1 tips they especially agree with.",

@@ -6,10 +6,10 @@ export const CATEGORIES = [
   { id: "bar", label: "Bar", emoji: "🍹" },
   { id: "pub", label: "Pub", emoji: "🍺" },
   { id: "klubb", label: "Klubb", emoji: "💿" },
-  { id: "sevardhet", label: "Sevärdhet", emoji: "🗼" },
+  { id: "sevardhet", label: "Sevärdhet", emoji: "🗽" },
   { id: "shopping", label: "Shopping", emoji: "🛍️" },
   { id: "boende", label: "Boende", emoji: "🏨" },
-  { id: "annat", label: "Annat", emoji: "✨" },
+  { id: "annat", label: "Gå inte hit", emoji: "🙅" },
 ] as const;
 
 export type CategoryId = (typeof CATEGORIES)[number]["id"];
@@ -20,7 +20,7 @@ export function isCategoryId(value: string): value is CategoryId {
 
 export function categoryMeta(id: string) {
   const hit = CATEGORIES.find((c) => c.id === id);
-  return hit ?? { id: "annat", label: "Annat", emoji: "✨" as const };
+  return hit ?? { id: "annat", label: "Gå inte hit", emoji: "🙅" as const };
 }
 
 /** Unika giltiga kategorier i stabil ordning; tom lista → annat. */
