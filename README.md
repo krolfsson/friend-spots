@@ -99,24 +99,10 @@ npx prisma migrate deploy
 npm run dev
 ```
 
-### Starta utvecklingsservern (tydligt)
-
-1. Öppna **Terminal** (eller i Cursor: Terminal-panelen).
-2. Gå till projektmappen: `cd sökväg/till/friend-spots`
-3. Kör: **`npm run dev`**
-4. Vänta tills terminalen skriver att servern är **redo** (rad med `Ready` eller liknande).
-5. Öppna webbläsaren på **exakt den adress som står i terminalen**. Standard är:
-
-**[http://localhost:3030](http://localhost:3030)**  
-(`npm run dev` använder port **3030** så den inte krockar med andra appar som ofta tar **3000**.)
-
-- Vill du ändå ha port 3000: **`npm run dev:3000`** → [http://localhost:3000](http://localhost:3000) (kräver att inget annat lyssnar där).
-- Alternativ port: **`npm run dev:3003`** → [http://localhost:3003](http://localhost:3003).
-- För att **se vad som använder port 3000** (om du vill stänga det): kör `lsof -nP -iTCP:3000 | grep LISTEN` i Terminal.
+Appen: [http://localhost:3002](http://localhost:3002) (port satt i `package.json`).
 
 ## Felsökning
 
-- **Webbläsaren kan inte ansluta till dev-servern**: Kör `npm run dev` i projektroten och öppna exakt den URL som terminalen visar (standard är `http://localhost:3030`). Om den porten är upptagen, kör `npm run dev:3003` eller `PORT=3040 npx next dev --turbopack -p 3040`.
 - **Build faller på Prisma / DATABASE_URL**: Kontrollera att variabeln finns i Vercel *och* börjar med `postgresql://` eller `postgres://`.
 - **P1002 / advisory lock / timeout vid `migrate deploy`**: Lägg till `DIRECT_URL` i Vercel (Neons **direkta** Postgres-URL, inte poolern). Sätt samma värde som `DATABASE_URL` i `.env.local` om du kör utan pooler lokalt.
 - **Git hooks / Operation not permitted** (vissa miljöer): kör `git init` på din egen Mac-terminal i `~/friend-spots`, inte i sandlådor utan full filåtkomst.
