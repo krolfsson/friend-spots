@@ -5,7 +5,7 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import type { DashboardSpot } from "@/lib/dashboardTypes";
 import { categoryMeta, primaryCategoryId, sanitizeCategoryIds } from "@/lib/categories";
 import { t, type Locale } from "@/lib/i18n";
-import { MapSunAtmosphereOverlay } from "@/lib/mapSunAtmosphereOverlay";
+import type { MapSunAtmosphereOptions } from "@/lib/mapSunAtmosphereOverlay";
 import { mapsOpenForSpot } from "@/lib/mapsUrl";
 import { getOrCreateVoterToken } from "@/lib/voterClient";
 
@@ -93,6 +93,13 @@ function describeMapLoadError(err: unknown): string {
   return msg || "Kunde inte ladda Google Maps.";
 }
 
+/** Runtime-typ för sol/skugga-overlay (laddas efter Google Maps). */
+type SunOverlayHandle = {
+  setMap(map: google.maps.Map | null): void;
+  setOptions(opts: MapSunAtmosphereOptions): void;
+  refresh(): void;
+};
+
 export function SpotsMap({
   spots,
   cityName,
@@ -124,7 +131,7 @@ export function SpotsMap({
   const containerRef = useRef<HTMLDivElement>(null);
   const spotMarkersRef = useRef<Array<{ marker: google.maps.Marker; spot: DashboardSpot }>>([]);
   const mapRef = useRef<google.maps.Map | null>(null);
-  const sunOverlayRef = useRef<MapSunAtmosphereOverlay | null>(null);
+  const sunOverlayRef = useRef<SunOverlayHandle | null>(null);
   const mapDisplayTimeRef = useRef(mapDisplayTime);
   mapDisplayTimeRef.current = mapDisplayTime;
   const onScrubRef = useRef(onMapTimeScrub);
@@ -164,6 +171,8 @@ export function SpotsMap({
         setOptions({ key: apiKey, v: "weekly" });
         await importLibrary("maps");
         if (cancelled || !containerRef.current) return;
+
+        const { MapSunAtmosphereOverlay } = await import("@/lib/mapSunAtmosphereOverlay");
 
         map = new google.maps.Map(containerRef.current, {
           center: DEFAULT_CENTER,
