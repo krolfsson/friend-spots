@@ -1,15 +1,23 @@
 "use client";
 
 import { importLibrary, setOptions } from "@googlemaps/js-api-loader";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import type { DashboardSpot } from "@/lib/dashboardTypes";
 import { categoryMeta, primaryCategoryId, sanitizeCategoryIds } from "@/lib/categories";
 import { t, type Locale } from "@/lib/i18n";
+import { MapSunAtmosphereOverlay } from "@/lib/mapSunAtmosphereOverlay";
 import { mapsOpenForSpot } from "@/lib/mapsUrl";
-import { isSunUpAtSpot } from "@/lib/sunAtSpot";
 import { getOrCreateVoterToken } from "@/lib/voterClient";
 
 const DEFAULT_CENTER = { lat: 59.33, lng: 18.07 };
+
+/** Tydligare parker/natur (”skog”) utan att byta till satellit. */
+const MAP_FOREST_FORWARD_STYLES: google.maps.MapTypeStyle[] = [
+  { featureType: "landscape.natural", elementType: "geometry.fill", stylers: [{ color: "#c4e8bc" }, { saturation: 22 }] },
+  { featureType: "poi.park", elementType: "geometry.fill", stylers: [{ color: "#6fbf73" }, { lightness: -8 }] },
+  { featureType: "water", elementType: "geometry.fill", stylers: [{ color: "#a8daf5" }] },
+  { featureType: "road", elementType: "geometry.fill", stylers: [{ saturation: -32 }, { lightness: 6 }] },
+];
 
 /** Samma emoji som i listan: egen emoji eller kategorins standard. */
 function spotMapEmoji(spot: DashboardSpot): string {
@@ -33,33 +41,25 @@ function spotDisplayScore(spot: DashboardSpot): number {
 function buildSpotMarkerIcon(
   emoji: string,
   score: number,
-  sunUp: boolean,
   cache: Map<string, google.maps.Icon>,
 ): google.maps.Icon {
   const scoreLabel = score > 99 ? "99+" : String(score);
-  const cacheKey = `${emoji}\0${scoreLabel}\0${sunUp ? "d" : "n"}`;
+  const cacheKey = `${emoji}\0${scoreLabel}`;
   const hit = cache.get(cacheKey);
   if (hit) return hit;
 
-  const w = 38;
-  const h = 40;
-  const mainCx = 18;
-  const mainCy = 18;
+  const w = 34;
+  const h = 36;
+  const mainCx = 16;
+  const mainCy = 16;
   const mainR = 12.5;
   const emojiFont = 15;
-  const badgeCx = 28.5;
-  const badgeCy = 25.5;
+  const badgeCx = 26.5;
+  const badgeCy = 23.5;
   const badgeR = scoreLabel.length > 2 ? 8.8 : 7.6;
   const badgeFont = scoreLabel.length > 2 ? 7.5 : 9;
-  const dayCx = 28.5;
-  const dayCy = 35;
-  const dayR = 5.35;
-  /** Färgdisk (emoji i SVG-data-URL ritas ofta inte i Maps-markörer). */
-  const dayDisc = sunUp
-    ? `<circle cx="${dayCx}" cy="${dayCy}" r="${dayR}" fill="#fcd34d" stroke="#d97706" stroke-width="1.2"/><circle cx="${dayCx - 1.1}" cy="${dayCy - 1.1}" r="1.5" fill="#fffbeb" opacity="0.95"/>`
-    : `<circle cx="${dayCx}" cy="${dayCy}" r="${dayR}" fill="#312e81" stroke="#a5b4fc" stroke-width="1.2"/><circle cx="${dayCx - 1.55}" cy="${dayCy - 1.05}" r="3.85" fill="#eef2ff" opacity="0.45"/>`;
 
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><defs><filter id="s" x="-35%" y="-35%" width="170%" height="170%"><feDropShadow dx="0" dy="1" stdDeviation="1.2" flood-opacity="0.28"/></filter></defs><circle cx="${mainCx}" cy="${mainCy}" r="${mainR}" fill="#ffffff" stroke="#4f46e5" stroke-width="1.75" filter="url(#s)"/><text x="${mainCx}" y="${mainCy}" font-size="${emojiFont}" text-anchor="middle" dominant-baseline="central" font-family="system-ui,&quot;Apple Color Emoji&quot;,&quot;Segoe UI Emoji&quot;,&quot;Noto Color Emoji&quot;,sans-serif">${escapeSvgText(emoji)}</text><circle cx="${badgeCx}" cy="${badgeCy}" r="${badgeR}" fill="#10b981" stroke="#ffffff" stroke-width="1.75"/><text x="${badgeCx}" y="${badgeCy}" font-size="${badgeFont}" font-weight="800" text-anchor="middle" dominant-baseline="central" fill="#ffffff" font-family="system-ui,ui-sans-serif,sans-serif">${escapeSvgText(scoreLabel)}</text>${dayDisc}</svg>`;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><defs><filter id="s" x="-35%" y="-35%" width="170%" height="170%"><feDropShadow dx="0" dy="1" stdDeviation="1.2" flood-opacity="0.28"/></filter></defs><circle cx="${mainCx}" cy="${mainCy}" r="${mainR}" fill="#ffffff" stroke="#4f46e5" stroke-width="1.75" filter="url(#s)"/><text x="${mainCx}" y="${mainCy}" font-size="${emojiFont}" text-anchor="middle" dominant-baseline="central" font-family="system-ui,&quot;Apple Color Emoji&quot;,&quot;Segoe UI Emoji&quot;,&quot;Noto Color Emoji&quot;,sans-serif">${escapeSvgText(emoji)}</text><circle cx="${badgeCx}" cy="${badgeCy}" r="${badgeR}" fill="#10b981" stroke="#ffffff" stroke-width="1.75"/><text x="${badgeCx}" y="${badgeCy}" font-size="${badgeFont}" font-weight="800" text-anchor="middle" dominant-baseline="central" fill="#ffffff" font-family="system-ui,ui-sans-serif,sans-serif">${escapeSvgText(scoreLabel)}</text></svg>`;
   const url = `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
   const icon: google.maps.Icon = {
     url,
@@ -68,25 +68,6 @@ function buildSpotMarkerIcon(
   };
   cache.set(cacheKey, icon);
   return icon;
-}
-
-function refreshSpotMarkerSunIcons(
-  entries: ReadonlyArray<{ marker: google.maps.Marker; spot: DashboardSpot }>,
-) {
-  if (!entries.length) return;
-  const now = new Date();
-  const cache = new Map<string, google.maps.Icon>();
-  for (const { marker, spot } of entries) {
-    if (!hasCoords(spot)) continue;
-    marker.setIcon(
-      buildSpotMarkerIcon(
-        spotMapEmoji(spot),
-        spotDisplayScore(spot),
-        isSunUpAtSpot(spot.lat!, spot.lng!, now),
-        cache,
-      ),
-    );
-  }
 }
 
 function hasCoords(s: DashboardSpot): boolean {
@@ -122,6 +103,9 @@ export function SpotsMap({
   overlay,
   /** Fyll återstående höjd i flex-layout (rumssidan) i stället för fast korthöjd. */
   fillHeight = false,
+  mapDisplayTime,
+  onMapTimeScrub,
+  onMapTimeReset,
 }: {
   spots: DashboardSpot[];
   cityName: string;
@@ -132,10 +116,21 @@ export function SpotsMap({
   /** Lägg t.ex. vänster knapp + höger kolumn som syskon — raden är `justify-between`. */
   overlay?: React.ReactNode;
   fillHeight?: boolean;
+  /** Visningstid för kart-sol/skugga (live eller efter skrubbning). */
+  mapDisplayTime: Date;
+  onMapTimeScrub: (next: Date) => void;
+  onMapTimeReset: () => void;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const spotMarkersRef = useRef<Array<{ marker: google.maps.Marker; spot: DashboardSpot }>>([]);
   const mapRef = useRef<google.maps.Map | null>(null);
+  const sunOverlayRef = useRef<MapSunAtmosphereOverlay | null>(null);
+  const mapDisplayTimeRef = useRef(mapDisplayTime);
+  mapDisplayTimeRef.current = mapDisplayTime;
+  const onScrubRef = useRef(onMapTimeScrub);
+  onScrubRef.current = onMapTimeScrub;
+  const onResetRef = useRef(onMapTimeReset);
+  onResetRef.current = onMapTimeReset;
   const hereMarkerRef = useRef<google.maps.Marker | null>(null);
   const hereCircleRef = useRef<google.maps.Circle | null>(null);
   const watchIdRef = useRef<number | null>(null);
@@ -177,8 +172,24 @@ export function SpotsMap({
           streetViewControl: false,
           fullscreenControl: true,
           gestureHandling: "greedy",
+          styles: MAP_FOREST_FORWARD_STYLES,
         });
+        if (cancelled) return;
         mapRef.current = map;
+
+        const sunOv = new MapSunAtmosphereOverlay({
+          getWhen: () => mapDisplayTimeRef.current,
+          getCenterLatLng: () => map!.getCenter() ?? null,
+          onSeekTime: (d) => onScrubRef.current(d),
+          onResetLive: () => onResetRef.current(),
+          locale,
+        });
+        if (cancelled) {
+          sunOv.setMap(null);
+          return;
+        }
+        sunOv.setMap(map);
+        sunOverlayRef.current = sunOv;
 
         spotMarkersRef.current = [];
 
@@ -187,13 +198,11 @@ export function SpotsMap({
 
         for (const spot of plotted) {
           if (cancelled) return;
-          const now = new Date();
-          const sunUp = isSunUpAtSpot(spot.lat!, spot.lng!, now);
           const marker = new google.maps.Marker({
             map,
             position: { lat: spot.lat!, lng: spot.lng! },
             title: spot.name,
-            icon: buildSpotMarkerIcon(spotMapEmoji(spot), spotDisplayScore(spot), sunUp, emojiIconCache),
+            icon: buildSpotMarkerIcon(spotMapEmoji(spot), spotDisplayScore(spot), emojiIconCache),
           });
           spotMarkersRef.current.push({ marker, spot: { ...spot } });
           marker.addListener("click", () => {
@@ -301,12 +310,7 @@ export function SpotsMap({
                 const row = spotMarkersRef.current.find((e) => e.marker === marker);
                 if (row) row.spot = { ...row.spot, plusCount };
                 marker.setIcon(
-                  buildSpotMarkerIcon(
-                    spotMapEmoji(spot),
-                    1 + plusCount,
-                    isSunUpAtSpot(spot.lat!, spot.lng!),
-                    emojiIconCache,
-                  ),
+                  buildSpotMarkerIcon(spotMapEmoji(spot), 1 + plusCount, emojiIconCache),
                 );
               } finally {
                 plusWrap.disabled = false;
@@ -349,7 +353,7 @@ export function SpotsMap({
           }
           if (!cancelled) {
             setLoading(false);
-            requestAnimationFrame(() => refreshSpotMarkerSunIcons(spotMarkersRef.current));
+            sunOverlayRef.current?.refresh();
           }
         });
       } catch (e) {
@@ -362,19 +366,26 @@ export function SpotsMap({
 
     return () => {
       cancelled = true;
+      sunOverlayRef.current?.setMap(null);
+      sunOverlayRef.current = null;
       spotMarkersRef.current = [];
       markers.forEach((m) => m.setMap(null));
       iw?.close();
       mapRef.current = null;
     };
-  }, [apiKey, cityName, plotted, locale]);
+  }, [apiKey, cityName, plotted, locale, roomSlug]);
 
-  /** Uppdatera sol/måne-disken ~varje minut (lokal “nu”). */
-  useEffect(() => {
-    refreshSpotMarkerSunIcons(spotMarkersRef.current);
-    const id = window.setInterval(() => refreshSpotMarkerSunIcons(spotMarkersRef.current), 60_000);
-    return () => window.clearInterval(id);
-  }, [plotted]);
+  /** Skugga + solknopp följer vald tid (t.ex. varje sekund live). */
+  useLayoutEffect(() => {
+    sunOverlayRef.current?.setOptions({
+      getWhen: () => mapDisplayTimeRef.current,
+      getCenterLatLng: () => mapRef.current?.getCenter() ?? null,
+      onSeekTime: (d) => onScrubRef.current(d),
+      onResetLive: () => onResetRef.current(),
+      locale,
+    });
+    sunOverlayRef.current?.refresh();
+  }, [mapDisplayTime, locale]);
 
   useEffect(() => {
     const map = mapRef.current;
