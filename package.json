@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack -p 3000",
+    "dev:3003": "next dev --turbopack -p 3003",
     "check:encoding": "node scripts/check-encoding.js",
     "build": "npm run check:encoding && prisma migrate deploy && next build",
     "start": "next start",

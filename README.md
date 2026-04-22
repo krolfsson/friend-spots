@@ -99,7 +99,17 @@ npx prisma migrate deploy
 npm run dev
 ```
 
-Appen: [http://localhost:3000](http://localhost:3000) (port satt i `package.json`).
+### Starta utvecklingsservern (tydligt)
+
+1. Öppna **Terminal** (eller i Cursor: Terminal-panelen).
+2. Gå till projektmappen: `cd sökväg/till/friend-spots`
+3. Kör: **`npm run dev`**
+4. Vänta tills terminalen skriver att servern är **redo** (rad med `Ready` eller liknande).
+5. Öppna webbläsaren på **exakt den adress som står i terminalen**. Standard är:
+
+**[http://localhost:3000](http://localhost:3000)**
+
+- Om du får felet **`EADDRINUSE`** (port 3000 upptagen): stäng den andra appen som använder port 3000, **eller** kör i stället **`npm run dev:3003`** och öppna då **[http://localhost:3003](http://localhost:3003)**.
 
 ## Felsökning
 
