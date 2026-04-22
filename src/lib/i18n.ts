@@ -53,9 +53,6 @@ export const MESSAGES: Record<Locale, Record<string, string>> = {
     "room.view.list": "Topplista",
     "room.view.latest": "Senaste",
     "room.filter.allCategories": "Alla kategorier",
-    "room.map.clockAria": "Tid för sol och skugga på kartan",
-    "room.map.timeReset": "Nu",
-    "room.map.timeResetAria": "Återgå till aktuell tid",
 
     "cat.frukost": "Frukost",
     "cat.lunch": "Lunch",
@@ -165,9 +162,6 @@ export const MESSAGES: Record<Locale, Record<string, string>> = {
     "room.view.list": "Leaderboard",
     "room.view.latest": "Latest",
     "room.filter.allCategories": "All categories",
-    "room.map.clockAria": "Time for sun and shadows on the map",
-    "room.map.timeReset": "Now",
-    "room.map.timeResetAria": "Return to current time",
 
     "cat.frukost": "Breakfast",
     "cat.lunch": "Lunch",

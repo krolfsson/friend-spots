@@ -1,23 +1,14 @@
 "use client";
 
 import { importLibrary, setOptions } from "@googlemaps/js-api-loader";
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { DashboardSpot } from "@/lib/dashboardTypes";
 import { categoryMeta, primaryCategoryId, sanitizeCategoryIds } from "@/lib/categories";
 import { t, type Locale } from "@/lib/i18n";
-import type { MapSunAtmosphereOptions } from "@/lib/mapSunAtmosphereOverlay";
 import { mapsOpenForSpot } from "@/lib/mapsUrl";
 import { getOrCreateVoterToken } from "@/lib/voterClient";
 
 const DEFAULT_CENTER = { lat: 59.33, lng: 18.07 };
-
-/** Tydligare parker/natur (”skog”) utan att byta till satellit. */
-const MAP_FOREST_FORWARD_STYLES: google.maps.MapTypeStyle[] = [
-  { featureType: "landscape.natural", elementType: "geometry.fill", stylers: [{ color: "#c4e8bc" }, { saturation: 22 }] },
-  { featureType: "poi.park", elementType: "geometry.fill", stylers: [{ color: "#6fbf73" }, { lightness: -8 }] },
-  { featureType: "water", elementType: "geometry.fill", stylers: [{ color: "#a8daf5" }] },
-  { featureType: "road", elementType: "geometry.fill", stylers: [{ saturation: -32 }, { lightness: 6 }] },
-];
 
 /** Samma emoji som i listan: egen emoji eller kategorins standard. */
 function spotMapEmoji(spot: DashboardSpot): string {
@@ -48,22 +39,21 @@ function buildSpotMarkerIcon(
   const hit = cache.get(cacheKey);
   if (hit) return hit;
 
-  const w = 34;
-  const h = 36;
-  const mainCx = 16;
-  const mainCy = 16;
+  const size = 38;
+  const mainCx = 18;
+  const mainCy = 18;
   const mainR = 12.5;
   const emojiFont = 15;
-  const badgeCx = 26.5;
-  const badgeCy = 23.5;
+  const badgeCx = 28.5;
+  const badgeCy = 25.5;
   const badgeR = scoreLabel.length > 2 ? 8.8 : 7.6;
   const badgeFont = scoreLabel.length > 2 ? 7.5 : 9;
 
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><defs><filter id="s" x="-35%" y="-35%" width="170%" height="170%"><feDropShadow dx="0" dy="1" stdDeviation="1.2" flood-opacity="0.28"/></filter></defs><circle cx="${mainCx}" cy="${mainCy}" r="${mainR}" fill="#ffffff" stroke="#4f46e5" stroke-width="1.75" filter="url(#s)"/><text x="${mainCx}" y="${mainCy}" font-size="${emojiFont}" text-anchor="middle" dominant-baseline="central" font-family="system-ui,&quot;Apple Color Emoji&quot;,&quot;Segoe UI Emoji&quot;,&quot;Noto Color Emoji&quot;,sans-serif">${escapeSvgText(emoji)}</text><circle cx="${badgeCx}" cy="${badgeCy}" r="${badgeR}" fill="#10b981" stroke="#ffffff" stroke-width="1.75"/><text x="${badgeCx}" y="${badgeCy}" font-size="${badgeFont}" font-weight="800" text-anchor="middle" dominant-baseline="central" fill="#ffffff" font-family="system-ui,ui-sans-serif,sans-serif">${escapeSvgText(scoreLabel)}</text></svg>`;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}"><defs><filter id="s" x="-35%" y="-35%" width="170%" height="170%"><feDropShadow dx="0" dy="1" stdDeviation="1.2" flood-opacity="0.28"/></filter></defs><circle cx="${mainCx}" cy="${mainCy}" r="${mainR}" fill="#ffffff" stroke="#4f46e5" stroke-width="1.75" filter="url(#s)"/><text x="${mainCx}" y="${mainCy}" font-size="${emojiFont}" text-anchor="middle" dominant-baseline="central" font-family="system-ui,&quot;Apple Color Emoji&quot;,&quot;Segoe UI Emoji&quot;,&quot;Noto Color Emoji&quot;,sans-serif">${escapeSvgText(emoji)}</text><circle cx="${badgeCx}" cy="${badgeCy}" r="${badgeR}" fill="#10b981" stroke="#ffffff" stroke-width="1.75"/><text x="${badgeCx}" y="${badgeCy}" font-size="${badgeFont}" font-weight="800" text-anchor="middle" dominant-baseline="central" fill="#ffffff" font-family="system-ui,ui-sans-serif,sans-serif">${escapeSvgText(scoreLabel)}</text></svg>`;
   const url = `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
   const icon: google.maps.Icon = {
     url,
-    scaledSize: new google.maps.Size(w, h),
+    scaledSize: new google.maps.Size(size, size),
     anchor: new google.maps.Point(mainCx, mainCy),
   };
   cache.set(cacheKey, icon);
@@ -93,13 +83,6 @@ function describeMapLoadError(err: unknown): string {
   return msg || "Kunde inte ladda Google Maps.";
 }
 
-/** Runtime-typ för sol/skugga-overlay (laddas efter Google Maps). */
-type SunOverlayHandle = {
-  setMap(map: google.maps.Map | null): void;
-  setOptions(opts: MapSunAtmosphereOptions): void;
-  refresh(): void;
-};
-
 export function SpotsMap({
   spots,
   cityName,
@@ -110,9 +93,6 @@ export function SpotsMap({
   overlay,
   /** Fyll återstående höjd i flex-layout (rumssidan) i stället för fast korthöjd. */
   fillHeight = false,
-  mapDisplayTime,
-  onMapTimeScrub,
-  onMapTimeReset,
 }: {
   spots: DashboardSpot[];
   cityName: string;
@@ -123,21 +103,9 @@ export function SpotsMap({
   /** Lägg t.ex. vänster knapp + höger kolumn som syskon — raden är `justify-between`. */
   overlay?: React.ReactNode;
   fillHeight?: boolean;
-  /** Visningstid för kart-sol/skugga (live eller efter skrubbning). */
-  mapDisplayTime: Date;
-  onMapTimeScrub: (next: Date) => void;
-  onMapTimeReset: () => void;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const spotMarkersRef = useRef<Array<{ marker: google.maps.Marker; spot: DashboardSpot }>>([]);
   const mapRef = useRef<google.maps.Map | null>(null);
-  const sunOverlayRef = useRef<SunOverlayHandle | null>(null);
-  const mapDisplayTimeRef = useRef(mapDisplayTime);
-  mapDisplayTimeRef.current = mapDisplayTime;
-  const onScrubRef = useRef(onMapTimeScrub);
-  onScrubRef.current = onMapTimeScrub;
-  const onResetRef = useRef(onMapTimeReset);
-  onResetRef.current = onMapTimeReset;
   const hereMarkerRef = useRef<google.maps.Marker | null>(null);
   const hereCircleRef = useRef<google.maps.Circle | null>(null);
   const watchIdRef = useRef<number | null>(null);
@@ -172,8 +140,6 @@ export function SpotsMap({
         await importLibrary("maps");
         if (cancelled || !containerRef.current) return;
 
-        const { MapSunAtmosphereOverlay } = await import("@/lib/mapSunAtmosphereOverlay");
-
         map = new google.maps.Map(containerRef.current, {
           center: DEFAULT_CENTER,
           zoom: 11,
@@ -181,26 +147,8 @@ export function SpotsMap({
           streetViewControl: false,
           fullscreenControl: true,
           gestureHandling: "greedy",
-          styles: MAP_FOREST_FORWARD_STYLES,
         });
-        if (cancelled) return;
         mapRef.current = map;
-
-        const sunOv = new MapSunAtmosphereOverlay({
-          getWhen: () => mapDisplayTimeRef.current,
-          getCenterLatLng: () => map!.getCenter() ?? null,
-          onSeekTime: (d) => onScrubRef.current(d),
-          onResetLive: () => onResetRef.current(),
-          locale,
-        });
-        if (cancelled) {
-          sunOv.setMap(null);
-          return;
-        }
-        sunOv.setMap(map);
-        sunOverlayRef.current = sunOv;
-
-        spotMarkersRef.current = [];
 
         iw = new google.maps.InfoWindow();
         const emojiIconCache = new Map<string, google.maps.Icon>();
@@ -213,7 +161,6 @@ export function SpotsMap({
             title: spot.name,
             icon: buildSpotMarkerIcon(spotMapEmoji(spot), spotDisplayScore(spot), emojiIconCache),
           });
-          spotMarkersRef.current.push({ marker, spot: { ...spot } });
           marker.addListener("click", () => {
             if (!map || !iw) return;
             const url = mapsOpenForSpot(spot, { cityName, locale });
@@ -316,8 +263,6 @@ export function SpotsMap({
                 else viewerHasPlussed = !isUndo;
 
                 setPlusUi();
-                const row = spotMarkersRef.current.find((e) => e.marker === marker);
-                if (row) row.spot = { ...row.spot, plusCount };
                 marker.setIcon(
                   buildSpotMarkerIcon(spotMapEmoji(spot), 1 + plusCount, emojiIconCache),
                 );
@@ -360,10 +305,7 @@ export function SpotsMap({
             plotted.forEach((s) => bounds.extend({ lat: s.lat!, lng: s.lng! }));
             map.fitBounds(bounds, 64);
           }
-          if (!cancelled) {
-            setLoading(false);
-            sunOverlayRef.current?.refresh();
-          }
+          if (!cancelled) setLoading(false);
         });
       } catch (e) {
         if (!cancelled) {
@@ -375,26 +317,11 @@ export function SpotsMap({
 
     return () => {
       cancelled = true;
-      sunOverlayRef.current?.setMap(null);
-      sunOverlayRef.current = null;
-      spotMarkersRef.current = [];
       markers.forEach((m) => m.setMap(null));
       iw?.close();
       mapRef.current = null;
     };
   }, [apiKey, cityName, plotted, locale, roomSlug]);
-
-  /** Skugga + solknopp följer vald tid (t.ex. varje sekund live). */
-  useLayoutEffect(() => {
-    sunOverlayRef.current?.setOptions({
-      getWhen: () => mapDisplayTimeRef.current,
-      getCenterLatLng: () => mapRef.current?.getCenter() ?? null,
-      onSeekTime: (d) => onScrubRef.current(d),
-      onResetLive: () => onResetRef.current(),
-      locale,
-    });
-    sunOverlayRef.current?.refresh();
-  }, [mapDisplayTime, locale]);
 
   useEffect(() => {
     const map = mapRef.current;

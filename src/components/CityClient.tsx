@@ -91,49 +91,6 @@ function NewTipPillButton({
   );
 }
 
-const MAP_CLOCK_PILL_BASE =
-  "pointer-events-auto inline-flex h-10 max-w-[min(100%,11rem)] shrink-0 items-center gap-1.5 rounded-full bg-white/88 px-2.5 pl-3 text-sm font-extrabold tabular-nums leading-none tracking-tight text-indigo-950 shadow-sm shadow-indigo-500/10 ring-1 ring-white/60 backdrop-blur-sm sm:max-w-none";
-
-function MapClockPillButton({
-  locale,
-  time,
-  scrubActive,
-  onReset,
-}: {
-  locale: Locale;
-  time: Date;
-  scrubActive: boolean;
-  onReset: () => void;
-}) {
-  const label = time.toLocaleTimeString(locale === "en" ? "en-US" : "sv-SE", {
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-    hour12: locale === "en",
-  });
-  return (
-    <div
-      className={MAP_CLOCK_PILL_BASE}
-      role="group"
-      aria-label={t(locale, "room.map.clockAria")}
-    >
-      <time dateTime={time.toISOString()} className="min-w-0 shrink truncate">
-        {label}
-      </time>
-      {scrubActive ? (
-        <button
-          type="button"
-          onClick={onReset}
-          className="shrink-0 rounded-full border border-indigo-200/80 bg-indigo-50/90 px-2 py-1 text-[11px] font-black uppercase tracking-wide text-indigo-900 transition hover:bg-indigo-100 active:scale-95"
-          aria-label={t(locale, "room.map.timeResetAria")}
-        >
-          {t(locale, "room.map.timeReset")}
-        </button>
-      ) : null}
-    </div>
-  );
-}
-
 function FadingHorizontalChips({
   children,
   rowClassName = "py-2",
@@ -298,30 +255,11 @@ export function CityClient({
   const [category, setCategory] = useState<"alla" | CategoryId>("alla");
   const [neighborhood, setNeighborhood] = useState<string>("alla");
   const [viewMode, setViewMode] = useState<"list" | "map">("map");
-  /** Live klocka för kartläge; `mapClockOverride` sätter t.ex. skrubbad tid. */
-  const [mapClockLive, setMapClockLive] = useState(() => new Date());
-  const [mapClockOverride, setMapClockOverride] = useState<Date | null>(null);
   /** Ordning i listvy: popularitet (server) eller nyast först. */
   const [listSort, setListSort] = useState<"popular" | "recent">("popular");
   const [error, setError] = useState<string | null>(null);
   const [toast, setToast] = useState<{ message: string; tone?: ToastTone } | null>(null);
   const mapEnabled = isMapViewConfigured();
-  const mapDisplayTime = mapClockOverride ?? mapClockLive;
-
-  useEffect(() => {
-    if (!mapEnabled || viewMode !== "map") return;
-    const id = window.setInterval(() => setMapClockLive(new Date()), 1000);
-    return () => clearInterval(id);
-  }, [mapEnabled, viewMode]);
-
-  useEffect(() => {
-    if (viewMode !== "map") setMapClockOverride(null);
-  }, [viewMode]);
-
-  const handleMapTimeScrub = useCallback((d: Date) => {
-    setMapClockOverride(new Date(d.getTime()));
-  }, []);
-  const handleMapTimeReset = useCallback(() => setMapClockOverride(null), []);
 
   const onRoomViewSegment = useCallback((s: RoomViewSegment) => {
     if (s === "map") {
@@ -640,13 +578,7 @@ export function CityClient({
                       />
                     </div>
                   ) : (
-                    <div className="hidden w-full flex-col gap-2 sm:flex sm:w-auto sm:shrink-0 sm:flex-row sm:items-center sm:gap-2">
-                      <MapClockPillButton
-                        locale={locale}
-                        time={mapDisplayTime}
-                        scrubActive={mapClockOverride != null}
-                        onReset={handleMapTimeReset}
-                      />
+                    <div className="hidden w-full sm:block sm:w-auto sm:shrink-0">
                       <NewTipPillButton
                         locale={locale}
                         onClick={() => {
@@ -696,18 +628,9 @@ export function CityClient({
                   roomSlug={roomSlug}
                   userHereOn={hereOn}
                   onUserHereError={(msg) => showToast(msg, "info")}
-                  mapDisplayTime={mapDisplayTime}
-                  onMapTimeScrub={handleMapTimeScrub}
-                  onMapTimeReset={handleMapTimeReset}
                   overlay={
                   <>
-                    <div className="pointer-events-auto flex flex-wrap items-center gap-2 sm:hidden">
-                      <MapClockPillButton
-                        locale={locale}
-                        time={mapDisplayTime}
-                        scrubActive={mapClockOverride != null}
-                        onReset={handleMapTimeReset}
-                      />
+                    <div className="pointer-events-auto sm:hidden">
                       <NewTipPillButton
                         locale={locale}
                         onClick={() => {
