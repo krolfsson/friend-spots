@@ -32,7 +32,6 @@ export function CreateRoomLandingForm({ locale }: { locale: Locale }) {
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Okänt fel");
-    } finally {
       setBusy(false);
     }
   }
@@ -66,10 +65,16 @@ export function CreateRoomLandingForm({ locale }: { locale: Locale }) {
       <button
         type="submit"
         disabled={busy || pin.trim().length < 4}
+        aria-busy={busy}
         className="ui-press w-full rounded-full bg-gradient-to-r from-emerald-400 to-teal-500 py-2.5 text-sm font-extrabold text-white transition enabled:hover:brightness-110 enabled:active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-40 sm:py-3"
       >
-        {busy ? (locale === "en" ? "Creating…" : "Skapar…") : t(locale, "home.create.cta")}
+        {busy ? t(locale, "home.create.ctaBusy") : t(locale, "home.create.cta")}
       </button>
+      {busy ? (
+        <div className="home-cta-progress mt-2" aria-hidden>
+          <div className="home-cta-progress__inner" />
+        </div>
+      ) : null}
     </form>
   );
 }

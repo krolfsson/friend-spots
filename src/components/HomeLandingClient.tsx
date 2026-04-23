@@ -241,7 +241,7 @@ export function HomeLandingClient({ locale, totalSpots }: { locale: Locale; tota
                       aria-busy={busy}
                       className="ui-press mt-1 w-full rounded-full bg-gradient-to-r from-emerald-400 to-teal-500 py-3 text-sm font-extrabold text-white shadow-md shadow-emerald-600/25 transition enabled:hover:brightness-110 enabled:active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-40"
                     >
-                      {busy ? (locale === "en" ? "Creating…" : "Skapar…") : t(locale, "home.create.cta")}
+                      {busy ? t(locale, "home.create.ctaBusy") : t(locale, "home.create.cta")}
                     </button>
                     {busy ? (
                       <div className="home-cta-progress mt-2" aria-hidden>
