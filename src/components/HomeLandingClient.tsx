@@ -119,7 +119,7 @@ export function HomeLandingClient({ locale, totalSpots }: { locale: Locale; tota
     <div className="relative z-10 flex min-h-dvh flex-col">
       <main className="flex flex-1 flex-col items-stretch justify-center px-8 pb-10 pt-8 sm:pb-14 sm:pt-10 lg:px-10">
         <div className="mx-auto grid w-full max-w-6xl grid-cols-1 items-center gap-y-5 sm:gap-y-6 lg:grid-cols-2 lg:gap-x-12 lg:gap-y-12 xl:gap-x-16">
-          <div className="mx-auto flex w-full max-w-md flex-col items-stretch overflow-x-visible text-center sm:max-w-lg lg:mx-0 lg:max-w-xl lg:text-left">
+          <div className="mx-auto flex w-full max-w-md flex-col items-stretch overflow-x-visible text-center sm:max-w-lg lg:mx-0 lg:max-w-xl lg:translate-x-[20%] lg:text-left">
             <div className="mapsies-home-reveal mapsies-home-reveal--d0 flex w-full justify-center overflow-x-visible overflow-y-visible lg:justify-start">
               <div className="mapsies-home-logo-wrap">
                 <div
