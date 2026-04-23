@@ -117,34 +117,35 @@ export function HomeLandingClient({ locale, totalSpots }: { locale: Locale; tota
 
   return (
     <div className="relative z-10 flex min-h-dvh flex-col">
-      <main className="flex flex-1 flex-col items-stretch justify-center px-4 pb-10 pt-8 sm:px-6 sm:pb-14 sm:pt-10 lg:px-10">
+      <main className="flex flex-1 flex-col items-stretch justify-center px-8 pb-10 pt-8 sm:pb-14 sm:pt-10 lg:px-10">
         <div className="mx-auto grid w-full max-w-6xl grid-cols-1 items-center gap-y-10 sm:gap-y-11 lg:grid-cols-2 lg:gap-x-12 lg:gap-y-12 xl:gap-x-16">
-          <div className="mx-auto flex min-w-0 w-full max-w-md flex-col items-stretch text-center sm:max-w-lg lg:mx-0 lg:max-w-xl lg:text-left">
-            <div className="flex w-full justify-center overflow-visible lg:justify-start">
+          <div className="mx-auto flex w-full max-w-md flex-col items-stretch overflow-x-visible text-center sm:max-w-lg lg:mx-0 lg:max-w-xl lg:text-left">
+            <div className="mapsies-home-reveal mapsies-home-reveal--d0 flex w-full justify-center overflow-x-visible overflow-y-visible lg:justify-start">
               <div
-                className="select-none whitespace-nowrap bg-gradient-to-r from-indigo-800 via-violet-600 to-indigo-700 bg-clip-text pb-2.5 pt-0.5 text-[clamp(2.85rem,12vw,4.25rem)] font-extrabold leading-[1.02] tracking-tight text-transparent drop-shadow-[0_12px_32px_rgba(67,56,202,0.2)] sm:text-[clamp(3.2rem,10vw,4.5rem)]"
+                className="select-none whitespace-nowrap bg-gradient-to-r from-indigo-800 via-violet-600 to-indigo-700 bg-clip-text px-1.5 pb-2.5 pt-0.5 text-[clamp(2.35rem,min(11.5vw,3.15rem),4.25rem)] font-extrabold leading-[1.02] tracking-tight text-transparent drop-shadow-[0_12px_32px_rgba(67,56,202,0.2)] sm:text-[clamp(2.85rem,9.5vw,4.5rem)]"
                 style={{
                   fontFamily: "var(--font-logo), var(--font-y2k), system-ui, sans-serif",
                   WebkitBackgroundClip: "text",
                   backgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
                 }}
               >
                 Mapsies
               </div>
             </div>
 
-            <p className="mt-2.5 w-full text-center text-[0.7rem] font-semibold uppercase tracking-[0.14em] text-indigo-900/38 tabular-nums sm:text-[0.72rem] lg:hidden">
+            <p className="mapsies-home-reveal mapsies-home-reveal--d1 mt-2.5 w-full text-center text-[0.7rem] font-semibold uppercase tracking-[0.14em] text-indigo-900/38 tabular-nums sm:text-[0.72rem] lg:hidden">
               {statsLine}
             </p>
 
-            <p className="mt-3.5 w-full text-[0.98rem] font-bold leading-snug tracking-tight text-indigo-950 sm:mt-4 sm:text-lg lg:mt-5">
+            <p className="mapsies-home-reveal mapsies-home-reveal--d2 mt-3.5 w-full text-[0.98rem] font-bold leading-snug tracking-tight text-indigo-950 sm:mt-4 sm:text-lg lg:mt-5">
               {t(locale, "home.hero.lead")}
             </p>
-            <p className="mt-3 w-full text-[0.8125rem] font-medium leading-relaxed text-indigo-900/62 sm:mt-3.5 sm:text-sm">
+            <p className="mapsies-home-reveal mapsies-home-reveal--d3 mt-3 w-full text-[0.8125rem] font-medium leading-relaxed text-indigo-900/62 sm:mt-3.5 sm:text-sm">
               {t(locale, "home.hero.sub")}
             </p>
 
-            <div className="mt-10 flex w-full max-w-sm flex-col gap-3 sm:mt-11 lg:max-w-[20rem] lg:self-start">
+            <div className="mapsies-home-reveal mapsies-home-reveal--d4 mt-10 flex w-full max-w-sm flex-col gap-3 sm:mt-11 lg:max-w-[20rem] lg:self-start">
               <button
                 type="button"
                 onClick={openCreate}
@@ -179,15 +180,15 @@ export function HomeLandingClient({ locale, totalSpots }: { locale: Locale; tota
             </div>
 
             <p
-              className="mt-6 hidden w-full text-center text-[0.7rem] font-semibold uppercase tracking-[0.14em] text-indigo-900/38 tabular-nums sm:mt-7 sm:text-[0.72rem] lg:block lg:text-left"
+              className="mapsies-home-reveal mapsies-home-reveal--d5 mt-6 hidden w-full text-center text-[0.7rem] font-semibold uppercase tracking-[0.14em] text-indigo-900/38 tabular-nums sm:mt-7 sm:text-[0.72rem] lg:block lg:text-left"
               aria-live="polite"
             >
               {statsLine}
             </p>
           </div>
 
-          <div className="flex min-w-0 w-full flex-col items-center lg:items-end">
-            <div className="flex w-full justify-center lg:justify-end">
+          <div className="flex min-w-0 w-full flex-col items-center overflow-x-visible lg:items-end">
+            <div className="mapsies-home-reveal mapsies-home-reveal--d6 flex w-full justify-center lg:justify-end">
               <Image
                 src="/mockups.png"
                 alt="Mapsies"
@@ -198,7 +199,7 @@ export function HomeLandingClient({ locale, totalSpots }: { locale: Locale; tota
                 className="h-auto w-full max-w-2xl object-contain drop-shadow-[0_24px_48px_-12px_rgba(49,46,129,0.25)] lg:max-w-none"
               />
             </div>
-            <p className="mt-6 w-full text-center text-[0.72rem] font-medium text-indigo-900/42 lg:mt-7 lg:max-w-none lg:self-end lg:text-right">
+            <p className="mapsies-home-reveal mapsies-home-reveal--d7 mt-6 w-full text-center text-[0.72rem] font-medium text-indigo-900/42 lg:mt-7 lg:max-w-none lg:self-end lg:text-right">
               {t(locale, "home.footer.copyright")}
             </p>
           </div>

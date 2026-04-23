@@ -157,6 +157,56 @@ body {
   }
 }
 
+/* Startsida: mjukt inflygande innehåll vid första paint */
+@keyframes mapsies-home-reveal {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 14px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.mapsies-home-reveal {
+  opacity: 0;
+  animation: mapsies-home-reveal 0.62s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.mapsies-home-reveal--d0 {
+  animation-delay: 0ms;
+}
+.mapsies-home-reveal--d1 {
+  animation-delay: 70ms;
+}
+.mapsies-home-reveal--d2 {
+  animation-delay: 140ms;
+}
+.mapsies-home-reveal--d3 {
+  animation-delay: 210ms;
+}
+.mapsies-home-reveal--d4 {
+  animation-delay: 280ms;
+}
+.mapsies-home-reveal--d5 {
+  animation-delay: 350ms;
+}
+.mapsies-home-reveal--d6 {
+  animation-delay: 420ms;
+}
+.mapsies-home-reveal--d7 {
+  animation-delay: 490ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mapsies-home-reveal {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}
+
 .y2k-panel {
   background: linear-gradient(160deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.68));
   border: 1.5px solid rgba(255, 255, 255, 0.85);
