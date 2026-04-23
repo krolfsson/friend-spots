@@ -8,6 +8,7 @@ import { t, type Locale } from "@/lib/i18n";
 import { mapsOpenForSpot } from "@/lib/mapsUrl";
 import { getOrCreateVoterToken } from "@/lib/voterClient";
 
+/** Sista utväg när varken filtrerade tips eller fallback har koordinater (t.ex. helt ny stad). */
 const DEFAULT_CENTER = { lat: 59.33, lng: 18.07 };
 
 /** Samma emoji som i listan: egen emoji eller kategorins standard. */
@@ -85,6 +86,7 @@ function describeMapLoadError(err: unknown): string {
 
 export function SpotsMap({
   spots,
+  boundsFallbackSpots,
   cityName,
   locale = "sv",
   roomSlug,
@@ -95,6 +97,8 @@ export function SpotsMap({
   fillHeight = false,
 }: {
   spots: DashboardSpot[];
+  /** Alla tips i staden m.m. koord — zoom/centrum när `spots` saknar punkter (t.ex. tom kategori). */
+  boundsFallbackSpots?: DashboardSpot[];
   cityName: string;
   locale?: Locale;
   roomSlug: string;
@@ -115,6 +119,14 @@ export function SpotsMap({
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY?.trim() ?? "";
 
   const plotted = useMemo(() => spots.filter(hasCoords), [spots]);
+  const fallbackPlotted = useMemo(
+    () => (boundsFallbackSpots ?? []).filter(hasCoords),
+    [boundsFallbackSpots],
+  );
+  const boundsPlotted = useMemo(
+    () => (plotted.length > 0 ? plotted : fallbackPlotted),
+    [plotted, fallbackPlotted],
+  );
   const missingCount = spots.length - plotted.length;
 
   useEffect(() => {
@@ -294,15 +306,15 @@ export function SpotsMap({
 
         google.maps.event.addListenerOnce(map, "idle", () => {
           if (cancelled || !map) return;
-          if (plotted.length === 0) {
+          if (boundsPlotted.length === 0) {
             map.setCenter(DEFAULT_CENTER);
             map.setZoom(11);
-          } else if (plotted.length === 1) {
-            map.setCenter({ lat: plotted[0].lat!, lng: plotted[0].lng! });
+          } else if (boundsPlotted.length === 1) {
+            map.setCenter({ lat: boundsPlotted[0].lat!, lng: boundsPlotted[0].lng! });
             map.setZoom(14);
           } else {
             const bounds = new google.maps.LatLngBounds();
-            plotted.forEach((s) => bounds.extend({ lat: s.lat!, lng: s.lng! }));
+            boundsPlotted.forEach((s) => bounds.extend({ lat: s.lat!, lng: s.lng! }));
             map.fitBounds(bounds, 64);
           }
           if (!cancelled) setLoading(false);
@@ -321,7 +333,7 @@ export function SpotsMap({
       iw?.close();
       mapRef.current = null;
     };
-  }, [apiKey, cityName, plotted, locale, roomSlug]);
+  }, [apiKey, cityName, plotted, boundsPlotted, locale, roomSlug]);
 
   useEffect(() => {
     const map = mapRef.current;

@@ -621,6 +621,7 @@ export function CityClient({
                 <SpotsMap
                   fillHeight
                   spots={displaySpots}
+                  boundsFallbackSpots={baseSpots}
                   cityName={activeCity.name}
                   locale={locale}
                   roomSlug={roomSlug}
