@@ -198,7 +198,7 @@ export function HomeLandingClient({ locale, totalSpots }: { locale: Locale; tota
                 className="h-auto w-full max-w-2xl object-contain drop-shadow-[0_24px_48px_-12px_rgba(49,46,129,0.25)] lg:max-w-none"
               />
             </div>
-            <p className="mapsies-home-reveal mapsies-home-reveal--d7 mt-3 w-full text-center text-[0.72rem] font-medium text-indigo-900/42 lg:mt-4 lg:max-w-none lg:self-end lg:text-right">
+            <p className="mapsies-home-reveal mapsies-home-reveal--d7 mt-3 w-full text-center text-[0.72rem] font-medium text-indigo-900/42 lg:hidden">
               {t(locale, "home.footer.copyright")}
             </p>
           </div>
