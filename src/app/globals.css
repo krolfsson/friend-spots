@@ -207,47 +207,77 @@ body {
   }
 }
 
-/* Startsida: diffus “shimmer” på Mapsies-loggan */
-@keyframes mapsies-home-logo-shimmer {
-  0% {
-    background-position: 12% 50%;
-  }
-  50% {
-    background-position: 88% 50%;
-  }
+/* Startsida: mjukt ljus bakom Mapsies (diffus “glow”, samma palett) */
+@keyframes mapsies-home-logo-halo {
+  0%,
   100% {
-    background-position: 12% 50%;
+    opacity: 0.48;
+    transform: translate3d(-50%, -50%, 0) scale(0.94);
   }
+  42% {
+    opacity: 0.88;
+    transform: translate3d(-50%, -50%, 0) scale(1.06);
+  }
+  68% {
+    opacity: 0.58;
+    transform: translate3d(-50%, -50%, 0) scale(0.98);
+  }
+}
+
+.mapsies-home-logo-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mapsies-home-logo-wrap::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  left: 50%;
+  top: 54%;
+  width: 125%;
+  height: 118%;
+  transform: translate3d(-50%, -50%, 0);
+  pointer-events: none;
+  border-radius: 50%;
+  background:
+    radial-gradient(
+      ellipse 52% 46% at 50% 48%,
+      rgba(233, 213, 255, 0.55) 0%,
+      rgba(192, 132, 252, 0.42) 22%,
+      rgba(139, 92, 246, 0.28) 48%,
+      rgba(91, 33, 182, 0.12) 68%,
+      transparent 78%
+    ),
+    radial-gradient(
+      ellipse 95% 72% at 44% 58%,
+      rgba(167, 139, 250, 0.28) 0%,
+      transparent 58%
+    );
+  filter: blur(22px);
+  opacity: 0.65;
+  animation: mapsies-home-logo-halo 4.2s ease-in-out infinite;
 }
 
 .mapsies-home-logo {
+  position: relative;
+  z-index: 1;
   color: transparent;
-  background-image: linear-gradient(
-    102deg,
-    #312e81 0%,
-    #4338ca 16%,
-    #5b21b6 30%,
-    #7c3aed 40%,
-    rgba(237, 233, 254, 0.5) 50%,
-    #6d28d9 60%,
-    #5b21b6 74%,
-    #4338ca 88%,
-    #312e81 100%
-  );
-  background-size: 240% 140%;
-  background-repeat: no-repeat;
-  background-position: 20% 50%;
+  background-image: linear-gradient(92deg, #312e81 0%, #5b21b6 28%, #7c3aed 52%, #6d28d9 78%, #4338ca 100%);
+  background-size: 100% 100%;
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
-  animation: mapsies-home-logo-shimmer 5.2s ease-in-out infinite;
-  filter: drop-shadow(0 12px 32px rgba(67, 56, 202, 0.2));
+  filter: drop-shadow(0 10px 28px rgba(67, 56, 202, 0.22));
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .mapsies-home-logo {
+  .mapsies-home-logo-wrap::before {
     animation: none;
-    background-position: 45% 50%;
+    opacity: 0.62;
+    transform: translate3d(-50%, -50%, 0) scale(1);
   }
 }
 
