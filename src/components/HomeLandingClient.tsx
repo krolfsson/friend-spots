@@ -183,10 +183,10 @@ export function HomeLandingClient({ locale, totalSpots }: { locale: Locale; tota
 
           <div className="flex min-w-0 w-full justify-center lg:justify-end">
             <Image
-              src="/home-hero.png"
+              src="/mockups.png"
               alt="Mapsies"
-              width={1200}
-              height={900}
+              width={1682}
+              height={2068}
               priority
               sizes="(min-width: 1024px) min(50vw, 36rem), 100vw"
               className="h-auto w-full max-w-2xl object-contain drop-shadow-[0_24px_48px_-12px_rgba(49,46,129,0.25)] lg:max-w-none"
