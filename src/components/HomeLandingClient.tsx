@@ -118,8 +118,8 @@ export function HomeLandingClient({ locale, totalSpots }: { locale: Locale; tota
   return (
     <div className="relative z-10 flex min-h-dvh flex-col">
       <main className="flex flex-1 flex-col items-stretch justify-center overflow-x-hidden px-8 pb-10 pt-8 sm:pb-14 sm:pt-10 lg:px-12">
-        <div className="mx-auto grid w-full max-w-6xl grid-cols-1 items-center gap-y-5 sm:gap-y-6 lg:grid-cols-2 lg:gap-x-10 lg:gap-y-12 xl:gap-x-14">
-          <div className="mx-auto flex w-full max-w-md flex-col items-stretch text-center sm:max-w-lg lg:mx-0 lg:max-w-[46%] lg:text-left">
+        <div className="mx-auto grid w-full max-w-6xl grid-cols-1 items-center gap-y-5 sm:gap-y-6 lg:grid-cols-[3fr_2fr] lg:gap-x-10 lg:gap-y-12 xl:gap-x-14">
+          <div className="mx-auto flex w-full max-w-md flex-col items-stretch text-center sm:max-w-lg lg:mx-0 lg:max-w-none lg:text-left">
             <div className="mapsies-home-reveal mapsies-home-reveal--d0 flex w-full justify-center overflow-visible lg:justify-start">
               <div className="mapsies-home-logo-wrap">
                 <div
@@ -144,7 +144,7 @@ export function HomeLandingClient({ locale, totalSpots }: { locale: Locale; tota
               {t(locale, "home.hero.sub")}
             </p>
 
-            <div className="mapsies-home-reveal mapsies-home-reveal--d4 mt-10 flex w-full max-w-sm flex-col gap-3 sm:mt-11 lg:max-w-[20rem] lg:self-start">
+            <div className="mapsies-home-reveal mapsies-home-reveal--d4 mx-auto mt-10 flex w-full max-w-sm flex-col gap-3 sm:mt-11 lg:mx-0 lg:max-w-[20rem] lg:self-start">
               <button
                 type="button"
                 onClick={openCreate}
