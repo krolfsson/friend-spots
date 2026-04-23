@@ -5,7 +5,7 @@ import { useCallback, useEffect, useState } from "react";
 import type { Locale } from "@/lib/i18n";
 import { t, tReplace } from "@/lib/i18n";
 import { normalizeRoomSlugInput } from "@/lib/roomSlugInput";
-import { HomeMacBookMockup } from "@/components/HomeMacBookMockup";
+import { HomeDeviceMockup } from "@/components/HomeDeviceMockup";
 
 type Step = null | "create" | "open";
 
@@ -139,14 +139,14 @@ export function HomeLandingClient({ locale, totalSpots }: { locale: Locale; tota
               {t(locale, "home.hero.sub")}
             </p>
 
-            <div className="mt-10 flex w-full max-w-sm flex-col gap-2.5 sm:mt-11 lg:max-w-[20rem]">
+            <div className="mt-10 flex w-full max-w-sm flex-col gap-3 sm:mt-11 lg:max-w-[20rem]">
               <button
                 type="button"
                 onClick={openCreate}
-                className="ui-press inline-flex h-[3.15rem] w-full cursor-default items-center justify-center gap-2.5 rounded-2xl bg-gradient-to-br from-indigo-800 to-violet-700 px-5 text-sm font-semibold tracking-tight text-white shadow-[0_14px_36px_-10px_rgba(49,46,129,0.55)] ring-1 ring-white/15 transition hover:brightness-[1.04] active:scale-[0.99] sm:h-14 sm:text-[0.95rem]"
+                className="ui-press inline-flex h-12 w-full cursor-default items-center justify-center gap-2 rounded-full bg-gradient-to-br from-indigo-800 to-violet-700 px-5 text-sm font-extrabold tracking-tight text-white shadow-[0_14px_36px_-10px_rgba(49,46,129,0.5)] ring-1 ring-white/25 transition hover:brightness-[1.05] active:scale-[0.99] sm:h-14 sm:text-base"
               >
-                <span className="grid h-8 w-8 shrink-0 place-items-center rounded-xl border border-white/20 bg-white/10" aria-hidden>
-                  <svg viewBox="0 0 24 24" className="h-[1.05rem] w-[1.05rem]" aria-hidden>
+                <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full border border-white/30 bg-white/15" aria-hidden>
+                  <svg viewBox="0 0 24 24" className="h-4 w-4" aria-hidden>
                     <path
                       d="M12 7v10M7 12h10"
                       fill="none"
@@ -161,10 +161,10 @@ export function HomeLandingClient({ locale, totalSpots }: { locale: Locale; tota
               <button
                 type="button"
                 onClick={openExisting}
-                className="ui-press inline-flex h-[3.15rem] w-full cursor-default items-center justify-center gap-2.5 rounded-2xl border border-slate-300/95 bg-white/90 px-5 text-sm font-semibold tracking-tight text-indigo-950 shadow-sm shadow-slate-900/5 backdrop-blur-sm transition hover:bg-white active:scale-[0.99] sm:h-14 sm:text-[0.95rem]"
+                className="ui-press inline-flex h-12 w-full cursor-default items-center justify-center gap-2 rounded-full border border-indigo-200/85 bg-white/90 px-5 text-sm font-extrabold tracking-tight text-indigo-950 shadow-md shadow-indigo-500/10 backdrop-blur-sm transition hover:brightness-[1.03] active:scale-[0.99] sm:h-14 sm:text-base"
               >
                 <span
-                  className="grid h-8 w-8 shrink-0 place-items-center rounded-xl border border-indigo-200/70 bg-indigo-50/60 text-[1rem] leading-none"
+                  className="grid h-8 w-8 shrink-0 place-items-center rounded-full border border-indigo-200/60 bg-indigo-50/50 text-[1.05rem] leading-none"
                   aria-hidden
                 >
                   🔑
@@ -182,7 +182,7 @@ export function HomeLandingClient({ locale, totalSpots }: { locale: Locale; tota
           </div>
 
           <div className="flex justify-center lg:col-span-7 lg:justify-end">
-            <HomeMacBookMockup locale={locale} />
+            <HomeDeviceMockup locale={locale} />
           </div>
         </div>
       </main>
