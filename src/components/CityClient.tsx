@@ -1230,7 +1230,7 @@ function SpotCard({
         }
       >
         <div
-          className="flex h-14 w-14 shrink-0 select-none items-center justify-center rounded-2xl bg-gradient-to-br from-white/90 to-fuchsia-50/80 text-[2.1rem] leading-none shadow-inner shadow-fuchsia-100"
+          className="flex h-14 w-14 shrink-0 select-none items-center justify-center rounded-2xl bg-[#ede9fe] text-[2.1rem] leading-none shadow-inner shadow-violet-300/50 ring-1 ring-violet-300/55"
           aria-hidden
         >
           {big}
