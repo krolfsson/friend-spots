@@ -55,7 +55,7 @@ export function HomeDeviceMockup({ locale, macScreenSrc, phoneScreenSrc }: HomeD
   const phoneLabel = t(locale, "home.mockup.placeholderPhone");
 
   return (
-    <div className="mx-auto w-full max-w-[min(100%,28rem)] select-none">
+    <div className="mx-auto w-[min(100%,28rem)] max-w-[28rem] shrink-0 select-none">
       <div className="relative pb-1">
         {/* MacBook (bakgrund) */}
         <div className="relative z-0">

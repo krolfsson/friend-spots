@@ -23,7 +23,7 @@ export default async function Home() {
   return (
     <>
       <EmojiCollageBackground />
-      <div className="relative z-10 mx-auto min-h-dvh max-w-6xl overflow-x-visible px-4 pt-3 pb-8 sm:pt-6 sm:pb-12">
+      <div className="relative z-10 mx-auto min-h-dvh max-w-6xl overflow-x-visible pt-3 pb-8 sm:pt-6 sm:pb-12">
         <HomeLandingClient locale={locale} totalSpots={totalSpots} />
       </div>
     </>

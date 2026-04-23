@@ -116,9 +116,9 @@ export function HomeLandingClient({ locale, totalSpots }: { locale: Locale; tota
 
   return (
     <div className="relative z-10 flex min-h-dvh flex-col">
-      <main className="flex flex-1 flex-col items-stretch justify-center px-4 pb-10 pt-8 sm:pb-14 sm:pt-10 lg:px-6">
-        <div className="mx-auto grid w-full max-w-5xl grid-cols-1 items-center gap-12 lg:grid-cols-12 lg:gap-14 xl:max-w-6xl">
-          <div className="flex flex-col items-center text-center lg:col-span-5 lg:items-start lg:text-left">
+      <main className="flex flex-1 flex-col items-stretch justify-center px-4 pb-10 pt-8 sm:px-6 sm:pb-14 sm:pt-10 lg:px-10">
+        <div className="mx-auto grid w-full max-w-6xl grid-cols-1 items-center gap-12 lg:grid-cols-2 lg:gap-x-12 lg:gap-y-12 xl:gap-x-16">
+          <div className="flex min-w-0 flex-col items-center text-center lg:items-start lg:text-left">
             <div className="flex w-full justify-center overflow-visible px-2 sm:px-4 lg:justify-start lg:px-0">
               <div
                 className="select-none whitespace-nowrap bg-gradient-to-r from-indigo-800 via-violet-600 to-indigo-700 bg-clip-text px-1 pb-2.5 pt-0.5 text-[clamp(2.85rem,12vw,4.25rem)] font-extrabold leading-[1.02] tracking-tight text-transparent drop-shadow-[0_12px_32px_rgba(67,56,202,0.2)] sm:text-[clamp(3.2rem,10vw,4.5rem)]"
@@ -181,7 +181,7 @@ export function HomeLandingClient({ locale, totalSpots }: { locale: Locale; tota
             </p>
           </div>
 
-          <div className="flex justify-center lg:col-span-7 lg:justify-end">
+          <div className="flex min-w-0 w-full justify-center">
             <HomeDeviceMockup locale={locale} />
           </div>
         </div>
