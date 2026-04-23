@@ -3,11 +3,11 @@ import { t } from "@/lib/i18n";
 
 export type HomeDeviceMockupProps = {
   locale: Locale;
-  /** Desktop — lägg fil i `public/`, t.ex. `/mapsies-home-mac.png` */
+  /** Desktop — t.ex. `/cph1.png` i `public/` */
   macScreenSrc?: string;
-  /** Vänster iPhone */
+  /** iPhone längst till vänster (bakom den andra). */
   phoneLeftScreenSrc?: string;
-  /** Höger iPhone */
+  /** iPhone närmast Mac (ligger ovanpå vänster-telefonen). */
   phoneRightScreenSrc?: string;
   /** Om bara denna sätts används samma bild i båda telefonerna. */
   phoneScreenSrc?: string;
@@ -55,17 +55,22 @@ function PhoneFrame({
   screenSrc,
   placeholderLabel,
   island,
+  narrow,
 }: {
   screenSrc?: string;
   placeholderLabel: string;
   island: boolean;
+  /** Något smalare bakre telefon i stacken. */
+  narrow?: boolean;
 }) {
+  const w = narrow ? "max-w-[4.95rem]" : "max-w-[5.35rem]";
   return (
     <div
       className={[
-        "relative w-full max-w-[5.85rem] shrink-0",
-        "drop-shadow-[0_18px_36px_rgba(30,27,75,0.38)]",
-        "before:pointer-events-none before:absolute before:-inset-3 before:rounded-[2rem] before:bg-gradient-to-b before:from-indigo-500/12 before:via-violet-500/8 before:to-transparent before:blur-md before:content-['']",
+        "relative w-full shrink-0",
+        w,
+        "drop-shadow-[0_18px_36px_rgba(30,27,75,0.4)]",
+        "before:pointer-events-none before:absolute before:-inset-3 before:rounded-[2rem] before:bg-gradient-to-b before:from-indigo-500/14 before:via-violet-500/10 before:to-transparent before:blur-md before:content-['']",
       ].join(" ")}
     >
       <div
@@ -94,8 +99,8 @@ function PhoneFrame({
 }
 
 /**
- * MacBook i mitten, två iPhones i porträtt på sidorna — utan rotation, med djupa skuggor.
- * Skärmbilder: `macScreenSrc`, `phoneLeftScreenSrc`, `phoneRightScreenSrc` (eller bara `phoneScreenSrc` för båda).
+ * MacBook i samma storlek som tidigare (~28rem), två iPhones stående till vänster —
+ * överlappar varandra och skärmens vänsterkant, med djupa skuggor.
  */
 export function HomeDeviceMockup({
   locale,
@@ -104,72 +109,72 @@ export function HomeDeviceMockup({
   phoneRightScreenSrc,
   phoneScreenSrc,
 }: HomeDeviceMockupProps) {
-  const leftSrc = phoneLeftScreenSrc ?? phoneScreenSrc;
-  const rightSrc = phoneRightScreenSrc ?? phoneScreenSrc;
+  const rearSrc = phoneLeftScreenSrc ?? phoneScreenSrc;
+  const frontSrc = phoneRightScreenSrc ?? phoneScreenSrc;
 
   const desktopLabel = t(locale, "home.mockup.placeholderDesktop");
   const phoneLabel = t(locale, "home.mockup.placeholderPhone");
 
   return (
-    <div className="mx-auto w-[min(100%,38rem)] max-w-[38rem] shrink-0 select-none">
-      <div className="relative px-1 pb-3 pt-6 sm:px-2 sm:pb-4 sm:pt-8">
-        {/* Mjuk “golv”-reflex */}
+    <div className="mx-auto w-[min(100%,28rem)] max-w-[28rem] shrink-0 select-none overflow-visible">
+      <div className="relative overflow-visible pb-1 pt-4 sm:pt-6">
         <div
-          className="pointer-events-none absolute bottom-0 left-[8%] right-[8%] h-10 rounded-[100%] bg-gradient-to-r from-indigo-600/[0.07] via-violet-600/[0.12] to-fuchsia-500/[0.07] blur-2xl"
+          className="pointer-events-none absolute bottom-0 left-[6%] right-[6%] h-10 rounded-[100%] bg-gradient-to-r from-indigo-600/[0.08] via-violet-600/[0.12] to-fuchsia-500/[0.08] blur-2xl"
           aria-hidden
         />
 
-        <div className="relative z-10 flex items-end justify-center gap-0 sm:gap-1">
-          {/* Vänster iPhone */}
-          <div className="relative z-20 mb-[2px] w-[26%] min-w-0 max-w-[6rem] sm:-mr-3 sm:w-[24%] lg:-mr-5">
-            <PhoneFrame screenSrc={leftSrc} placeholderLabel={phoneLabel} island />
+        {/* Två iPhones till vänster om Mac: bakre + främre (överlappar varandra & Mac) */}
+        <div
+          className="pointer-events-none absolute bottom-[2px] left-0 z-30 flex items-end sm:bottom-[3px]"
+          aria-hidden
+        >
+          <div className="relative z-20 w-[min(32%,5.1rem)] max-w-[5.1rem] -translate-x-[8%] sm:-translate-x-[4%] sm:-mr-[2.15rem]">
+            <PhoneFrame screenSrc={rearSrc} placeholderLabel={phoneLabel} island narrow />
           </div>
+          <div className="relative z-40 -ml-[2.35rem] w-[min(34%,5.45rem)] max-w-[5.45rem] sm:-ml-[2.65rem]">
+            <PhoneFrame screenSrc={frontSrc} placeholderLabel={phoneLabel} island />
+          </div>
+        </div>
 
-          {/* MacBook */}
-          <div
-            className={[
-              "relative z-10 w-[min(54%,17.5rem)] min-w-0 shrink",
-              "drop-shadow-[0_26px_52px_rgba(30,27,75,0.42)]",
-              "before:pointer-events-none before:absolute before:-inset-x-4 before:-top-6 before:bottom-[-6px] before:rounded-[2rem] before:bg-gradient-to-b before:from-indigo-400/15 before:via-violet-500/10 before:to-transparent before:blur-2xl before:content-['']",
-            ].join(" ")}
-          >
-            <div className="rounded-t-[1.12rem] border border-slate-300/90 bg-gradient-to-b from-slate-200 via-slate-200 to-slate-300 p-[8px] shadow-[0_26px_52px_-14px_rgba(15,23,42,0.42),0_0_0_1px_rgba(255,255,255,0.35)_inset]">
-              <div className="overflow-hidden rounded-[0.5rem] bg-slate-950 p-[5px] shadow-[inset_0_2px_10px_rgba(0,0,0,0.5)]">
-                <div className="relative flex aspect-[16/10] flex-col overflow-hidden rounded-[0.32rem] bg-[#0f172a] ring-1 ring-black/50">
-                  {macScreenSrc ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={macScreenSrc} alt="" className="h-full w-full object-cover object-top" />
-                  ) : (
-                    <>
-                      <div className="flex h-7 shrink-0 items-center gap-2 border-b border-slate-700/80 bg-slate-900/95 px-2.5">
-                        <span className="flex gap-1" aria-hidden>
-                          <span className="h-2 w-2 rounded-full bg-[#ff5f57]" />
-                          <span className="h-2 w-2 rounded-full bg-[#febc2e]" />
-                          <span className="h-2 w-2 rounded-full bg-[#28c840]" />
-                        </span>
-                      </div>
-                      <div className="relative min-h-0 flex-1">
-                        <ScreenPlaceholder label={desktopLabel} variant="desktop" />
-                      </div>
-                    </>
-                  )}
-                </div>
+        {/* MacBook — samma proportioner som tidigare singel-layout */}
+        <div
+          className={[
+            "relative z-10 mx-auto w-full max-w-[28rem]",
+            "drop-shadow-[0_28px_56px_-12px_rgba(30,27,75,0.42)]",
+            "before:pointer-events-none before:absolute before:-inset-x-3 before:-top-5 before:bottom-[-4px] before:rounded-[2rem] before:bg-gradient-to-b before:from-indigo-400/14 before:via-violet-500/10 before:to-transparent before:blur-2xl before:content-['']",
+          ].join(" ")}
+        >
+          <div className="rounded-t-[1.15rem] border border-slate-300/90 bg-gradient-to-b from-slate-200 via-slate-200 to-slate-300 p-[9px] shadow-[0_28px_60px_-12px_rgba(15,23,42,0.35)]">
+            <div className="overflow-hidden rounded-[0.55rem] bg-slate-950 p-[6px] shadow-[inset_0_2px_8px_rgba(0,0,0,0.45)]">
+              <div className="relative flex aspect-[16/10] flex-col overflow-hidden rounded-[0.35rem] bg-[#0f172a] shadow-inner ring-1 ring-black/45">
+                {macScreenSrc ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={macScreenSrc} alt="" className="h-full w-full object-cover object-top" />
+                ) : (
+                  <>
+                    <div className="flex h-7 shrink-0 items-center gap-2 border-b border-slate-700/80 bg-slate-900/95 px-2.5">
+                      <span className="flex gap-1" aria-hidden>
+                        <span className="h-2 w-2 rounded-full bg-[#ff5f57]" />
+                        <span className="h-2 w-2 rounded-full bg-[#febc2e]" />
+                        <span className="h-2 w-2 rounded-full bg-[#28c840]" />
+                      </span>
+                    </div>
+                    <div className="relative min-h-0 flex-1">
+                      <ScreenPlaceholder label={desktopLabel} variant="desktop" />
+                    </div>
+                  </>
+                )}
               </div>
             </div>
-            <div
-              className="h-[10px] rounded-b-[0.62rem] border border-t-0 border-slate-300/80 bg-gradient-to-b from-slate-300 to-slate-400 shadow-[0_14px_28px_-10px_rgba(15,23,42,0.35)]"
-              aria-hidden
-            />
           </div>
-
-          {/* Höger iPhone */}
-          <div className="relative z-20 mb-[2px] w-[26%] min-w-0 max-w-[6rem] sm:-ml-3 sm:w-[24%] lg:-ml-5">
-            <PhoneFrame screenSrc={rightSrc} placeholderLabel={phoneLabel} island />
-          </div>
+          <div
+            className="h-[11px] rounded-b-[0.65rem] border border-t-0 border-slate-300/80 bg-gradient-to-b from-slate-300 to-slate-400 shadow-[0_12px_24px_-8px_rgba(15,23,42,0.28)]"
+            aria-hidden
+          />
         </div>
       </div>
 
-      <p className="mt-1 text-center text-[10px] font-semibold leading-snug tracking-wide text-indigo-900/40 sm:mt-2">
+      <p className="mt-2 text-center text-[10px] font-semibold leading-snug tracking-wide text-indigo-900/40 sm:mt-3">
         {t(locale, "home.mockup.caption")}
       </p>
     </div>

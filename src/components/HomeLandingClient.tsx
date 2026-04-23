@@ -182,7 +182,7 @@ export function HomeLandingClient({ locale, totalSpots }: { locale: Locale; tota
           </div>
 
           <div className="flex min-w-0 w-full justify-center">
-            {/* Skärmdumpar i public/: cph1.png (Mac), nyc1.png / nyc2.png (iPhones). Byt fil → ladda om sidan (ev. hård uppdatering) så nya versionen syns. */}
+            {/* public/: Mac = cph1. iPhones till vänster om Mac — phoneLeft = bakom, phoneRight = framför (nyc1 / nyc2). */}
             <HomeDeviceMockup
               locale={locale}
               macScreenSrc="/cph1.png"
