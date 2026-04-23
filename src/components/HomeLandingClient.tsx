@@ -41,7 +41,7 @@ export function HomeLandingClient({ locale, totalSpots }: { locale: Locale; tota
   const [slugInput, setSlugInput] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const animatedTotal = useCountUp(totalSpots, 550);
+  const animatedTotal = useCountUp(totalSpots, 2500);
   const totalFmt = new Intl.NumberFormat(locale === "sv" ? "sv-SE" : "en-US").format(animatedTotal);
   const statsLine = tReplace(locale, "home.stats.line", { count: totalFmt });
 
