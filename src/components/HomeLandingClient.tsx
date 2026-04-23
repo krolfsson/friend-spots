@@ -118,10 +118,10 @@ export function HomeLandingClient({ locale, totalSpots }: { locale: Locale; tota
     <div className="relative z-10 flex min-h-dvh flex-col">
       <main className="flex flex-1 flex-col items-stretch justify-center px-4 pb-10 pt-8 sm:px-6 sm:pb-14 sm:pt-10 lg:px-10">
         <div className="mx-auto grid w-full max-w-6xl grid-cols-1 items-center gap-12 lg:grid-cols-2 lg:gap-x-12 lg:gap-y-12 xl:gap-x-16">
-          <div className="flex min-w-0 flex-col items-center text-center lg:items-start lg:text-left">
-            <div className="flex w-full justify-center overflow-visible px-2 sm:px-4 lg:justify-start lg:px-0">
+          <div className="mx-auto flex min-w-0 w-full max-w-md flex-col items-stretch text-center sm:max-w-lg lg:mx-0 lg:max-w-xl lg:text-left">
+            <div className="flex w-full justify-center overflow-visible lg:justify-start">
               <div
-                className="select-none whitespace-nowrap bg-gradient-to-r from-indigo-800 via-violet-600 to-indigo-700 bg-clip-text px-1 pb-2.5 pt-0.5 text-[clamp(2.85rem,12vw,4.25rem)] font-extrabold leading-[1.02] tracking-tight text-transparent drop-shadow-[0_12px_32px_rgba(67,56,202,0.2)] sm:text-[clamp(3.2rem,10vw,4.5rem)]"
+                className="select-none whitespace-nowrap bg-gradient-to-r from-indigo-800 via-violet-600 to-indigo-700 bg-clip-text pb-2.5 pt-0.5 text-[clamp(2.85rem,12vw,4.25rem)] font-extrabold leading-[1.02] tracking-tight text-transparent drop-shadow-[0_12px_32px_rgba(67,56,202,0.2)] sm:text-[clamp(3.2rem,10vw,4.5rem)]"
                 style={{
                   fontFamily: "var(--font-logo), var(--font-y2k), system-ui, sans-serif",
                   WebkitBackgroundClip: "text",
@@ -132,14 +132,14 @@ export function HomeLandingClient({ locale, totalSpots }: { locale: Locale; tota
               </div>
             </div>
 
-            <p className="mt-5 max-w-[min(100%,24rem)] text-[0.98rem] font-bold leading-snug tracking-tight text-indigo-950 sm:mt-6 sm:max-w-md sm:text-lg lg:max-w-none">
+            <p className="mt-5 w-full text-[0.98rem] font-bold leading-snug tracking-tight text-indigo-950 sm:mt-6 sm:text-lg">
               {t(locale, "home.hero.lead")}
             </p>
-            <p className="mt-3 max-w-[min(100%,26rem)] px-1 text-[0.8125rem] font-medium leading-relaxed text-indigo-900/62 sm:mt-3.5 sm:max-w-lg sm:text-sm lg:max-w-none">
+            <p className="mt-3 w-full text-[0.8125rem] font-medium leading-relaxed text-indigo-900/62 sm:mt-3.5 sm:text-sm">
               {t(locale, "home.hero.sub")}
             </p>
 
-            <div className="mt-10 flex w-full max-w-sm flex-col gap-3 sm:mt-11 lg:max-w-[20rem]">
+            <div className="mt-10 flex w-full max-w-sm flex-col gap-3 sm:mt-11 lg:max-w-[20rem] lg:self-start">
               <button
                 type="button"
                 onClick={openCreate}
@@ -174,7 +174,7 @@ export function HomeLandingClient({ locale, totalSpots }: { locale: Locale; tota
             </div>
 
             <p
-              className="mt-6 max-w-sm px-2 text-[0.7rem] font-semibold uppercase tracking-[0.14em] text-indigo-900/38 tabular-nums sm:mt-7 sm:px-0 sm:text-[0.72rem] lg:text-left"
+              className="mt-6 w-full text-center text-[0.7rem] font-semibold uppercase tracking-[0.14em] text-indigo-900/38 tabular-nums sm:mt-7 sm:text-[0.72rem] lg:text-left"
               aria-live="polite"
             >
               {tReplace(locale, "home.stats.line", { count: totalFmt })}
