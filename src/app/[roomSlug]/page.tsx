@@ -5,6 +5,7 @@ import { getDashboardDataForRoom } from "@/lib/getDashboard";
 import { findRoomBySlugInsensitive } from "@/lib/roomLookup";
 import { isReservedRoomSlug } from "@/lib/reservedSlugs";
 import { ROOM_ACCESS_COOKIE, verifyRoomAccessToken } from "@/lib/roomToken";
+import { t } from "@/lib/i18n";
 import { getRequestLocale } from "@/lib/i18n.server";
 import { SITE_DESCRIPTION, SITE_TITLE } from "@/lib/site";
 import type { Metadata } from "next";
@@ -77,9 +78,9 @@ export default async function RoomPage({ params }: { params: Promise<{ roomSlug:
     return (
       <div className="mx-auto max-w-md px-4 py-16">
         <p className="mb-4 text-center text-sm font-bold text-indigo-900/60">
-          Inga städer i den här kartan än — skapa den första.
+          {t(locale, "room.city.emptyLead")}
         </p>
-        <CreateCityForm roomSlug={canonicalSlug} />
+        <CreateCityForm roomSlug={canonicalSlug} locale={locale} />
       </div>
     );
   }

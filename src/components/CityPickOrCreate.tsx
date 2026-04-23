@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import type { Locale } from "@/lib/i18n";
+import { t } from "@/lib/i18n";
 import { cityNewEmojiInputClassName } from "@/lib/cityEmojiUi";
 
 export type CityLite = { id: string; name: string; slug: string; emoji?: string | null; _count?: { spots: number } };
@@ -46,8 +47,12 @@ export function CityPickOrCreate({
 
   useEffect(() => {
     if (ordered.length === 0) return;
-    const t = window.setTimeout(() => document.getElementById("city-modal-select")?.focus(), 40);
-    return () => window.clearTimeout(t);
+    const id = window.setTimeout(() => document.getElementById("city-modal-select")?.focus(), 40);
+    return () => window.clearTimeout(id);
+  }, [ordered.length]);
+
+  useEffect(() => {
+    if (ordered.length > 0) setBusy(false);
   }, [ordered.length]);
 
   const canCreate =
@@ -76,8 +81,7 @@ export function CityPickOrCreate({
       setNewCityName("");
       setNewCityEmoji("");
     } catch (e) {
-      setErr(e instanceof Error ? e.message : "Okänt fel");
-    } finally {
+      setErr(e instanceof Error ? e.message : t(locale, "room.city.unknownError"));
       setBusy(false);
     }
   }
@@ -95,9 +99,7 @@ export function CityPickOrCreate({
   if (ordered.length === 0) {
     return (
       <div className={shell}>
-        <p className="text-xs font-bold text-indigo-900/55">
-          {locale === "en" ? "No cities yet — create the first one." : "Inga städer än — skapa den första."}
-        </p>
+        <p className="text-xs font-bold text-indigo-900/55">{t(locale, "room.city.emptyLead")}</p>
         <div className="mt-2 space-y-2">
           <div className="flex min-w-0 max-w-full items-center gap-2">
             <input
@@ -106,8 +108,8 @@ export function CityPickOrCreate({
                 setNewCityName(e.target.value);
                 setErr(null);
               }}
-              placeholder={locale === "en" ? "City name" : "Stadens namn"}
-              aria-label={locale === "en" ? "New city name" : "Ny stads namn"}
+              placeholder={t(locale, "room.city.namePlaceholder")}
+              aria-label={t(locale, "room.city.nameAria")}
               className={nameInputClassEmpty}
             />
             <div className="flex shrink-0 flex-col items-end">
@@ -116,7 +118,7 @@ export function CityPickOrCreate({
                 onChange={(e) => setNewCityEmoji(e.target.value)}
                 maxLength={8}
                 placeholder="🇸🇪"
-                aria-label={locale === "en" ? "City emoji or flag" : "Stad-emoji eller flagga"}
+                aria-label={t(locale, "room.city.emojiAria")}
                 className={cityNewEmojiInputClassName}
               />
             </div>
@@ -124,11 +126,17 @@ export function CityPickOrCreate({
           <button
             type="button"
             disabled={busy || newCityName.trim().length < 2}
+            aria-busy={busy}
             onClick={() => void createCity()}
             className="ui-press w-full rounded-full bg-gradient-to-r from-emerald-400 to-teal-500 py-2.5 text-xs font-extrabold text-white disabled:opacity-40 sm:w-auto sm:px-6"
           >
-            {busy ? "…" : locale === "en" ? "Create" : "Skapa"}
+            {busy ? t(locale, "home.create.ctaBusy") : t(locale, "room.city.createCta")}
           </button>
+          {busy ? (
+            <div className="home-cta-progress mt-1.5 max-w-full sm:max-w-xs" aria-hidden>
+              <div className="home-cta-progress__inner" />
+            </div>
+          ) : null}
         </div>
         {err ? <p className="mt-2 text-xs font-bold text-rose-600">{err}</p> : null}
       </div>
@@ -171,8 +179,8 @@ export function CityPickOrCreate({
                 setNewCityName(e.target.value);
                 setErr(null);
               }}
-              placeholder={locale === "en" ? "Name of new city" : "Namn på ny stad"}
-              aria-label={locale === "en" ? "Name of new city" : "Namn på ny stad"}
+              placeholder={t(locale, "room.city.detailsNamePlaceholder")}
+              aria-label={t(locale, "room.city.detailsNamePlaceholder")}
               className={nameInputClassDetails}
             />
             <div className="flex shrink-0 flex-col items-end">
@@ -181,20 +189,28 @@ export function CityPickOrCreate({
                 onChange={(e) => setNewCityEmoji(e.target.value)}
                 maxLength={8}
                 placeholder="🇸🇪"
-                aria-label={locale === "en" ? "City emoji or flag" : "Stad-emoji eller flagga"}
+                aria-label={t(locale, "room.city.emojiAria")}
                 className={cityNewEmojiInputClassName}
               />
             </div>
           </div>
           {canCreate ? (
-            <button
-              type="button"
-              disabled={busy}
-              onClick={() => void createCity()}
-              className="ui-press rounded-full border border-emerald-300/80 bg-gradient-to-r from-emerald-400 to-teal-500 px-4 py-2 text-[11px] font-extrabold text-white disabled:opacity-45"
-            >
-              {busy ? "…" : locale === "en" ? "Add" : "Lägg till"}
-            </button>
+            <>
+              <button
+                type="button"
+                disabled={busy}
+                aria-busy={busy}
+                onClick={() => void createCity()}
+                className="ui-press rounded-full border border-emerald-300/80 bg-gradient-to-r from-emerald-400 to-teal-500 px-4 py-2 text-[11px] font-extrabold text-white disabled:opacity-45"
+              >
+                {busy ? t(locale, "room.city.addBusy") : t(locale, "room.city.addCta")}
+              </button>
+              {busy ? (
+                <div className="home-cta-progress mt-1.5 max-w-xs" aria-hidden>
+                  <div className="home-cta-progress__inner" />
+                </div>
+              ) : null}
+            </>
           ) : null}
         </div>
       </details>

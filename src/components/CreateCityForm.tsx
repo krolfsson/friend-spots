@@ -3,8 +3,9 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { cityNewEmojiInputClassName } from "@/lib/cityEmojiUi";
+import { t, type Locale } from "@/lib/i18n";
 
-export function CreateCityForm({ roomSlug }: { roomSlug: string }) {
+export function CreateCityForm({ roomSlug, locale }: { roomSlug: string; locale: Locale }) {
   const router = useRouter();
   const [name, setName] = useState("");
   const [emoji, setEmoji] = useState("");
@@ -22,14 +23,14 @@ export function CreateCityForm({ roomSlug }: { roomSlug: string }) {
         body: JSON.stringify({ name, emoji: emoji.trim() || undefined }),
       });
       const data = (await res.json()) as { city?: { slug: string }; error?: string };
-      if (!res.ok) throw new Error(data.error ?? "Kunde inte skapa stad");
+      if (!res.ok) throw new Error(data.error ?? t(locale, "room.city.createError"));
+      if (!data.city?.slug) throw new Error(t(locale, "room.city.missingSlug"));
       setName("");
       setEmoji("");
       router.replace(`/${roomSlug}`);
       router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Okänt fel");
-    } finally {
+      setError(err instanceof Error ? err.message : t(locale, "room.city.unknownError"));
       setBusy(false);
     }
   }
@@ -42,8 +43,8 @@ export function CreateCityForm({ roomSlug }: { roomSlug: string }) {
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
-            placeholder="Stad"
-            aria-label="Stadens namn"
+            placeholder={t(locale, "room.city.namePlaceholder")}
+            aria-label={t(locale, "room.city.nameAria")}
             className="box-border h-11 min-h-11 min-w-0 flex-1 rounded-2xl border border-gray-200 bg-gray-50 px-4 text-sm outline-none ring-emerald-600 focus:ring-2"
           />
           <div className="flex shrink-0 flex-col items-end">
@@ -52,7 +53,7 @@ export function CreateCityForm({ roomSlug }: { roomSlug: string }) {
               onChange={(e) => setEmoji(e.target.value)}
               maxLength={8}
               placeholder="🇸🇪"
-              aria-label="Stad-emoji eller flagga"
+              aria-label={t(locale, "room.city.emojiAria")}
               className={cityNewEmojiInputClassName}
             />
           </div>
@@ -60,10 +61,16 @@ export function CreateCityForm({ roomSlug }: { roomSlug: string }) {
         <button
           type="submit"
           disabled={busy}
+          aria-busy={busy}
           className="rounded-full bg-emerald-600 px-5 py-3 text-sm font-semibold text-white disabled:opacity-40 sm:self-start"
         >
-          {busy ? "Skapar…" : "Skapa"}
+          {busy ? t(locale, "home.create.ctaBusy") : t(locale, "room.city.createCta")}
         </button>
+        {busy ? (
+          <div className="home-cta-progress max-w-xs" aria-hidden>
+            <div className="home-cta-progress__inner" />
+          </div>
+        ) : null}
       </div>
       {error ? <p className="mt-3 text-sm text-red-700">{error}</p> : null}
     </form>
