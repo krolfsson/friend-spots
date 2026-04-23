@@ -7,6 +7,7 @@ export const RESERVED_ROOM_SLUGS = new Set([
   "robots",
   "sitemap",
   "manifest",
+  "admin",
 ]);
 
 export function isReservedRoomSlug(slug: string): boolean {
