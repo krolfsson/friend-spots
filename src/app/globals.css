@@ -32,6 +32,12 @@ body,
   background-attachment: scroll;
 }
 
+/** Rum/karta: samma vertikala “krom” upp/ned (största safe area + min 0,75rem) — symmetri stad-rad ↔ knapprad. */
+.mapsies-room-chrome-y {
+  padding-top: max(0.75rem, env(safe-area-inset-top), env(safe-area-inset-bottom));
+  padding-bottom: max(0.75rem, env(safe-area-inset-top), env(safe-area-inset-bottom));
+}
+
 body {
   color: var(--y2k-ink);
 }

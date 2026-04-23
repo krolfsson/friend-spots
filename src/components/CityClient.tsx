@@ -140,7 +140,7 @@ function FadingHorizontalChips({
   return (
     <div
       ref={scrollRef}
-      className={`overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden ${rowClassName} ${
+      className={`mapsies-body-bg overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden ${rowClassName} ${
         fadeLeft && fadeRight
           ? "chip-row-fade-both"
           : fadeRight
@@ -493,7 +493,7 @@ export function CityClient({
       : "flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-y-contain";
 
   return (
-    <div className="mapsies-body-bg relative mx-auto flex h-dvh max-h-dvh w-full max-w-5xl flex-col overflow-hidden px-[0.96rem] pb-[env(safe-area-inset-bottom)] pt-[env(safe-area-inset-top)]">
+    <div className="mapsies-body-bg mapsies-room-chrome-y relative mx-auto flex h-dvh max-h-dvh w-full max-w-5xl flex-col overflow-hidden px-[0.96rem]">
       <div className="relative z-40 shrink-0">
         <div className="relative space-y-[0.6rem] pb-[0.6rem]">
             <FadingHorizontalChips rowClassName="py-0">
