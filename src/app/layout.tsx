@@ -46,8 +46,12 @@ export const metadata: Metadata = {
   appleWebApp: {
     title: SITE_TITLE,
     capable: true,
+    statusBarStyle: "default",
   },
 };
+
+/** Safari/Chrome: en kompromiss mellan lavendel upptill och mint längst ner i gradienten. */
+const MAPSIES_THEME_COLOR = "#eef6ff";
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -55,6 +59,8 @@ export const viewport: Viewport = {
   maximumScale: 1,
   userScalable: false,
   viewportFit: "cover",
+  themeColor: MAPSIES_THEME_COLOR,
+  colorScheme: "light",
 };
 
 export default function RootLayout({

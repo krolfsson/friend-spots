@@ -700,7 +700,7 @@ export function CityClient({
           <div className="grid grid-cols-2 gap-[0.6rem] sm:gap-3">
             <Link
               href="/"
-              className="inline-flex h-10 w-full cursor-default items-center justify-center gap-2 rounded-full border border-amber-300/90 bg-gradient-to-r from-amber-200/92 via-amber-100/96 to-amber-50/94 px-[0.55rem] text-center text-sm font-extrabold text-amber-950 shadow-md shadow-amber-900/18 ring-1 ring-amber-100/80 transition hover:brightness-[1.05] active:scale-[0.99] sm:h-11 sm:px-[0.75rem]"
+              className="inline-flex h-10 w-full cursor-default items-center justify-center gap-2 overflow-hidden rounded-full border border-amber-300/90 bg-gradient-to-r from-amber-200/92 via-amber-100/96 to-amber-50/94 px-[0.55rem] text-center text-sm font-extrabold text-amber-950 shadow-sm shadow-amber-900/12 transition hover:brightness-[1.05] active:scale-[0.99] sm:h-11 sm:px-[0.75rem]"
             >
               <span
                 className="grid h-7 w-7 shrink-0 cursor-default place-items-center rounded-full border border-amber-400/55 bg-amber-50/95 text-amber-950 shadow-sm shadow-amber-900/8"
@@ -713,7 +713,7 @@ export function CityClient({
             <button
               type="button"
               onClick={() => void shareRoom()}
-              className="inline-flex h-10 w-full cursor-default items-center justify-center gap-2 rounded-full border border-sky-300/88 bg-gradient-to-r from-sky-200/90 via-sky-100/95 to-indigo-100/92 px-[0.55rem] text-center text-sm font-extrabold text-indigo-950 shadow-md shadow-sky-600/16 ring-1 ring-sky-100/85 transition hover:brightness-[1.05] active:scale-[0.99] sm:h-11 sm:px-[0.75rem]"
+              className="inline-flex h-10 w-full cursor-default items-center justify-center gap-2 overflow-hidden rounded-full border border-sky-300/88 bg-gradient-to-r from-sky-200/90 via-sky-100/95 to-indigo-100/92 px-[0.55rem] text-center text-sm font-extrabold text-indigo-950 shadow-sm shadow-sky-600/12 transition hover:brightness-[1.05] active:scale-[0.99] sm:h-11 sm:px-[0.75rem]"
             >
               <span
                 className="grid h-7 w-7 shrink-0 cursor-default place-items-center rounded-full border border-sky-400/50 bg-sky-50/95 text-[15px] leading-none shadow-sm shadow-sky-600/10"

@@ -9,17 +9,17 @@
   --y2k-chrome: rgba(255, 255, 255, 0.55);
 }
 
-html {
-  /* iOS-överscroll: samma bas som sidan så det inte flammar annan färg */
-  background-color: #fdf4ff;
-}
-
 html,
 body {
   height: 100%;
+  min-height: 100dvh;
 }
 
-/** Fullsidig Y2K-gradient — delas av body och in-app-skalet så safe areas inte får “annan rosa kant”. */
+/**
+ * Fullsidig Y2K-gradient på html + body så iOS-statusrad, överscroll och
+ * webbläsarens verktygsrad får samma ton som innehållet (tillsammans med theme-color).
+ */
+html,
 body,
 .mapsies-body-bg {
   background-color: #fdf4ff;
