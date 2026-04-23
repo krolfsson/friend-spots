@@ -9,13 +9,19 @@
   --y2k-chrome: rgba(255, 255, 255, 0.55);
 }
 
+html {
+  /* iOS-överscroll: samma bas som sidan så det inte flammar annan färg */
+  background-color: #fdf4ff;
+}
+
 html,
 body {
   height: 100%;
 }
 
-body {
-  color: var(--y2k-ink);
+/** Fullsidig Y2K-gradient — delas av body och in-app-skalet så safe areas inte får “annan rosa kant”. */
+body,
+.mapsies-body-bg {
   background-color: #fdf4ff;
   background-image:
     radial-gradient(900px 500px at 10% 0%, rgba(233, 213, 255, 0.95), transparent 55%),
@@ -24,6 +30,10 @@ body {
     linear-gradient(180deg, #fff7fb 0%, #f5f3ff 45%, #ecfeff 100%);
   /* scroll: mindre jank än fixed på mobil, samma färger vid normal scroll */
   background-attachment: scroll;
+}
+
+body {
+  color: var(--y2k-ink);
 }
 
 .y2k-card {

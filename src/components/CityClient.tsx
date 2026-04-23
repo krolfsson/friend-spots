@@ -493,11 +493,8 @@ export function CityClient({
       : "flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-y-contain";
 
   return (
-    <div className="relative mx-auto flex h-dvh max-h-dvh w-full max-w-5xl flex-col overflow-hidden px-[0.96rem] pb-[max(0.25rem,env(safe-area-inset-bottom))] pt-[max(0.5rem,env(safe-area-inset-top))]">
+    <div className="mapsies-body-bg relative mx-auto flex h-dvh max-h-dvh w-full max-w-5xl flex-col overflow-hidden px-[0.96rem] pb-[env(safe-area-inset-bottom)] pt-[env(safe-area-inset-top)]">
       <div className="relative z-40 shrink-0">
-        {/* Samma bas som body (#fdf4ff) i botten — inget transparent + blur som ger raka “kantlinjer” mot bakgrunden. */}
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(900px_520px_at_10%_0%,rgba(233,213,255,0.82),transparent_58%),radial-gradient(800px_500px_at_95%_10%,rgba(251,207,232,0.72),transparent_55%),linear-gradient(180deg,rgba(253,244,255,0.96)_0%,rgba(245,243,255,0.78)_38%,rgba(253,244,255,0.55)_62%,#fdf4ff_88%,#fdf4ff_100%)]" />
-
         <div className="relative space-y-[0.6rem] pb-[0.6rem]">
             <FadingHorizontalChips rowClassName="py-0">
               {cityList.map((c) => {
