@@ -1,11 +1,11 @@
 "use client";
 
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import type { Locale } from "@/lib/i18n";
 import { t, tReplace } from "@/lib/i18n";
 import { normalizeRoomSlugInput } from "@/lib/roomSlugInput";
-import { HomeDeviceMockup } from "@/components/HomeDeviceMockup";
 
 type Step = null | "create" | "open";
 
@@ -181,13 +181,15 @@ export function HomeLandingClient({ locale, totalSpots }: { locale: Locale; tota
             </p>
           </div>
 
-          <div className="flex min-w-0 w-full justify-center">
-            {/* public/: Mac = cph1. iPhones till vänster om Mac — phoneLeft = bakom, phoneRight = framför (nyc1 / nyc2). */}
-            <HomeDeviceMockup
-              locale={locale}
-              macScreenSrc="/cph1.png"
-              phoneLeftScreenSrc="/nyc1.png"
-              phoneRightScreenSrc="/nyc2.png"
+          <div className="flex min-w-0 w-full justify-center lg:justify-end">
+            <Image
+              src="/home-hero.png"
+              alt="Mapsies"
+              width={1200}
+              height={900}
+              priority
+              sizes="(min-width: 1024px) min(50vw, 36rem), 100vw"
+              className="h-auto w-full max-w-2xl object-contain drop-shadow-[0_24px_48px_-12px_rgba(49,46,129,0.25)] lg:max-w-none"
             />
           </div>
         </div>
