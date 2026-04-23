@@ -122,12 +122,9 @@ export function HomeLandingClient({ locale, totalSpots }: { locale: Locale; tota
           <div className="mx-auto flex w-full max-w-md flex-col items-stretch overflow-x-visible text-center sm:max-w-lg lg:mx-0 lg:max-w-xl lg:text-left">
             <div className="mapsies-home-reveal mapsies-home-reveal--d0 flex w-full justify-center overflow-x-visible overflow-y-visible lg:justify-start">
               <div
-                className="select-none whitespace-nowrap bg-gradient-to-r from-indigo-800 via-violet-600 to-indigo-700 bg-clip-text px-1.5 pb-2.5 pt-0.5 text-[clamp(2.35rem,min(11.5vw,3.15rem),4.25rem)] font-extrabold leading-[1.02] tracking-tight text-transparent drop-shadow-[0_12px_32px_rgba(67,56,202,0.2)] sm:text-[clamp(2.85rem,9.5vw,4.5rem)]"
+                className="mapsies-home-logo select-none whitespace-nowrap px-1.5 pb-2.5 pt-0.5 text-[clamp(2.35rem,min(11.5vw,3.15rem),4.25rem)] font-extrabold leading-[1.02] tracking-tight sm:text-[clamp(2.85rem,9.5vw,4.5rem)]"
                 style={{
                   fontFamily: "var(--font-logo), var(--font-y2k), system-ui, sans-serif",
-                  WebkitBackgroundClip: "text",
-                  backgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
                 }}
               >
                 Mapsies
