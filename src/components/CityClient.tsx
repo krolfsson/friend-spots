@@ -7,6 +7,7 @@ import type { Locale } from "@/lib/i18n";
 import { t } from "@/lib/i18n";
 import { createPortal } from "react-dom";
 import { AddSpotForm } from "@/components/AddSpotForm";
+import { QrModal } from "@/components/QrModal";
 import { CityPickOrCreate } from "@/components/CityPickOrCreate";
 import {
   CATEGORIES,
@@ -245,6 +246,7 @@ export function CityClient({
   const categoryItems = CATEGORIES as readonly { id: CategoryId; label: string; emoji: string }[];
   const [addOpen, setAddOpen] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
+  const [qrOpen, setQrOpen] = useState(false);
   const [renameOpen, setRenameOpen] = useState(false);
   const [renameBusy, setRenameBusy] = useState(false);
   const [renameValue, setRenameValue] = useState(roomTitle);
@@ -881,6 +883,14 @@ export function CityClient({
               </button>
               <button
                 type="button"
+                onClick={() => { setShareOpen(false); setQrOpen(true); }}
+                className="ui-press inline-flex min-h-11 items-center justify-center gap-1.5 rounded-2xl border border-violet-200/80 bg-violet-50/70 px-4 py-3 text-sm font-extrabold text-violet-950 shadow-sm shadow-violet-500/10 ring-1 ring-white/60 transition hover:brightness-105 active:scale-[0.99]"
+                title="Visa QR-kod"
+              >
+                <span aria-hidden>⬛</span> QR
+              </button>
+              <button
+                type="button"
                 onClick={() => setShareOpen(false)}
                 className="ui-press inline-flex min-h-11 items-center justify-center rounded-2xl border border-indigo-200/70 bg-white/80 px-4 py-3 text-sm font-extrabold text-indigo-950 shadow-sm shadow-indigo-500/10 ring-1 ring-white/60 transition hover:brightness-105 active:scale-[0.99]"
               >
@@ -889,6 +899,14 @@ export function CityClient({
             </div>
           </div>
         </div>
+      ) : null}
+
+      {qrOpen ? (
+        <QrModal
+          url={sharePayload.url}
+          title={roomTitleLive.trim() || roomSlug}
+          onClose={() => setQrOpen(false)}
+        />
       ) : null}
 
       {addOpen ? (
