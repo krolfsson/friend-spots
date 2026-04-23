@@ -436,8 +436,8 @@ export function SpotsMap({
     ? "flex h-full min-h-0 flex-1 flex-col gap-2 overflow-hidden"
     : "space-y-2";
   const mapFrameClass = fillHeight
-    ? "relative min-h-[12rem] w-full flex-1 overflow-hidden overscroll-y-contain rounded-2xl border border-indigo-200/70 bg-indigo-50/30 shadow-inner shadow-indigo-100/80"
-    : "relative h-[min(472px,calc(55dvh+3rem))] w-full overflow-hidden overscroll-y-contain rounded-2xl border border-indigo-200/70 bg-indigo-50/30 shadow-inner shadow-indigo-100/80 md:h-[min(420px,55dvh)]";
+    ? "relative min-h-[12rem] w-full flex-1 overflow-hidden overscroll-y-contain rounded-2xl border border-indigo-200/35 bg-[#fdf4ff] shadow-sm shadow-indigo-900/[0.04]"
+    : "relative h-[min(472px,calc(55dvh+3rem))] w-full overflow-hidden overscroll-y-contain rounded-2xl border border-indigo-200/35 bg-[#fdf4ff] shadow-sm shadow-indigo-900/[0.04] md:h-[min(420px,55dvh)]";
 
   return (
     <div className={shellClass}>
@@ -454,7 +454,7 @@ export function SpotsMap({
       ) : null}
       <div className={mapFrameClass}>
         {loading && !loadError ? (
-          <div className="absolute inset-0 z-10 flex items-center justify-center bg-indigo-50/80 text-sm font-bold text-indigo-900/70">
+          <div className="absolute inset-0 z-10 flex items-center justify-center bg-[#fdf4ff]/92 text-sm font-bold text-indigo-900/70">
             Laddar karta…
           </div>
         ) : null}

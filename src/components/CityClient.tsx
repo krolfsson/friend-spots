@@ -493,7 +493,7 @@ export function CityClient({
       : "flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-y-contain";
 
   return (
-    <div className="mapsies-body-bg mapsies-room-chrome-y relative mx-auto flex h-dvh max-h-dvh w-full max-w-5xl flex-col overflow-hidden px-[0.96rem]">
+    <div className="mapsies-body-bg mapsies-room-chrome-y relative mx-auto flex h-dvh max-h-dvh w-full max-w-5xl flex-col overflow-hidden px-[0.96rem] xl:max-w-7xl 2xl:max-w-[min(100%,88rem)]">
       <div className="relative z-40 shrink-0">
         {/* En gemensam gradient-yta för alla chip-rader — annars repeteras radialerna per rad och ger “randiga” band. */}
         <div className="mapsies-body-bg relative space-y-[0.6rem] pb-[0.6rem]">

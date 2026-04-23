@@ -15,21 +15,12 @@ body {
   min-height: 100dvh;
 }
 
-/**
- * Fullsidig Y2K-gradient på html + body så iOS-statusrad, överscroll och
- * webbläsarens verktygsrad får samma ton som innehållet (tillsammans med theme-color).
- */
+/** Enhetlig sidbakgrund — startsida, rum/karta och desktop-kanter utan “kort” mot annan ton. */
 html,
 body,
 .mapsies-body-bg {
   background-color: #fdf4ff;
-  background-image:
-    radial-gradient(900px 500px at 10% 0%, rgba(233, 213, 255, 0.95), transparent 55%),
-    radial-gradient(800px 480px at 95% 10%, rgba(251, 207, 232, 0.9), transparent 50%),
-    radial-gradient(700px 500px at 50% 100%, rgba(167, 243, 208, 0.55), transparent 55%),
-    linear-gradient(180deg, #fff7fb 0%, #f5f3ff 45%, #ecfeff 100%);
-  /* scroll: mindre jank än fixed på mobil, samma färger vid normal scroll */
-  background-attachment: scroll;
+  background-image: none;
 }
 
 /** Rum/karta: samma vertikala “krom” upp/ned (största safe area + min 0,75rem) — symmetri stad-rad ↔ knapprad. */
@@ -181,11 +172,7 @@ body {
  */
 .y2k-add-modal-shell {
   background-color: #fdf4ff;
-  background-image:
-    radial-gradient(520px 340px at 12% 8%, rgba(233, 213, 255, 0.92), transparent 58%),
-    radial-gradient(480px 320px at 92% 16%, rgba(251, 207, 232, 0.88), transparent 52%),
-    radial-gradient(420px 280px at 48% 88%, rgba(167, 243, 208, 0.52), transparent 58%),
-    linear-gradient(180deg, #fff7fb 0%, #f5f3ff 42%, #ecfeff 100%);
+  background-image: none;
 }
 
 .y2k-fab {

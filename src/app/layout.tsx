@@ -50,8 +50,7 @@ export const metadata: Metadata = {
   },
 };
 
-/** Safari/Chrome: en kompromiss mellan lavendel upptill och mint längst ner i gradienten. */
-const MAPSIES_THEME_COLOR = "#eef6ff";
+const MAPSIES_THEME_COLOR = "#fdf4ff";
 
 export const viewport: Viewport = {
   width: "device-width",
