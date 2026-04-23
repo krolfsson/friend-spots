@@ -726,15 +726,6 @@ export function CityClient({
               <span className="min-w-0 cursor-default truncate">{t(locale, "room.actions.shareMap")}</span>
             </button>
           </div>
-
-          <div className="hidden justify-center pt-1 sm:flex">
-            <div
-              className="select-none bg-gradient-to-r from-fuchsia-500 via-violet-500 to-sky-500 bg-clip-text text-[22px] font-extrabold leading-none tracking-tight text-transparent drop-shadow-[0_10px_26px_rgba(236,72,153,0.18)]"
-              style={{ fontFamily: "var(--font-logo), var(--font-y2k), system-ui, sans-serif" }}
-            >
-              Mapsies
-            </div>
-          </div>
           </div>
         </div>
 
