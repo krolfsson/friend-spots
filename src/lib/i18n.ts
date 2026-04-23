@@ -29,6 +29,7 @@ export const MESSAGES: Record<Locale, Record<string, string>> = {
     "home.hero.sub":
       "Ni samlar era favoritställen på en karta, likear det ni gillar, lägger till fler städer när ni vill – och en pinkod så inte halva internet snubblar in av misstag. Och massa emojis.",
     "home.stats.line": "{count} tips sparade hittills.",
+    "home.footer.copyright": "Mapsies © 2026",
     "home.cta.create": "Skapa ny karta",
     "home.cta.open": "Öppna min karta",
     "home.mockup.caption": "Mac i mitten, två iPhones — byt till era skärmdumpar när de ligger i public/.",
@@ -153,6 +154,7 @@ export const MESSAGES: Record<Locale, Record<string, string>> = {
     "home.hero.sub":
       "You save your favorite spots on one map, like what you like, add more cities whenever you want — and a PIN so half the internet doesn’t stumble in by mistake. And tons of emojis.",
     "home.stats.line": "{count} tips saved so far.",
+    "home.footer.copyright": "Mapsies © 2026",
     "home.cta.create": "Create a new map",
     "home.cta.open": "Open my map",
     "home.mockup.caption": "Mac in the center, two iPhones — swap in screenshots from public/ when ready.",

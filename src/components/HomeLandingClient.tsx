@@ -43,6 +43,7 @@ export function HomeLandingClient({ locale, totalSpots }: { locale: Locale; tota
   const [error, setError] = useState<string | null>(null);
   const animatedTotal = useCountUp(totalSpots, 1100);
   const totalFmt = new Intl.NumberFormat(locale === "sv" ? "sv-SE" : "en-US").format(animatedTotal);
+  const statsLine = tReplace(locale, "home.stats.line", { count: totalFmt });
 
   const resetForms = useCallback(() => {
     setName("");
@@ -117,7 +118,7 @@ export function HomeLandingClient({ locale, totalSpots }: { locale: Locale; tota
   return (
     <div className="relative z-10 flex min-h-dvh flex-col">
       <main className="flex flex-1 flex-col items-stretch justify-center px-4 pb-10 pt-8 sm:px-6 sm:pb-14 sm:pt-10 lg:px-10">
-        <div className="mx-auto grid w-full max-w-6xl grid-cols-1 items-center gap-12 lg:grid-cols-2 lg:gap-x-12 lg:gap-y-12 xl:gap-x-16">
+        <div className="mx-auto grid w-full max-w-6xl grid-cols-1 items-center gap-y-10 sm:gap-y-11 lg:grid-cols-2 lg:gap-x-12 lg:gap-y-12 xl:gap-x-16">
           <div className="mx-auto flex min-w-0 w-full max-w-md flex-col items-stretch text-center sm:max-w-lg lg:mx-0 lg:max-w-xl lg:text-left">
             <div className="flex w-full justify-center overflow-visible lg:justify-start">
               <div
@@ -132,7 +133,11 @@ export function HomeLandingClient({ locale, totalSpots }: { locale: Locale; tota
               </div>
             </div>
 
-            <p className="mt-5 w-full text-[0.98rem] font-bold leading-snug tracking-tight text-indigo-950 sm:mt-6 sm:text-lg">
+            <p className="mt-2.5 w-full text-center text-[0.7rem] font-semibold uppercase tracking-[0.14em] text-indigo-900/38 tabular-nums sm:text-[0.72rem] lg:hidden">
+              {statsLine}
+            </p>
+
+            <p className="mt-3.5 w-full text-[0.98rem] font-bold leading-snug tracking-tight text-indigo-950 sm:mt-4 sm:text-lg lg:mt-5">
               {t(locale, "home.hero.lead")}
             </p>
             <p className="mt-3 w-full text-[0.8125rem] font-medium leading-relaxed text-indigo-900/62 sm:mt-3.5 sm:text-sm">
@@ -174,23 +179,28 @@ export function HomeLandingClient({ locale, totalSpots }: { locale: Locale; tota
             </div>
 
             <p
-              className="mt-6 w-full text-center text-[0.7rem] font-semibold uppercase tracking-[0.14em] text-indigo-900/38 tabular-nums sm:mt-7 sm:text-[0.72rem] lg:text-left"
+              className="mt-6 hidden w-full text-center text-[0.7rem] font-semibold uppercase tracking-[0.14em] text-indigo-900/38 tabular-nums sm:mt-7 sm:text-[0.72rem] lg:block lg:text-left"
               aria-live="polite"
             >
-              {tReplace(locale, "home.stats.line", { count: totalFmt })}
+              {statsLine}
             </p>
           </div>
 
-          <div className="flex min-w-0 w-full justify-center lg:justify-end">
-            <Image
-              src="/mockups.png"
-              alt="Mapsies"
-              width={1682}
-              height={2068}
-              priority
-              sizes="(min-width: 1024px) min(50vw, 36rem), 100vw"
-              className="h-auto w-full max-w-2xl object-contain drop-shadow-[0_24px_48px_-12px_rgba(49,46,129,0.25)] lg:max-w-none"
-            />
+          <div className="flex min-w-0 w-full flex-col items-center lg:items-end">
+            <div className="flex w-full justify-center lg:justify-end">
+              <Image
+                src="/mockups.png"
+                alt="Mapsies"
+                width={1682}
+                height={2068}
+                priority
+                sizes="(min-width: 1024px) min(50vw, 36rem), 100vw"
+                className="h-auto w-full max-w-2xl object-contain drop-shadow-[0_24px_48px_-12px_rgba(49,46,129,0.25)] lg:max-w-none"
+              />
+            </div>
+            <p className="mt-6 w-full text-center text-[0.72rem] font-medium text-indigo-900/42 lg:mt-7 lg:max-w-none lg:self-end lg:text-right">
+              {t(locale, "home.footer.copyright")}
+            </p>
           </div>
         </div>
       </main>
