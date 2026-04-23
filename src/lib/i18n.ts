@@ -27,7 +27,7 @@ export const MESSAGES: Record<Locale, Record<string, string>> = {
     "home.hero.lead":
       "Inga konton, inga onödiga integreringar (eller ok, en – Google Maps). Inga dashboards eller andra saker ni aldrig bad om.",
     "home.hero.sub":
-      "Ni samlar era favoritställen på en karta, likear det ni gillar, lägger till fler städer när ni vill – och en pinkod så inte halva internet snubblar in av misstag. Och massa emojis.",
+      "Ni samlar era favoritställen på en karta, likear det ni gillar, lägger till fler städer när ni vill – och en pinkod så inte halva internet snubblar in av misstag.",
     "home.stats.line": "{count} tips sparade hittills.",
     "home.footer.copyright": "Mapsies © 2026",
     "home.cta.create": "Skapa ny karta",
@@ -152,7 +152,7 @@ export const MESSAGES: Record<Locale, Record<string, string>> = {
     "home.hero.lead":
       "No accounts, no pointless integrations (okay, one — Google Maps). No dashboards or anything else you never asked for.",
     "home.hero.sub":
-      "You save your favorite spots on one map, like what you like, add more cities whenever you want — and a PIN so half the internet doesn’t stumble in by mistake. And tons of emojis.",
+      "You save your favorite spots on one map, like what you like, add more cities whenever you want — and a PIN so half the internet doesn’t stumble in by mistake.",
     "home.stats.line": "{count} tips saved so far.",
     "home.footer.copyright": "Mapsies © 2026",
     "home.cta.create": "Create a new map",
