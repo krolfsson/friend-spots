@@ -35,7 +35,6 @@ export function UnlockRoomForm({
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Okänt fel");
-    } finally {
       setBusy(false);
     }
   }
@@ -63,10 +62,16 @@ export function UnlockRoomForm({
           <button
             type="submit"
             disabled={busy || pin.trim().length < 4}
+            aria-busy={busy}
             className="w-full rounded-full bg-gradient-to-r from-fuchsia-500 to-violet-600 py-3 text-sm font-extrabold text-white transition enabled:hover:brightness-110 enabled:active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-40"
           >
             {busy ? t(locale, "unlock.ctaBusy") : t(locale, "unlock.cta")}
           </button>
+          {busy ? (
+            <div className="home-cta-progress mt-2" aria-hidden>
+              <div className="home-cta-progress__inner" />
+            </div>
+          ) : null}
         </form>
         <p className="mt-6 text-center text-xs font-bold text-indigo-900/45">
           <Link

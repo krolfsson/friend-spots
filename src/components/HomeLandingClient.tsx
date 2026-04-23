@@ -87,7 +87,6 @@ export function HomeLandingClient({ locale, totalSpots }: { locale: Locale; tota
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : locale === "en" ? "Unknown error" : "Okänt fel");
-    } finally {
       setBusy(false);
     }
   }
@@ -110,7 +109,6 @@ export function HomeLandingClient({ locale, totalSpots }: { locale: Locale; tota
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : locale === "en" ? "Unknown error" : "Okänt fel");
-    } finally {
       setBusy(false);
     }
   }
@@ -240,10 +238,16 @@ export function HomeLandingClient({ locale, totalSpots }: { locale: Locale; tota
                     <button
                       type="submit"
                       disabled={busy || pin.trim().length < 4}
+                      aria-busy={busy}
                       className="ui-press mt-1 w-full rounded-full bg-gradient-to-r from-emerald-400 to-teal-500 py-3 text-sm font-extrabold text-white shadow-md shadow-emerald-600/25 transition enabled:hover:brightness-110 enabled:active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-40"
                     >
                       {busy ? (locale === "en" ? "Creating…" : "Skapar…") : t(locale, "home.create.cta")}
                     </button>
+                    {busy ? (
+                      <div className="home-cta-progress mt-2" aria-hidden>
+                        <div className="home-cta-progress__inner" />
+                      </div>
+                    ) : null}
                   </form>
                 </>
               ) : (
@@ -284,10 +288,16 @@ export function HomeLandingClient({ locale, totalSpots }: { locale: Locale; tota
                     <button
                       type="submit"
                       disabled={busy || !normalizeRoomSlugInput(slugInput) || pin.trim().length < 4}
+                      aria-busy={busy}
                       className="ui-press mt-1 w-full rounded-full bg-gradient-to-r from-sky-500 to-indigo-600 py-3 text-sm font-extrabold text-white shadow-md shadow-indigo-500/20 transition enabled:hover:brightness-110 enabled:active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-40"
                     >
                       {busy ? t(locale, "unlock.ctaBusy") : t(locale, "home.step.open.submit")}
                     </button>
+                    {busy ? (
+                      <div className="home-cta-progress mt-2" aria-hidden>
+                        <div className="home-cta-progress__inner" />
+                      </div>
+                    ) : null}
                   </form>
                 </>
               )}

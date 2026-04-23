@@ -295,3 +295,28 @@ body {
   font-size: 16px;
   line-height: 1;
 }
+
+/* Home unlock/create modal: thin indeterminate bar under CTA while busy */
+@keyframes home-cta-progress-shuttle {
+  0% {
+    transform: translateX(-8%);
+  }
+  100% {
+    transform: translateX(188%);
+  }
+}
+
+.home-cta-progress {
+  height: 3px;
+  border-radius: 9999px;
+  background: rgba(99, 102, 241, 0.2);
+  overflow: hidden;
+}
+
+.home-cta-progress__inner {
+  width: 40%;
+  height: 100%;
+  border-radius: 9999px;
+  background: linear-gradient(90deg, rgba(99, 102, 241, 0.2), rgb(99 102 241), rgba(139, 92, 246, 0.9));
+  animation: home-cta-progress-shuttle 0.9s ease-in-out infinite alternate;
+}
