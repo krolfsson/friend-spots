@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { AdminPinGate } from "./AdminPinGate";
+import { AdminChart } from "./AdminChart";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Mapsies Admin" };
@@ -103,6 +104,9 @@ export default async function AdminPage() {
               </div>
             </div>
           </div>
+
+          {/* Chart */}
+          <AdminChart />
 
           {/* All maps table */}
           <div className="rounded-2xl border border-indigo-100 bg-white/80 shadow-sm">
