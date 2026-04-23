@@ -2,7 +2,7 @@ import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 
 /**
- * Slug-match oavsett skiftläge (t.ex. /rolfsson mot DB "Rolfsson").
+ * Slug-match oavsett skiftläge (t.ex. /mapsiessos mot DB "Mapsiessos").
  * Använder LOWER i SQL så det fungerar konsekvent mot Postgres (även om Prisma-filter skulle strula).
  */
 export async function findRoomIdBySlugInsensitive(slug: string): Promise<string | null> {

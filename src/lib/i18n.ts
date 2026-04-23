@@ -21,7 +21,7 @@ export const MESSAGES: Record<Locale, Record<string, string>> = {
     "home.create.cta": "Skapa karta",
     "home.create.ctaBusy": "Skapar…",
     "home.open.title": "Har du redan en karta?",
-    "home.open.placeholder": "t.ex. /rolfsson",
+    "home.open.placeholder": "t.ex. /mapsiessos",
     "home.open.cta": "Öppna karta",
 
     "home.hero.lead":
@@ -44,9 +44,9 @@ export const MESSAGES: Record<Locale, Record<string, string>> = {
     "home.step.mapNameLabel": "Namn på kartan",
     "home.step.open.title": "Välkommen tillbaka",
     "home.step.open.lede":
-      "Skriv samma sista bit som i länken (t.ex. rolfsson om det står mapsies…/rolfsson) och er pinkod. Klart.",
+      "Skriv samma sista bit som i länken (t.ex. mapsiessos om det står mapsies…/mapsiessos) och er pinkod. Klart.",
     "home.step.open.slugLabel": "Sista biten av länken",
-    "home.step.open.slugPlaceholder": "t.ex. rolfsson",
+    "home.step.open.slugPlaceholder": "t.ex. mapsiessos",
     "home.step.open.pinHint": "Samma pinkod som när kartan skapades — den som bara ni vet.",
     "home.step.open.submit": "Öppna kartan",
 
@@ -145,7 +145,7 @@ export const MESSAGES: Record<Locale, Record<string, string>> = {
     "home.create.cta": "Create map",
     "home.create.ctaBusy": "Creating…",
     "home.open.title": "Already have a map?",
-    "home.open.placeholder": "e.g. /rolfsson",
+    "home.open.placeholder": "e.g. /mapsiessos",
     "home.open.cta": "Open map",
 
     "home.hero.lead":
@@ -168,9 +168,9 @@ export const MESSAGES: Record<Locale, Record<string, string>> = {
     "home.step.mapNameLabel": "Map name",
     "home.step.open.title": "Welcome back",
     "home.step.open.lede":
-      "Type the last part of your link (e.g. rolfsson if it’s mapsies…/rolfsson) and your PIN. That’s it.",
+      "Type the last part of your link (e.g. mapsiessos if it’s mapsies…/mapsiessos) and your PIN. That’s it.",
     "home.step.open.slugLabel": "Last part of the link",
-    "home.step.open.slugPlaceholder": "e.g. rolfsson",
+    "home.step.open.slugPlaceholder": "e.g. mapsiessos",
     "home.step.open.pinHint": "Same PIN as when the map was made — the one only you lot know.",
     "home.step.open.submit": "Open map",
 
