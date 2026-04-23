@@ -117,10 +117,10 @@ export function HomeLandingClient({ locale, totalSpots }: { locale: Locale; tota
 
   return (
     <div className="relative z-10 flex min-h-dvh flex-col">
-      <main className="flex flex-1 flex-col items-stretch justify-center px-8 pb-10 pt-8 sm:pb-14 sm:pt-10 lg:px-10">
-        <div className="mx-auto grid w-full max-w-6xl grid-cols-1 items-center gap-y-5 sm:gap-y-6 lg:grid-cols-2 lg:gap-x-12 lg:gap-y-12 xl:gap-x-16">
-          <div className="mx-auto flex w-full max-w-md flex-col items-stretch overflow-x-visible text-center sm:max-w-lg lg:mx-0 lg:max-w-xl lg:translate-x-[10%] lg:text-left">
-            <div className="mapsies-home-reveal mapsies-home-reveal--d0 flex w-full justify-center overflow-x-visible overflow-y-visible lg:justify-start">
+      <main className="flex flex-1 flex-col items-stretch justify-center overflow-x-hidden px-8 pb-10 pt-8 sm:pb-14 sm:pt-10 lg:px-12">
+        <div className="mx-auto grid w-full max-w-6xl grid-cols-1 items-center gap-y-5 sm:gap-y-6 lg:grid-cols-2 lg:gap-x-10 lg:gap-y-12 xl:gap-x-14">
+          <div className="mx-auto flex w-full max-w-md flex-col items-stretch text-center sm:max-w-lg lg:mx-0 lg:max-w-[46%] lg:text-left">
+            <div className="mapsies-home-reveal mapsies-home-reveal--d0 flex w-full justify-center overflow-visible lg:justify-start">
               <div className="mapsies-home-logo-wrap">
                 <div
                   className="mapsies-home-logo select-none whitespace-nowrap px-1.5 pb-2.5 pt-0.5 text-[clamp(2.35rem,min(11.5vw,3.15rem),4.25rem)] font-extrabold leading-[1.02] tracking-tight sm:text-[clamp(2.85rem,9.5vw,4.5rem)]"
@@ -186,7 +186,7 @@ export function HomeLandingClient({ locale, totalSpots }: { locale: Locale; tota
             </p>
           </div>
 
-          <div className="flex min-w-0 w-full flex-col items-center overflow-x-visible lg:items-end">
+          <div className="flex min-w-0 w-full flex-col items-center overflow-hidden lg:items-end">
             <div className="mapsies-home-reveal mapsies-home-reveal--d6 flex w-full justify-center lg:justify-end">
               <Image
                 src="/mockups.png"
@@ -196,7 +196,7 @@ export function HomeLandingClient({ locale, totalSpots }: { locale: Locale; tota
                 priority
                 unoptimized
                 sizes="(min-width: 1024px) min(50vw, 36rem), 100vw"
-                className="h-auto w-full max-w-2xl object-contain drop-shadow-[0_24px_48px_-12px_rgba(49,46,129,0.25)] lg:max-w-none"
+                className="h-auto w-full max-w-2xl object-contain drop-shadow-[0_24px_48px_-12px_rgba(49,46,129,0.25)] lg:max-w-full"
               />
             </div>
             <p className="mapsies-home-reveal mapsies-home-reveal--d7 mt-3 w-full text-center text-[0.72rem] font-medium text-indigo-900/42 lg:hidden">
