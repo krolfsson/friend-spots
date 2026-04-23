@@ -140,7 +140,7 @@ function FadingHorizontalChips({
   return (
     <div
       ref={scrollRef}
-      className={`mapsies-body-bg overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden ${rowClassName} ${
+      className={`overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden ${rowClassName} ${
         fadeLeft && fadeRight
           ? "chip-row-fade-both"
           : fadeRight
@@ -495,7 +495,8 @@ export function CityClient({
   return (
     <div className="mapsies-body-bg mapsies-room-chrome-y relative mx-auto flex h-dvh max-h-dvh w-full max-w-5xl flex-col overflow-hidden px-[0.96rem]">
       <div className="relative z-40 shrink-0">
-        <div className="relative space-y-[0.6rem] pb-[0.6rem]">
+        {/* En gemensam gradient-yta för alla chip-rader — annars repeteras radialerna per rad och ger “randiga” band. */}
+        <div className="mapsies-body-bg relative space-y-[0.6rem] pb-[0.6rem]">
             <FadingHorizontalChips rowClassName="py-0">
               {cityList.map((c) => {
                 const active = c.slug === activeCity.slug;
