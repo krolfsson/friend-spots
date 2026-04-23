@@ -25,7 +25,7 @@ export const MESSAGES: Record<Locale, Record<string, string>> = {
     "home.open.cta": "Öppna karta",
 
     "home.hero.lead":
-      "Inga konton, inga onödiga integreringar (eller jo, en – Google Maps). Inga dashboards eller andra saker ni aldrig bad om.",
+      "Inga konton, inga onödiga integreringar (eller ok, en – Google Maps). Inga dashboards eller andra saker ni aldrig bad om.",
     "home.hero.sub":
       "Ni samlar era favoritställen på en karta, likear det ni gillar, lägger till fler städer när ni vill – och en pinkod så inte halva internet snubblar in av misstag. Och massa emojis.",
     "home.stats.line": "{count} tips sparade hittills.",
