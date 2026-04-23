@@ -28,6 +28,7 @@ function fmtDate(date: string, days: Days) {
 export function AdminChart() {
   const [days, setDays] = useState<Days>(30);
   const [active, setActive] = useState<Set<Metric>>(new Set(["maps", "spots"]));
+  const [cumulative, setCumulative] = useState(false);
   const [data, setData] = useState<Row[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -47,12 +48,37 @@ export function AdminChart() {
     });
   }
 
-  const formatted = data.map((r) => ({ ...r, date: fmtDate(r.date, days) }));
+  const displayData = (() => {
+    if (!cumulative) return data;
+    const acc = { maps: 0, cities: 0, spots: 0, plusses: 0 };
+    return data.map((r) => {
+      acc.maps    += r.maps;
+      acc.cities  += r.cities;
+      acc.spots   += r.spots;
+      acc.plusses += r.plusses;
+      return { ...r, ...acc };
+    });
+  })();
+
+  const formatted = displayData.map((r) => ({ ...r, date: fmtDate(r.date, days) }));
 
   return (
     <div className="rounded-2xl border border-indigo-100 bg-white/80 shadow-sm">
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-indigo-100 px-5 py-3">
-        <p className="text-sm font-extrabold text-indigo-950">Activity over time</p>
+        <div className="flex items-center gap-3">
+          <p className="text-sm font-extrabold text-indigo-950">Activity over time</p>
+          {/* Cumulative toggle */}
+          <button
+            onClick={() => setCumulative((v) => !v)}
+            className={`rounded-full px-3 py-1 text-xs font-extrabold transition ${
+              cumulative
+                ? "bg-violet-600 text-white"
+                : "bg-indigo-50 text-indigo-900/60 hover:bg-indigo-100"
+            }`}
+          >
+            {cumulative ? "Total" : "Per day"}
+          </button>
+        </div>
 
         {/* Day range toggle */}
         <div className="flex gap-1">
