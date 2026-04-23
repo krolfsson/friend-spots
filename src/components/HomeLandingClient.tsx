@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState } from "react";
 import type { Locale } from "@/lib/i18n";
 import { t, tReplace } from "@/lib/i18n";
 import { normalizeRoomSlugInput } from "@/lib/roomSlugInput";
+import { HomeMacBookMockup } from "@/components/HomeMacBookMockup";
 
 type Step = null | "create" | "open";
 
@@ -115,67 +116,75 @@ export function HomeLandingClient({ locale, totalSpots }: { locale: Locale; tota
 
   return (
     <div className="relative z-10 flex min-h-dvh flex-col">
-      <main className="flex flex-1 flex-col items-center justify-center px-4 pb-10 pt-8 sm:pb-14 sm:pt-10">
-        <div className="flex w-full justify-center overflow-visible px-2 sm:px-4">
-          <div
-            className="select-none whitespace-nowrap bg-gradient-to-r from-fuchsia-500 via-violet-500 to-sky-500 bg-clip-text px-1 pb-2.5 pt-0.5 text-[clamp(3.1rem,15vw,4.6rem)] font-extrabold leading-[1.02] tracking-tight text-transparent drop-shadow-[0_14px_38px_rgba(236,72,153,0.24)] sm:text-[clamp(3.6rem,13vw,5.25rem)]"
-            style={{
-              fontFamily: "var(--font-logo), var(--font-y2k), system-ui, sans-serif",
-              WebkitBackgroundClip: "text",
-              backgroundClip: "text",
-            }}
-          >
-            Mapsies
+      <main className="flex flex-1 flex-col items-stretch justify-center px-4 pb-10 pt-8 sm:pb-14 sm:pt-10 lg:px-6">
+        <div className="mx-auto grid w-full max-w-5xl grid-cols-1 items-center gap-12 lg:grid-cols-12 lg:gap-14 xl:max-w-6xl">
+          <div className="flex flex-col items-center text-center lg:col-span-5 lg:items-start lg:text-left">
+            <div className="flex w-full justify-center overflow-visible px-2 sm:px-4 lg:justify-start lg:px-0">
+              <div
+                className="select-none whitespace-nowrap bg-gradient-to-r from-indigo-800 via-violet-600 to-indigo-700 bg-clip-text px-1 pb-2.5 pt-0.5 text-[clamp(2.85rem,12vw,4.25rem)] font-extrabold leading-[1.02] tracking-tight text-transparent drop-shadow-[0_12px_32px_rgba(67,56,202,0.2)] sm:text-[clamp(3.2rem,10vw,4.5rem)]"
+                style={{
+                  fontFamily: "var(--font-logo), var(--font-y2k), system-ui, sans-serif",
+                  WebkitBackgroundClip: "text",
+                  backgroundClip: "text",
+                }}
+              >
+                Mapsies
+              </div>
+            </div>
+
+            <p className="mt-5 max-w-[min(100%,24rem)] text-[0.98rem] font-bold leading-snug tracking-tight text-indigo-950 sm:mt-6 sm:max-w-md sm:text-lg lg:max-w-none">
+              {t(locale, "home.hero.lead")}
+            </p>
+            <p className="mt-3 max-w-[min(100%,26rem)] px-1 text-[0.8125rem] font-medium leading-relaxed text-indigo-900/62 sm:mt-3.5 sm:max-w-lg sm:text-sm lg:max-w-none">
+              {t(locale, "home.hero.sub")}
+            </p>
+
+            <div className="mt-10 flex w-full max-w-sm flex-col gap-2.5 sm:mt-11 lg:max-w-[20rem]">
+              <button
+                type="button"
+                onClick={openCreate}
+                className="ui-press inline-flex h-[3.15rem] w-full cursor-default items-center justify-center gap-2.5 rounded-2xl bg-gradient-to-br from-indigo-800 to-violet-700 px-5 text-sm font-semibold tracking-tight text-white shadow-[0_14px_36px_-10px_rgba(49,46,129,0.55)] ring-1 ring-white/15 transition hover:brightness-[1.04] active:scale-[0.99] sm:h-14 sm:text-[0.95rem]"
+              >
+                <span className="grid h-8 w-8 shrink-0 place-items-center rounded-xl border border-white/20 bg-white/10" aria-hidden>
+                  <svg viewBox="0 0 24 24" className="h-[1.05rem] w-[1.05rem]" aria-hidden>
+                    <path
+                      d="M12 7v10M7 12h10"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.2"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                </span>
+                {t(locale, "home.cta.create")}
+              </button>
+              <button
+                type="button"
+                onClick={openExisting}
+                className="ui-press inline-flex h-[3.15rem] w-full cursor-default items-center justify-center gap-2.5 rounded-2xl border border-slate-300/95 bg-white/90 px-5 text-sm font-semibold tracking-tight text-indigo-950 shadow-sm shadow-slate-900/5 backdrop-blur-sm transition hover:bg-white active:scale-[0.99] sm:h-14 sm:text-[0.95rem]"
+              >
+                <span
+                  className="grid h-8 w-8 shrink-0 place-items-center rounded-xl border border-indigo-200/70 bg-indigo-50/60 text-[1rem] leading-none"
+                  aria-hidden
+                >
+                  🔑
+                </span>
+                {t(locale, "home.cta.open")}
+              </button>
+            </div>
+
+            <p
+              className="mt-6 max-w-sm px-2 text-[0.7rem] font-semibold uppercase tracking-[0.14em] text-indigo-900/38 tabular-nums sm:mt-7 sm:px-0 sm:text-[0.72rem] lg:text-left"
+              aria-live="polite"
+            >
+              {tReplace(locale, "home.stats.line", { count: totalFmt })}
+            </p>
+          </div>
+
+          <div className="flex justify-center lg:col-span-7 lg:justify-end">
+            <HomeMacBookMockup locale={locale} />
           </div>
         </div>
-
-        <p className="mt-6 max-w-[min(100%,22rem)] text-center text-[0.98rem] font-extrabold leading-snug tracking-tight text-indigo-950 sm:mt-7 sm:max-w-md sm:text-lg">
-          {t(locale, "home.hero.lead")}
-        </p>
-        <p className="mt-3 max-w-[min(100%,24rem)] px-1 text-center text-[0.8125rem] font-semibold leading-relaxed text-indigo-900/58 sm:mt-4 sm:max-w-lg sm:text-sm">
-          {t(locale, "home.hero.sub")}
-        </p>
-
-        <div className="mt-12 flex w-full max-w-sm flex-col gap-3 sm:mt-14">
-          <button
-            type="button"
-            onClick={openCreate}
-            className="ui-press inline-flex h-12 w-full cursor-default items-center justify-center gap-2 rounded-full bg-gradient-to-r from-emerald-400 to-teal-500 px-5 text-sm font-extrabold tracking-tight text-white shadow-lg shadow-emerald-700/25 ring-1 ring-white/50 transition hover:brightness-110 active:scale-[0.99] sm:h-14 sm:text-base"
-          >
-            <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full border border-white/35 bg-white/15" aria-hidden>
-              <svg viewBox="0 0 24 24" className="h-4 w-4" aria-hidden>
-                <path
-                  d="M12 7v10M7 12h10"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.2"
-                  strokeLinecap="round"
-                />
-              </svg>
-            </span>
-            {t(locale, "home.cta.create")}
-          </button>
-          <button
-            type="button"
-            onClick={openExisting}
-            className="ui-press inline-flex h-12 w-full cursor-default items-center justify-center gap-2 rounded-full border border-indigo-200/80 bg-white/90 px-5 text-sm font-extrabold tracking-tight text-indigo-950 shadow-md shadow-indigo-500/10 transition hover:brightness-105 active:scale-[0.99] sm:h-14 sm:text-base"
-          >
-            <span
-              className="grid h-8 w-8 shrink-0 place-items-center rounded-full border border-indigo-200/55 bg-indigo-50/45 text-[1.05rem] leading-none"
-              aria-hidden
-            >
-              🔑
-            </span>
-            {t(locale, "home.cta.open")}
-          </button>
-        </div>
-
-        <p
-          className="mt-5 max-w-sm px-2 text-center text-[0.7rem] font-extrabold uppercase tracking-[0.18em] text-indigo-900/40 tabular-nums sm:mt-6 sm:text-[0.72rem]"
-          aria-live="polite"
-        >
-          {tReplace(locale, "home.stats.line", { count: totalFmt })}
-        </p>
       </main>
 
       {step ? (
