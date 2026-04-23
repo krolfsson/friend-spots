@@ -191,9 +191,10 @@ export function HomeLandingClient({ locale, totalSpots }: { locale: Locale; tota
               <Image
                 src="/mockups.png"
                 alt="Mapsies"
-                width={1682}
+                width={1809}
                 height={2068}
                 priority
+                unoptimized
                 sizes="(min-width: 1024px) min(50vw, 36rem), 100vw"
                 className="h-auto w-full max-w-2xl object-contain drop-shadow-[0_24px_48px_-12px_rgba(49,46,129,0.25)] lg:max-w-none"
               />
