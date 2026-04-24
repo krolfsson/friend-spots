@@ -159,6 +159,13 @@ export function SpotsMap({
           streetViewControl: false,
           fullscreenControl: true,
           gestureHandling: "greedy",
+          styles: [
+            // Dölj Googles egna POI-ikoner och deras etiketter
+            { featureType: "poi", elementType: "labels", stylers: [{ visibility: "off" }] },
+            { featureType: "poi", elementType: "geometry", stylers: [{ visibility: "off" }] },
+            // Behåll transit men ta bort transit-POIs
+            { featureType: "transit.station", elementType: "labels.icon", stylers: [{ visibility: "off" }] },
+          ],
         });
         mapRef.current = map;
 
