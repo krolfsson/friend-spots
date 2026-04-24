@@ -1,12 +1,12 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import Link from "next/link";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import type { Locale } from "@/lib/i18n";
 import { t } from "@/lib/i18n";
 import { createPortal } from "react-dom";
 import { AddSpotForm } from "@/components/AddSpotForm";
+import { CreateRoomModal } from "@/components/CreateRoomModal";
 import { QrModal } from "@/components/QrModal";
 import { CityPickOrCreate } from "@/components/CityPickOrCreate";
 import {
@@ -247,6 +247,7 @@ export function CityClient({
 
   const categoryItems = CATEGORIES as readonly { id: CategoryId; label: string; emoji: string }[];
   const [addOpen, setAddOpen] = useState(false);
+  const [createRoomOpen, setCreateRoomOpen] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
   const [qrOpen, setQrOpen] = useState(false);
   const [renameOpen, setRenameOpen] = useState(false);
@@ -708,8 +709,9 @@ export function CityClient({
 
           <div className="shrink-0 space-y-[0.6rem]">
           <div className="grid grid-cols-2 gap-[0.6rem] sm:gap-3">
-            <Link
-              href="/"
+            <button
+              type="button"
+              onClick={() => setCreateRoomOpen(true)}
               className="mapsies-room-bar-cta touch-manipulation inline-flex h-10 w-full cursor-default items-center justify-center gap-2 overflow-hidden rounded-full border border-amber-300/90 bg-gradient-to-r from-amber-200/92 via-amber-100/96 to-amber-50/94 px-[0.55rem] text-center text-sm font-extrabold text-amber-950 shadow-sm shadow-amber-900/12 hover:brightness-[1.05] sm:h-11 sm:px-[0.75rem]"
             >
               <span
@@ -719,7 +721,7 @@ export function CityClient({
                 <NewTipPlusIcon />
               </span>
               <span className="min-w-0 cursor-default truncate">{t(locale, "room.actions.newMap")}</span>
-            </Link>
+            </button>
             <button
               type="button"
               onClick={() => void shareRoom()}
@@ -914,6 +916,10 @@ export function CityClient({
           title={roomTitleLive.trim() || roomSlug}
           onClose={() => setQrOpen(false)}
         />
+      ) : null}
+
+      {createRoomOpen ? (
+        <CreateRoomModal locale={locale} onClose={() => setCreateRoomOpen(false)} />
       ) : null}
 
       {addOpen ? (
