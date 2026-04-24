@@ -13,7 +13,7 @@ const y2k = M_PLUS_Rounded_1c({
 
 const logo = Fredoka({
   subsets: ["latin"],
-  weight: ["500", "600", "700"],
+  weight: ["600", "700"],
   variable: "--font-logo",
   display: "swap",
   adjustFontFallback: true,

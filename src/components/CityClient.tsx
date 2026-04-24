@@ -242,6 +242,8 @@ export function CityClient({
   const [cityList, setCityList] = useState<City[]>(cities);
   const [activeCity, setActiveCity] = useState<City>(city);
   const [bundle, setBundle] = useState<DashboardBySlug>(dashboard);
+  // Track slugs whose data arrived via SSR so we can skip the initial client refetch.
+  const ssrSlugsRef = useRef(new Set(Object.keys(dashboard)));
 
   const categoryItems = CATEGORIES as readonly { id: CategoryId; label: string; emoji: string }[];
   const [addOpen, setAddOpen] = useState(false);
@@ -371,6 +373,11 @@ export function CityClient({
 
   useEffect(() => {
     const ctrl = new AbortController();
+    // Skip the first client fetch when SSR already provided fresh data for this city.
+    // Subsequent visits to the same city (ssrSlugsRef cleared) will refetch normally.
+    if (ssrSlugsRef.current.delete(activeCity.slug)) {
+      return () => ctrl.abort();
+    }
     void refreshCity(activeCity.slug, ctrl.signal);
     return () => ctrl.abort();
   }, [activeCity.slug, refreshCity]);

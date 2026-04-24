@@ -187,7 +187,7 @@ export function HomeLandingClient({ locale, totalSpots }: { locale: Locale; tota
           </div>
 
           <div className="flex min-w-0 w-full flex-col items-center overflow-hidden lg:items-end">
-            <div className="mapsies-home-reveal mapsies-home-reveal--d6 flex w-full justify-center lg:justify-end">
+            <div className="flex w-full justify-center lg:justify-end">
               <Image
                 src="/mockups.png"
                 alt="Mapsies"

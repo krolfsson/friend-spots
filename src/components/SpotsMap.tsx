@@ -423,9 +423,9 @@ export function SpotsMap({
         clearWatch();
       },
       {
-        enableHighAccuracy: true,
-        maximumAge: 10_000,
-        timeout: 10_000,
+        enableHighAccuracy: false,
+        maximumAge: 30_000,
+        timeout: 15_000,
       },
     );
 
