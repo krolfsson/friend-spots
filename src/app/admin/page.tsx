@@ -57,7 +57,7 @@ export default async function AdminPage() {
   const s = await getStats();
 
   const fmt = (d: Date) =>
-    new Intl.DateTimeFormat("sv-SE", { dateStyle: "short", timeStyle: "short" }).format(d);
+    new Intl.DateTimeFormat("sv-SE", { dateStyle: "short", timeStyle: "short", timeZone: "Europe/Stockholm" }).format(d);
 
   return (
     <AdminPinGate>

@@ -20,9 +20,10 @@ const DAY_OPTIONS: Days[] = [1, 7, 30, 365];
 
 function fmtDate(date: string, days: Days) {
   const d = new Date(date);
-  if (days === 1)   return d.toLocaleTimeString("sv-SE", { hour: "2-digit", minute: "2-digit" });
-  if (days <= 30)   return d.toLocaleDateString("sv-SE", { month: "short", day: "numeric" });
-  return d.toLocaleDateString("sv-SE", { month: "short", day: "numeric" });
+  const tz = "Europe/Stockholm";
+  if (days === 1)   return d.toLocaleTimeString("sv-SE", { hour: "2-digit", minute: "2-digit", timeZone: tz });
+  if (days <= 30)   return d.toLocaleDateString("sv-SE", { month: "short", day: "numeric", timeZone: tz });
+  return d.toLocaleDateString("sv-SE", { month: "short", day: "numeric", timeZone: tz });
 }
 
 export function AdminChart() {
