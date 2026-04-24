@@ -7,15 +7,6 @@ import { t } from "@/lib/i18n";
 
 type Suggestion = { placeId: string; label: string };
 
-/** Biasar sökning mot vald stad (samma beteende oavsett vilken stad som är aktiv). */
-function composePlacesAutocompleteInput(query: string, cityName?: string): string {
-  const q = query.trim();
-  const c = cityName?.trim();
-  if (!c) return q;
-  if (q.toLowerCase().includes(c.toLowerCase())) return q;
-  return `${q} ${c}`.trim();
-}
-
 const GUEST_LS = "friend_spots_guest";
 
 function useGuestContributor() {
@@ -34,7 +25,6 @@ function useGuestContributor() {
 export function AddSpotForm({
   roomSlug,
   citySlug,
-  placeSearchBiasName,
   locale,
   embeddedInModal = false,
   onSaved,
@@ -42,8 +32,6 @@ export function AddSpotForm({
 }: {
   roomSlug: string;
   citySlug: string;
-  /** Stad där tipset sparas — skickas med i platssök så förslag inte domineras av en annan ort. */
-  placeSearchBiasName?: string;
   locale: Locale;
   /** Ingen egen panel/stäng-knapp — ligger i gemensam modal (CityClient). */
   embeddedInModal?: boolean;
@@ -79,11 +67,10 @@ export function AddSpotForm({
     const ctrl = new AbortController();
     const t = window.setTimeout(async () => {
       try {
-        const input = composePlacesAutocompleteInput(query, placeSearchBiasName);
         const res = await fetch("/api/places/autocomplete", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ input }),
+          body: JSON.stringify({ input: query.trim() }),
           signal: ctrl.signal,
         });
         const data = (await res.json()) as { suggestions?: Suggestion[]; error?: string };
@@ -110,7 +97,7 @@ export function AddSpotForm({
       ctrl.abort();
       window.clearTimeout(t);
     };
-  }, [query, selected, placeSearchBiasName]);
+  }, [query, selected]);
 
   const canSave = useMemo(() => {
     return Boolean(selected && pickedCategories.size > 0 && contributorName.trim());

@@ -59,3 +59,38 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }
+
+export async function PATCH(req: NextRequest) {
+  try {
+    const auth = await getAuthorizedRoomFromRequest(req);
+    if (!auth.ok) return auth.response;
+
+    const body = (await req.json()) as { cityId?: string; name?: string; emoji?: string };
+    const cityId = body.cityId?.trim();
+    if (!cityId) return NextResponse.json({ error: "cityId saknas" }, { status: 400 });
+
+    const existing = await prisma.city.findFirst({
+      where: { id: cityId, roomId: auth.room.id },
+    });
+    if (!existing) return NextResponse.json({ error: "Stad hittades inte" }, { status: 404 });
+
+    const data: { name?: string; emoji?: string } = {};
+    if (typeof body.name === "string" && body.name.trim().length >= 1) {
+      data.name = body.name.trim();
+    }
+    if (typeof body.emoji === "string") {
+      const raw = body.emoji.trim();
+      data.emoji = raw.length > 0 ? Array.from(raw).slice(0, 8).join("") : "";
+    }
+
+    const updated = await prisma.city.update({
+      where: { id: cityId },
+      data,
+      include: { _count: { select: { spots: true } } },
+    });
+    return NextResponse.json({ city: updated });
+  } catch (e) {
+    const message = e instanceof Error ? e.message : "Okänt fel";
+    return NextResponse.json({ error: message }, { status: 500 });
+  }
+}

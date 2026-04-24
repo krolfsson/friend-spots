@@ -266,6 +266,14 @@ export function CityClient({
   const [toast, setToast] = useState<{ message: string; tone?: ToastTone } | null>(null);
   const mapEnabled = isMapViewConfigured();
 
+  // City edit (long-press on city tab)
+  const [editCityTarget, setEditCityTarget] = useState<City | null>(null);
+  const [editCityName, setEditCityName] = useState("");
+  const [editCityEmoji, setEditCityEmoji] = useState("");
+  const [editCityBusy, setEditCityBusy] = useState(false);
+  const [editCityErr, setEditCityErr] = useState<string | null>(null);
+  const longPressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   const onRoomViewSegment = useCallback((s: RoomViewSegment) => {
     if (s === "map") {
       setViewMode("map");
@@ -497,6 +505,61 @@ export function CityClient({
     window.scrollTo(0, 0);
   }, []);
 
+  function openCityEdit(c: City) {
+    setEditCityTarget(c);
+    setEditCityName(c.name);
+    setEditCityEmoji(c.emoji?.trim() ?? "");
+    setEditCityErr(null);
+    setEditCityBusy(false);
+  }
+
+  function closeCityEdit() {
+    setEditCityTarget(null);
+    setEditCityErr(null);
+  }
+
+  async function saveCityEdit() {
+    if (!editCityTarget || editCityBusy) return;
+    setEditCityBusy(true);
+    setEditCityErr(null);
+    try {
+      const res = await fetch("/api/cities", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json", "X-Room-Slug": roomSlug },
+        body: JSON.stringify({
+          cityId: editCityTarget.id,
+          name: editCityName.trim() || editCityTarget.name,
+          emoji: editCityEmoji,
+        }),
+      });
+      const data = (await res.json()) as { city?: City; error?: string };
+      if (!res.ok) throw new Error(data.error ?? t(locale, "room.city.editError"));
+      const updated = data.city;
+      if (!updated) throw new Error(t(locale, "room.city.editError"));
+      setCityList((prev) => prev.map((c) => (c.id === updated.id ? updated : c)));
+      if (activeCity.id === updated.id) setActiveCity(updated);
+      closeCityEdit();
+      showToast(t(locale, "rename.successToast"), "success");
+    } catch (e) {
+      setEditCityErr(e instanceof Error ? e.message : t(locale, "room.city.editError"));
+    } finally {
+      setEditCityBusy(false);
+    }
+  }
+
+  function cityLongPressStart(c: City) {
+    longPressTimerRef.current = setTimeout(() => {
+      openCityEdit(c);
+    }, 500);
+  }
+
+  function cityLongPressCancel() {
+    if (longPressTimerRef.current !== null) {
+      clearTimeout(longPressTimerRef.current);
+      longPressTimerRef.current = null;
+    }
+  }
+
   const mapScrollShell =
     mapEnabled && viewMode === "map"
       ? "flex min-h-0 flex-1 flex-col overflow-hidden overscroll-y-contain"
@@ -515,6 +578,10 @@ export function CityClient({
                     key={c.id}
                     type="button"
                     onClick={() => setActiveCity(c)}
+                    onPointerDown={() => cityLongPressStart(c)}
+                    onPointerUp={cityLongPressCancel}
+                    onPointerLeave={cityLongPressCancel}
+                    onContextMenu={(e) => { e.preventDefault(); openCityEdit(c); }}
                     className={`pointer-events-auto inline-flex h-9 min-h-9 shrink-0 items-center justify-center gap-[0.45rem] rounded-full px-[0.84rem] text-sm font-extrabold leading-none tracking-tight transition active:scale-95 ${
                       active ? "y2k-chip-active text-white" : "y2k-chip text-indigo-950 hover:-translate-y-0.5"
                     }`}
@@ -823,6 +890,73 @@ export function CityClient({
         </div>
       ) : null}
 
+      {editCityTarget ? (
+        <div
+          className="fixed inset-0 z-[67] flex touch-manipulation items-end justify-center bg-indigo-950/35 p-2 sm:items-center sm:p-3"
+          role="dialog"
+          aria-modal="true"
+          aria-label={t(locale, "room.city.editTitle")}
+          onPointerDown={(e) => {
+            if (e.target === e.currentTarget) closeCityEdit();
+          }}
+        >
+          <div className="w-full max-w-md overflow-hidden rounded-2xl border border-indigo-200/70 bg-white/80 shadow-2xl shadow-indigo-950/25 backdrop-blur-sm sm:rounded-[1.75rem]">
+            <header className="flex items-center justify-between gap-3 border-b border-indigo-200/60 bg-white/70 px-4 py-3">
+              <h2 className="truncate text-sm font-extrabold tracking-tight text-indigo-950">
+                {t(locale, "room.city.editTitle")}
+              </h2>
+              <button
+                type="button"
+                onClick={closeCityEdit}
+                className="ui-press grid h-9 w-9 shrink-0 place-items-center rounded-full border border-indigo-200/60 bg-white/90 text-lg leading-none shadow-sm transition hover:bg-indigo-50/90"
+                aria-label={t(locale, "common.close")}
+              >
+                <span aria-hidden>❌</span>
+              </button>
+            </header>
+
+            <div className="space-y-2 p-3">
+              <div className="flex min-w-0 items-center gap-2">
+                <input
+                  value={editCityName}
+                  onChange={(e) => setEditCityName(e.target.value)}
+                  placeholder={t(locale, "room.city.editNamePlaceholder")}
+                  className="mt-1 min-w-0 flex-1 rounded-2xl border border-indigo-200/70 bg-white/90 px-4 py-3 text-sm font-semibold text-indigo-950 outline-none focus:ring-4 focus:ring-indigo-300/45"
+                />
+                <input
+                  value={editCityEmoji}
+                  onChange={(e) => setEditCityEmoji(e.target.value)}
+                  maxLength={8}
+                  placeholder={t(locale, "room.city.editEmojiPlaceholder")}
+                  className="mt-1 h-[46px] w-[46px] shrink-0 rounded-2xl border border-sky-200/70 bg-white/90 text-center text-xl leading-none text-indigo-950 shadow-inner shadow-sky-100/80 outline-none placeholder:text-indigo-900/35 focus:ring-2 focus:ring-sky-300/55"
+                />
+              </div>
+              {editCityErr ? (
+                <p className="text-xs font-bold text-rose-600">{editCityErr}</p>
+              ) : null}
+            </div>
+
+            <div className="flex gap-2 border-t border-indigo-200/60 bg-white/60 p-3">
+              <button
+                type="button"
+                disabled={editCityBusy || !editCityName.trim()}
+                onClick={() => void saveCityEdit()}
+                className="ui-press inline-flex min-h-11 flex-1 items-center justify-center rounded-2xl bg-gradient-to-r from-fuchsia-500 to-violet-600 px-4 py-3 text-sm font-extrabold text-white shadow-sm ring-1 ring-white/60 transition hover:brightness-110 active:scale-[0.99] disabled:opacity-50"
+              >
+                {editCityBusy ? t(locale, "room.city.editSaving") : t(locale, "room.city.editSave")}
+              </button>
+              <button
+                type="button"
+                onClick={closeCityEdit}
+                className="ui-press inline-flex min-h-11 items-center justify-center rounded-2xl border border-indigo-200/70 bg-white/80 px-4 py-3 text-sm font-extrabold text-indigo-950 shadow-sm ring-1 ring-white/60 transition hover:brightness-105 active:scale-[0.99]"
+              >
+                {t(locale, "common.cancel")}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
       {shareOpen ? (
         <div
           className="fixed inset-0 z-[65] flex touch-manipulation items-end justify-center bg-indigo-950/35 p-2 sm:items-center sm:p-3"
@@ -998,7 +1132,7 @@ export function CityClient({
                       roomSlug={roomSlug}
                       embeddedInModal
                       citySlug={addTargetSlug}
-                      placeSearchBiasName={addTargetCity.name}
+
                       locale={locale}
                       onSaved={() => {
                         void refreshCity(addTargetSlug);

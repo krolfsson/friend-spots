@@ -11,18 +11,18 @@ export function pickLocaleFromAcceptLanguage(acceptLanguage: string | null | und
 
 export const MESSAGES: Record<Locale, Record<string, string>> = {
   sv: {
-    "home.title": "Skapa en karta med kompisgänget",
+    "home.title": "Skapa en mapsie med kompisgänget",
     "home.lede":
-      "Skapa en länk, dela den i gruppchatten och fyll kartan med era favoritplatser och tips. Välj en pinkod så att nya webbläsare kan låsa upp kartan (inloggningen sparas som kaka i upp till 90 dagar).",
+      "Skapa en länk, dela den i gruppchatten och fyll mapsien med era favoritplatser och tips. Välj en pinkod så att nya webbläsare kan låsa upp mapsien (inloggningen sparas som kaka i upp till 90 dagar).",
     "home.create.nameLabel": "Namn (du kan ändra detta senare)",
     "home.create.namePlaceholder": "t.ex. Bucketlist 4 Lyfe",
     "home.create.pinLabel": "Pinkod",
     "home.create.pinPlaceholder": "t.ex. 1234",
-    "home.create.cta": "Skapa karta",
+    "home.create.cta": "Skapa mapsie",
     "home.create.ctaBusy": "Skapar…",
-    "home.open.title": "Har du redan en karta?",
+    "home.open.title": "Har du redan en mapsie?",
     "home.open.placeholder": "t.ex. /alla-mina-kompisars-tips",
-    "home.open.cta": "Öppna karta",
+    "home.open.cta": "Öppna mapsie",
 
     "home.hero.lead":
       "Inga konton, inga onödiga integreringar (eller ok, en – Google Maps). Inga dashboards eller andra saker ni aldrig bad om.",
@@ -37,19 +37,19 @@ export const MESSAGES: Record<Locale, Record<string, string>> = {
     "home.mockup.placeholderPhone": "iPhone-skärm",
     "home.step.back": "Tillbaka",
     "home.step.closeOverlayAria": "Stäng",
-    "home.step.create.title": "Ny karta — nice!",
+    "home.step.create.title": "Ny mapsie — nice!",
     "home.step.create.lede":
       "Välj ett namn som känns rätt (ni kan byta sen) och en pinkod som bara gänget fattar. Sen får ni en länk att slänga i chatten.",
     "home.step.create.pinHint":
-      "Pinkoden är bara så inte helt random folk råkar in i er karta. Sparas som kaka i typ 90 dagar.",
-    "home.step.mapNameLabel": "Namn på kartan",
+      "Pinkoden är bara så inte helt random folk råkar in i er mapsie. Sparas som kaka i typ 90 dagar.",
+    "home.step.mapNameLabel": "Namn på mapsien",
     "home.step.open.title": "Välkommen tillbaka",
     "home.step.open.lede":
       "Skriv samma sista bit som i länken (t.ex. alla-mina-kompisars-tips om länken slutar på …/alla-mina-kompisars-tips) och er pinkod. Klart.",
     "home.step.open.slugLabel": "Sista biten av länken",
     "home.step.open.slugPlaceholder": "t.ex. alla-mina-kompisars-tips",
-    "home.step.open.pinHint": "Samma pinkod som när kartan skapades — den som bara ni vet.",
-    "home.step.open.submit": "Öppna kartan",
+    "home.step.open.pinHint": "Samma pinkod som när mapsien skapades — den som bara ni vet.",
+    "home.step.open.submit": "Öppna mapsien",
 
     "room.actions.newMap": "Skapa ny mapsie",
     "room.actions.shareMap": "Dela med vänner",
@@ -65,10 +65,16 @@ export const MESSAGES: Record<Locale, Record<string, string>> = {
     "room.city.nameAria": "Stadens namn",
     "room.city.emojiAria": "Stad-emoji eller flagga",
     "room.city.detailsNamePlaceholder": "Namn på ny stad",
-    "room.city.emptyLead": "Inga städer i den här kartan än — skapa den första.",
+    "room.city.emptyLead": "Inga städer i den här mapsien än — skapa den första.",
     "room.city.createError": "Kunde inte skapa stad",
     "room.city.missingSlug": "Saknar stad",
     "room.city.unknownError": "Okänt fel",
+    "room.city.editTitle": "Redigera stad",
+    "room.city.editSave": "Spara",
+    "room.city.editSaving": "Sparar…",
+    "room.city.editNamePlaceholder": "Stadens namn",
+    "room.city.editEmojiPlaceholder": "🌍",
+    "room.city.editError": "Kunde inte spara",
 
     "cat.frukost": "Frukost",
     "cat.lunch": "Lunch",
@@ -92,11 +98,11 @@ export const MESSAGES: Record<Locale, Record<string, string>> = {
     "share.sheet.copy": "Kopiera länk",
     "share.sheet.close": "Stäng",
 
-    "rename.title": "Byt kartnamn",
+    "rename.title": "Döp om mapsien",
     "rename.subtitle": "Länken ändras inte. Bara namnet.",
     "rename.save": "Spara",
     "rename.saving": "Sparar…",
-    "rename.successToast": "Kartnamn uppdaterat.",
+    "rename.successToast": "Namn uppdaterat.",
     "rename.errorDefault": "Kunde inte spara namn",
 
     "add.title": "Nytt tips",
@@ -128,26 +134,26 @@ export const MESSAGES: Record<Locale, Record<string, string>> = {
 
     "add.closeAria": "Stäng lägg till",
 
-    "unlock.lede": "Ange pinkod för att öppna kartan.",
+    "unlock.lede": "Ange pinkod för att öppna mapsien.",
     "unlock.pinLabel": "Pinkod",
-    "unlock.cta": "Öppna kartan",
+    "unlock.cta": "Öppna mapsien",
     "unlock.ctaBusy": "Öppnar…",
-    "unlock.createLink": "Skapa egen karta",
+    "unlock.createLink": "Skapa egen mapsie",
     "unlock.errorDefault": "Kunde inte låsa upp",
   },
   en: {
-    "home.title": "Make a map with friends",
+    "home.title": "Make a mapsie with friends",
     "home.lede":
-      "Create a link, share it in the group chat, and fill the map with your favorite places and tips. Choose a PIN so new browsers can unlock the map (sign-in is saved as a cookie for up to 90 days).",
+      "Create a link, share it in the group chat, and fill the mapsie with your favorite places and tips. Choose a PIN so new browsers can unlock the mapsie (sign-in is saved as a cookie for up to 90 days).",
     "home.create.nameLabel": "Name (you can change this later)",
     "home.create.namePlaceholder": "e.g. Bucketlist 4 Lyfe",
     "home.create.pinLabel": "PIN",
     "home.create.pinPlaceholder": "e.g. 1234",
-    "home.create.cta": "Create map",
+    "home.create.cta": "Create mapsie",
     "home.create.ctaBusy": "Creating…",
-    "home.open.title": "Already have a map?",
+    "home.open.title": "Already have a mapsie?",
     "home.open.placeholder": "e.g. /all-my-friends-tips",
-    "home.open.cta": "Open map",
+    "home.open.cta": "Open mapsie",
 
     "home.hero.lead":
       "No accounts, no pointless integrations (okay, one — Google Maps). No dashboards or anything else you never asked for.",
@@ -162,19 +168,19 @@ export const MESSAGES: Record<Locale, Record<string, string>> = {
     "home.mockup.placeholderPhone": "iPhone screen",
     "home.step.back": "Back",
     "home.step.closeOverlayAria": "Close",
-    "home.step.create.title": "New map — let’s go",
+    "home.step.create.title": "New mapsie — let’s go",
     "home.step.create.lede":
       "Pick a name that feels right (you can change it later) and a PIN your crew will remember. You’ll get a link to drop in the group chat.",
     "home.step.create.pinHint":
-      "The PIN keeps random strangers from wandering into your map. Saved as a cookie for ~90 days.",
-    "home.step.mapNameLabel": "Map name",
+      "The PIN keeps random strangers from wandering into your mapsie. Saved as a cookie for ~90 days.",
+    "home.step.mapNameLabel": "Mapsie name",
     "home.step.open.title": "Welcome back",
     "home.step.open.lede":
       "Type the last part of your link (e.g. all-my-friends-tips if the URL ends with …/all-my-friends-tips) and your PIN. That’s it.",
     "home.step.open.slugLabel": "Last part of the link",
     "home.step.open.slugPlaceholder": "e.g. all-my-friends-tips",
-    "home.step.open.pinHint": "Same PIN as when the map was made — the one only you lot know.",
-    "home.step.open.submit": "Open map",
+    "home.step.open.pinHint": "Same PIN as when the mapsie was made — the one only you lot know.",
+    "home.step.open.submit": "Open mapsie",
 
     "room.actions.newMap": "Create new mapsie",
     "room.actions.shareMap": "Share with friends",
@@ -190,10 +196,16 @@ export const MESSAGES: Record<Locale, Record<string, string>> = {
     "room.city.nameAria": "City name",
     "room.city.emojiAria": "City emoji or flag",
     "room.city.detailsNamePlaceholder": "Name of new city",
-    "room.city.emptyLead": "No cities on this map yet — create the first one.",
+    "room.city.emptyLead": "No cities on this mapsie yet — create the first one.",
     "room.city.createError": "Could not create city",
     "room.city.missingSlug": "Missing city",
     "room.city.unknownError": "Unknown error",
+    "room.city.editTitle": "Edit city",
+    "room.city.editSave": "Save",
+    "room.city.editSaving": "Saving…",
+    "room.city.editNamePlaceholder": "City name",
+    "room.city.editEmojiPlaceholder": "🌍",
+    "room.city.editError": "Could not save",
 
     "cat.frukost": "Breakfast",
     "cat.lunch": "Lunch",
@@ -217,11 +229,11 @@ export const MESSAGES: Record<Locale, Record<string, string>> = {
     "share.sheet.copy": "Copy link",
     "share.sheet.close": "Close",
 
-    "rename.title": "Rename map",
+    "rename.title": "Rename mapsie",
     "rename.subtitle": "The link won’t change. Only the name.",
     "rename.save": "Save",
     "rename.saving": "Saving…",
-    "rename.successToast": "Map name updated.",
+    "rename.successToast": "Mapsie name updated.",
     "rename.errorDefault": "Could not save name",
 
     "add.title": "New tip",
@@ -253,11 +265,11 @@ export const MESSAGES: Record<Locale, Record<string, string>> = {
 
     "add.closeAria": "Close add tip",
 
-    "unlock.lede": "Enter the PIN to open the map.",
+    "unlock.lede": "Enter the PIN to open the mapsie.",
     "unlock.pinLabel": "PIN",
-    "unlock.cta": "Open map",
+    "unlock.cta": "Open mapsie",
     "unlock.ctaBusy": "Opening…",
-    "unlock.createLink": "Create a map",
+    "unlock.createLink": "Create a mapsie",
     "unlock.errorDefault": "Could not unlock",
   },
 };
