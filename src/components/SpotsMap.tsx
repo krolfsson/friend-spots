@@ -92,6 +92,7 @@ export function SpotsMap({
   roomSlug,
   userHereOn = false,
   onUserHereError,
+  onPlusToggled,
   overlay,
   /** Fyll återstående höjd i flex-layout (rumssidan) i stället för fast korthöjd. */
   fillHeight = false,
@@ -104,6 +105,11 @@ export function SpotsMap({
   roomSlug: string;
   userHereOn?: boolean;
   onUserHereError?: (message: string) => void;
+  /**
+   * Anropas direkt efter lyckad plus/unplus på kartan.
+   * Används av föräldrakomponenten för att uppdatera bundle-state utan att rita om kartan.
+   */
+  onPlusToggled?: (spotId: string, newPlusCount: number, viewerHasPlussed: boolean) => void;
   /** Lägg t.ex. vänster knapp + höger kolumn som syskon — raden är `justify-between`. */
   overlay?: React.ReactNode;
   fillHeight?: boolean;
@@ -128,6 +134,26 @@ export function SpotsMap({
     [plotted, fallbackPlotted],
   );
   const missingCount = spots.length - plotted.length;
+
+  // Stabila nycklar som bara ändras när spots läggs till/tas bort eller byter koordinater —
+  // INTE när plusCount ändras. Det förhindrar att kartan återskapas vid varje plus-klick.
+  const plottedKey = useMemo(
+    () => plotted.map((s) => `${s.id}:${s.lat ?? ""}:${s.lng ?? ""}`).join("|"),
+    [plotted],
+  );
+  const boundsKey = useMemo(
+    () => boundsPlotted.map((s) => `${s.id}:${s.lat ?? ""}:${s.lng ?? ""}`).join("|"),
+    [boundsPlotted],
+  );
+
+  // Refs så att map-effekten alltid läser senaste plotted/boundsPlotted/onPlusToggled
+  // även när den inte körts om (strukturnyckeln oförändrad, bara plusCount ändrades).
+  const plottedRef = useRef(plotted);
+  const boundsPlottedRef = useRef(boundsPlotted);
+  const onPlusToggledRef = useRef(onPlusToggled);
+  plottedRef.current = plotted;
+  boundsPlottedRef.current = boundsPlotted;
+  onPlusToggledRef.current = onPlusToggled;
 
   useEffect(() => {
     if (!apiKey) {
@@ -172,7 +198,7 @@ export function SpotsMap({
         iw = new google.maps.InfoWindow();
         const emojiIconCache = new Map<string, google.maps.Icon>();
 
-        for (const spot of plotted) {
+        for (const spot of plottedRef.current) {
           if (cancelled) return;
           const marker = new google.maps.Marker({
             map,
@@ -285,6 +311,8 @@ export function SpotsMap({
                 marker.setIcon(
                   buildSpotMarkerIcon(spotMapEmoji(spot), 1 + plusCount, emojiIconCache),
                 );
+                // Meddela föräldern så att bundle-state synkas utan att kartan ritas om.
+                onPlusToggledRef.current?.(spot.id, plusCount, viewerHasPlussed);
               } finally {
                 plusWrap.disabled = false;
               }
@@ -313,15 +341,16 @@ export function SpotsMap({
 
         google.maps.event.addListenerOnce(map, "idle", () => {
           if (cancelled || !map) return;
-          if (boundsPlotted.length === 0) {
+          const bp = boundsPlottedRef.current;
+          if (bp.length === 0) {
             map.setCenter(DEFAULT_CENTER);
             map.setZoom(11);
-          } else if (boundsPlotted.length === 1) {
-            map.setCenter({ lat: boundsPlotted[0].lat!, lng: boundsPlotted[0].lng! });
+          } else if (bp.length === 1) {
+            map.setCenter({ lat: bp[0].lat!, lng: bp[0].lng! });
             map.setZoom(14);
           } else {
             const bounds = new google.maps.LatLngBounds();
-            boundsPlotted.forEach((s) => bounds.extend({ lat: s.lat!, lng: s.lng! }));
+            bp.forEach((s) => bounds.extend({ lat: s.lat!, lng: s.lng! }));
             map.fitBounds(bounds, 64);
           }
           if (!cancelled) setLoading(false);
@@ -340,7 +369,10 @@ export function SpotsMap({
       iw?.close();
       mapRef.current = null;
     };
-  }, [apiKey, cityName, plotted, boundsPlotted, locale, roomSlug]);
+  // Använder plottedKey/boundsKey (enbart ID+koordinater) som deps istället för hela spot-arrayerna.
+  // Det innebär att effekten INTE körs om när bara plusCount ändras → kartan återskapas inte vid plus-klick.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [apiKey, cityName, plottedKey, boundsKey, locale, roomSlug]);
 
   useEffect(() => {
     const map = mapRef.current;

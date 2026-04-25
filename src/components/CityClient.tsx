@@ -395,6 +395,29 @@ export function CityClient({
     setToast({ message, tone });
   }, []);
 
+  /**
+   * Anropas av SpotsMap efter lyckad plus/unplus på kartan.
+   * Uppdaterar bundle optimistiskt utan att kartan återskapas eller laddas om.
+   */
+  const handleMapPlusToggled = useCallback(
+    (spotId: string, newPlusCount: number, viewerHasPlussed: boolean) => {
+      setBundle((prev) => {
+        const city = prev[activeCity.slug];
+        if (!city) return prev;
+        return {
+          ...prev,
+          [activeCity.slug]: {
+            ...city,
+            spots: city.spots.map((s) =>
+              s.id === spotId ? { ...s, plusCount: newPlusCount, viewerHasPlussed } : s,
+            ),
+          },
+        };
+      });
+    },
+    [activeCity.slug],
+  );
+
   useEffect(() => {
     if (!toast) return;
     const t = window.setTimeout(() => setToast(null), 3200);
@@ -704,6 +727,7 @@ export function CityClient({
                   roomSlug={roomSlug}
                   userHereOn={hereOn}
                   onUserHereError={(msg) => showToast(msg, "info")}
+                  onPlusToggled={handleMapPlusToggled}
                   overlay={
                   <>
                     <div className="pointer-events-auto sm:hidden">
