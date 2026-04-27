@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Fredoka, M_PLUS_Rounded_1c } from "next/font/google";
 import { SITE_DESCRIPTION, SITE_TITLE } from "@/lib/site";
+import { getPublicSiteOrigin } from "@/lib/siteUrl";
 import "./globals.css";
 
 const y2k = M_PLUS_Rounded_1c({
@@ -20,9 +21,7 @@ const logo = Fredoka({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL?.trim() || "https://friend-spots.vercel.app",
-  ),
+  metadataBase: new URL(getPublicSiteOrigin()),
   title: {
     default: SITE_TITLE,
     template: `%s · ${SITE_TITLE}`,

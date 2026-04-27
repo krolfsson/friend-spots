@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import type { Locale } from "@/lib/i18n";
@@ -205,6 +206,23 @@ export function HomeLandingClient({ locale, totalSpots }: { locale: Locale; tota
           </div>
         </div>
       </main>
+
+      <footer className="shrink-0 border-t border-indigo-100/70 bg-white/50 px-6 py-4 backdrop-blur-sm">
+        <nav
+          className="mx-auto flex max-w-6xl flex-wrap items-center justify-center gap-x-5 gap-y-2 text-center text-[0.7rem] font-extrabold uppercase tracking-wide text-indigo-900/45 sm:text-xs"
+          aria-label={locale === "en" ? "Guides" : "Guider"}
+        >
+          <Link href="/guides/delad-karta" className="text-indigo-900/55 transition hover:text-indigo-950">
+            {t(locale, "home.footer.guideDeladKarta")}
+          </Link>
+          <span className="text-indigo-200" aria-hidden>
+            ·
+          </span>
+          <Link href="/guides/shared-map" className="text-indigo-900/55 transition hover:text-indigo-950">
+            {t(locale, "home.footer.guideSharedMap")}
+          </Link>
+        </nav>
+      </footer>
 
       {step ? (
         <div

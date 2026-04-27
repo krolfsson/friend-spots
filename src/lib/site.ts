@@ -2,4 +2,4 @@
 export const SITE_TITLE = "Mapsies";
 
 export const SITE_DESCRIPTION =
-  "Samla era bästa tips på karta — stad för stad, tillsammans med vänner.";
+  "Delad karta och gemensam tipslista för kompisgänget — stad för stad, med pinkod istället för konton.";
