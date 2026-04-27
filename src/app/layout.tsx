@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { Analytics } from "@vercel/analytics/next";
 import { Fredoka, M_PLUS_Rounded_1c } from "next/font/google";
 import { SITE_DESCRIPTION, SITE_TITLE } from "@/lib/site";
 import { getPublicSiteOrigin } from "@/lib/siteUrl";
@@ -73,6 +74,7 @@ export default function RootLayout({
         style={{ fontFamily: "var(--font-y2k), system-ui, sans-serif" }}
       >
         {children}
+        <Analytics />
       </body>
     </html>
   );
