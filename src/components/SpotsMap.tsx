@@ -384,7 +384,6 @@ export function SpotsMap({
     };
   // Använder plottedKey/boundsKey (enbart ID+koordinater) som deps istället för hela spot-arrayerna.
   // Det innebär att effekten INTE körs om när bara plusCount ändras → kartan återskapas inte vid plus-klick.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [apiKey, cityName, plottedKey, boundsKey, locale, roomSlug]);
 
   useEffect(() => {

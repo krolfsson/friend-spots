@@ -352,11 +352,6 @@ export function CityClient({
     return [...displaySpots].sort(sortSpotsByCreatedAtNewestFirst);
   }, [displaySpots, listSort]);
 
-  const addTargetCity = useMemo(
-    () => cityList.find((c) => c.slug === addTargetSlug) ?? activeCity,
-    [cityList, addTargetSlug, activeCity],
-  );
-
   const refreshCity = useCallback(async (slug: string, signal?: AbortSignal) => {
     setError(null);
     try {
