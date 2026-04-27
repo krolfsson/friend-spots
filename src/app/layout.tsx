@@ -21,8 +21,16 @@ const logo = Fredoka({
   adjustFontFallback: true,
 });
 
+function metadataBaseUrl(): URL {
+  try {
+    return new URL(getPublicSiteOrigin());
+  } catch {
+    return new URL("https://mapsies.com");
+  }
+}
+
 export const metadata: Metadata = {
-  metadataBase: new URL(getPublicSiteOrigin()),
+  metadataBase: metadataBaseUrl(),
   title: {
     default: SITE_TITLE,
     template: `%s · ${SITE_TITLE}`,

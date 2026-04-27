@@ -14,6 +14,23 @@ import { notFound } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
+/** Endast fält som går att serialisera till Client Component (inga `Date` från Prisma). */
+function cityForClient(c: {
+  id: string;
+  name: string;
+  slug: string;
+  emoji: string | null;
+  _count?: { spots: number };
+}) {
+  return {
+    id: c.id,
+    name: c.name,
+    slug: c.slug,
+    emoji: c.emoji,
+    ...(c._count !== undefined ? { _count: c._count } : {}),
+  };
+}
+
 export async function generateMetadata({
   params,
 }: {
@@ -120,13 +137,16 @@ export default async function RoomPage({ params }: { params: Promise<{ roomSlug:
     if (envHit) city = envHit;
   }
 
+  const citiesClient = cities.map(cityForClient);
+  const cityClient = cityForClient(city);
+
   return (
     <CityClient
       roomSlug={canonicalSlug}
       roomTitle={room.name?.trim() || canonicalSlug}
       locale={locale}
-      cities={cities}
-      city={city}
+      cities={citiesClient}
+      city={cityClient}
       dashboard={bySlug}
       viewOnly={!authed}
       roomPublicRead={room.publicRead}
