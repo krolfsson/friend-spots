@@ -260,6 +260,7 @@ export function CityClient({
   const [qrOpen, setQrOpen] = useState(false);
   const [renameOpen, setRenameOpen] = useState(false);
   const [renameBusy, setRenameBusy] = useState(false);
+  const [publicReadPatchBusy, setPublicReadPatchBusy] = useState(false);
   const [renameValue, setRenameValue] = useState(roomTitle);
   const [publicReadSetting, setPublicReadSetting] = useState(roomPublicRead);
   const [roomTitleLive, setRoomTitleLive] = useState(roomTitle);
@@ -517,6 +518,32 @@ export function CityClient({
       setRenameBusy(false);
     }
   }, [renameBusy, renameValue, publicReadSetting, roomSlug, showToast, locale]);
+
+  const patchPublicRead = useCallback(
+    async (next: boolean) => {
+      if (viewOnly || publicReadPatchBusy || renameBusy) return;
+      const prev = publicReadSetting;
+      setPublicReadSetting(next);
+      setPublicReadPatchBusy(true);
+      try {
+        const res = await fetch(`/api/rooms/${encodeURIComponent(roomSlug)}/name`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ publicRead: next }),
+        });
+        const data = (await res.json()) as { publicRead?: boolean; error?: string };
+        if (!res.ok) throw new Error(data.error ?? t(locale, "rename.errorDefault"));
+        if (typeof data.publicRead === "boolean") setPublicReadSetting(data.publicRead);
+        showToast(t(locale, "rename.settingsSavedToast"), "success");
+      } catch (e) {
+        setPublicReadSetting(prev);
+        showToast(e instanceof Error ? e.message : t(locale, "rename.errorDefault"), "info");
+      } finally {
+        setPublicReadPatchBusy(false);
+      }
+    },
+    [viewOnly, publicReadPatchBusy, renameBusy, publicReadSetting, roomSlug, showToast, locale],
+  );
 
   const removeSpot = useCallback((spotId: string, slug: string, spotCategories: string[]) => {
     setBundle((prev) => {
@@ -969,6 +996,7 @@ export function CityClient({
                   type="checkbox"
                   className="mt-0.5 h-4 w-4 shrink-0 rounded border-indigo-300 text-indigo-600 focus:ring-indigo-400"
                   checked={publicReadSetting}
+                  disabled={renameBusy || publicReadPatchBusy}
                   onChange={(e) => setPublicReadSetting(e.target.checked)}
                 />
                 <span className="min-w-0">
@@ -985,7 +1013,7 @@ export function CityClient({
             <div className="flex gap-2 border-t border-indigo-200/60 bg-white/60 p-3">
               <button
                 type="button"
-                disabled={renameBusy}
+                disabled={renameBusy || publicReadPatchBusy}
                 onClick={() => void saveRoomTitle()}
                 className="ui-press inline-flex min-h-11 flex-1 items-center justify-center rounded-2xl bg-gradient-to-r from-emerald-400 to-teal-500 px-4 py-3 text-sm font-extrabold text-white shadow-sm shadow-emerald-500/20 ring-1 ring-white/60 transition hover:brightness-110 active:scale-[0.99] disabled:opacity-50"
               >
@@ -1109,6 +1137,28 @@ export function CityClient({
                 <span aria-hidden>❌</span>
               </button>
             </header>
+
+            {!viewOnly ? (
+              <div className="border-b border-indigo-100/80 px-4 py-3">
+                <label className="flex cursor-pointer items-start gap-3 rounded-2xl border border-indigo-100/90 bg-indigo-50/50 p-3">
+                  <input
+                    type="checkbox"
+                    className="mt-0.5 h-4 w-4 shrink-0 rounded border-indigo-300 text-indigo-600 focus:ring-indigo-400 disabled:opacity-50"
+                    checked={publicReadSetting}
+                    disabled={publicReadPatchBusy || renameBusy}
+                    onChange={(e) => void patchPublicRead(e.target.checked)}
+                  />
+                  <span className="min-w-0">
+                    <span className="block text-xs font-extrabold text-indigo-950">
+                      {t(locale, "rename.publicReadLabel")}
+                    </span>
+                    <span className="mt-1 block text-[11px] font-semibold leading-snug text-indigo-900/55">
+                      {t(locale, "rename.publicReadHint")}
+                    </span>
+                  </span>
+                </label>
+              </div>
+            ) : null}
 
             <div className="grid grid-cols-2 gap-2 p-3">
               <a
