@@ -1,15 +1,15 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
-import { getAuthorizedRoomFromRequest } from "@/lib/roomAuth";
+import { getAuthorizedRoomFromRequest, getReadableRoomFromRequest } from "@/lib/roomAuth";
 import { prisma } from "@/lib/prisma";
 import { slugify } from "@/lib/slug";
 
 export async function GET(req: NextRequest) {
-  const auth = await getAuthorizedRoomFromRequest(req);
-  if (!auth.ok) return auth.response;
+  const read = await getReadableRoomFromRequest(req);
+  if (!read.ok) return read.response;
 
   const cities = await prisma.city.findMany({
-    where: { roomId: auth.room.id },
+    where: { roomId: read.room.id },
     orderBy: { name: "asc" },
     include: { _count: { select: { spots: true } } },
   });

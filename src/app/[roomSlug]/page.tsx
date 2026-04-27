@@ -24,14 +24,20 @@ export async function generateMetadata({
   if (!slug || isReservedRoomSlug(slug)) {
     return { title: "Saknas" };
   }
-  const room = await findRoomBySlugInsensitive(slug, { name: true, slug: true });
+  const room = await findRoomBySlugInsensitive(slug, { id: true, name: true, slug: true, publicRead: true });
   if (!room) {
     return { title: "Saknas" };
   }
   const label = room.name?.trim() || room.slug;
+  const jar = await cookies();
+  const token = jar.get(ROOM_ACCESS_COOKIE)?.value;
+  const claims = token ? verifyRoomAccessToken(token) : null;
+  const guestPublic = Boolean(room.publicRead && !(claims && claims.roomId === room.id));
+
   return {
     title: label,
     description: SITE_DESCRIPTION,
+    ...(guestPublic ? { robots: { index: false, follow: true } as const } : {}),
     openGraph: {
       title: label,
       description: SITE_DESCRIPTION,
@@ -52,7 +58,12 @@ export default async function RoomPage({ params }: { params: Promise<{ roomSlug:
   const slug = roomSlug.trim();
   if (!slug || isReservedRoomSlug(slug)) notFound();
 
-  const room = await findRoomBySlugInsensitive(slug, { id: true, slug: true, name: true });
+  const room = await findRoomBySlugInsensitive(slug, {
+    id: true,
+    slug: true,
+    name: true,
+    publicRead: true,
+  });
   if (!room) notFound();
 
   const canonicalSlug = room.slug;
@@ -62,7 +73,7 @@ export default async function RoomPage({ params }: { params: Promise<{ roomSlug:
   const claims = token ? verifyRoomAccessToken(token) : null;
   const authed = Boolean(claims && claims.roomId === room.id);
 
-  if (!authed) {
+  if (!authed && !room.publicRead) {
     return (
       <UnlockRoomForm
         roomSlug={canonicalSlug}
@@ -75,6 +86,23 @@ export default async function RoomPage({ params }: { params: Promise<{ roomSlug:
   const { cities, bySlug } = await getDashboardDataForRoom(room.id);
 
   if (!cities.length) {
+    if (!authed) {
+      return (
+        <div className="mx-auto max-w-md px-4 py-16">
+          <p className="mb-4 text-center text-sm font-bold text-indigo-900/70">
+            {t(locale, "room.publicEmptyGuest")}
+          </p>
+          <p className="mb-6 text-center text-xs font-semibold text-indigo-900/50">
+            {t(locale, "room.publicEmptyGuestHint")}
+          </p>
+          <UnlockRoomForm
+            roomSlug={canonicalSlug}
+            title={room.name?.trim() || canonicalSlug}
+            locale={locale}
+          />
+        </div>
+      );
+    }
     return (
       <div className="mx-auto max-w-md px-4 py-16">
         <p className="mb-4 text-center text-sm font-bold text-indigo-900/60">
@@ -100,6 +128,8 @@ export default async function RoomPage({ params }: { params: Promise<{ roomSlug:
       cities={cities}
       city={city}
       dashboard={bySlug}
+      viewOnly={!authed}
+      roomPublicRead={room.publicRead}
     />
   );
 }

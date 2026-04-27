@@ -14,6 +14,8 @@ model Room {
   slug      String   @unique
   pinHash   String
   name      String?
+  /** Om true: vem som helst med länken kan läsa karta/lista utan PIN; like/redigera kräver fortfarande PIN. */
+  publicRead Boolean  @default(false)
   createdAt DateTime @default(now())
   cities    City[]
 }
@@ -26,6 +28,8 @@ model City {
   slug      String
   /** Valfri emoji/flagga som visas i stadsmenyn (t.ex. 🇸🇪). */
   emoji     String?
+  /** Markerar vilken stad som laddas som standard vid besök. Max en per room. */
+  isDefault Boolean  @default(false)
   createdAt DateTime @default(now())
   spots     Spot[]
 

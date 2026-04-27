@@ -90,6 +90,8 @@ export function SpotsMap({
   cityName,
   locale = "sv",
   roomSlug,
+  viewOnly = false,
+  onRequireUnlock,
   userHereOn = false,
   onUserHereError,
   onPlusToggled,
@@ -103,6 +105,9 @@ export function SpotsMap({
   cityName: string;
   locale?: Locale;
   roomSlug: string;
+  /** Gäst: plus-knappen öppnar PIN istället för att anropa API. */
+  viewOnly?: boolean;
+  onRequireUnlock?: () => void;
   userHereOn?: boolean;
   onUserHereError?: (message: string) => void;
   /**
@@ -151,9 +156,13 @@ export function SpotsMap({
   const plottedRef = useRef(plotted);
   const boundsPlottedRef = useRef(boundsPlotted);
   const onPlusToggledRef = useRef(onPlusToggled);
+  const viewOnlyRef = useRef(viewOnly);
+  const onRequireUnlockRef = useRef(onRequireUnlock);
   plottedRef.current = plotted;
   boundsPlottedRef.current = boundsPlotted;
   onPlusToggledRef.current = onPlusToggled;
+  viewOnlyRef.current = viewOnly;
+  onRequireUnlockRef.current = onRequireUnlock;
 
   useEffect(() => {
     if (!apiKey) {
@@ -278,6 +287,10 @@ export function SpotsMap({
             plusWrap.addEventListener("click", async (e) => {
               e.preventDefault();
               e.stopPropagation();
+              if (viewOnlyRef.current) {
+                onRequireUnlockRef.current?.();
+                return;
+              }
               if (plusWrap.disabled) return;
               plusWrap.disabled = true;
               try {
