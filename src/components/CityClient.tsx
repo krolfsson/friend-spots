@@ -9,7 +9,6 @@ import { createPortal } from "react-dom";
 import { AddSpotForm } from "@/components/AddSpotForm";
 import { CreateRoomModal } from "@/components/CreateRoomModal";
 import { QrModal } from "@/components/QrModal";
-import { UnlockRoomModal } from "@/components/UnlockRoomModal";
 import { CityPickOrCreate } from "@/components/CityPickOrCreate";
 import {
   CATEGORIES,
@@ -233,8 +232,6 @@ export function CityClient({
   cities,
   city,
   dashboard,
-  viewOnly = false,
-  roomPublicRead = false,
 }: {
   roomSlug: string;
   roomTitle: string;
@@ -242,10 +239,6 @@ export function CityClient({
   cities: City[];
   city: City;
   dashboard: DashboardBySlug;
-  /** Gäst: ser karta/lista utan PIN; like/redigera öppnar upplåsningsmodal. */
-  viewOnly?: boolean;
-  /** Nuvarande inställning (endast för medlemmar som ändrar i inställningar). */
-  roomPublicRead?: boolean;
 }) {
   const [cityList, setCityList] = useState<City[]>(cities);
   const [activeCity, setActiveCity] = useState<City>(city);
@@ -261,9 +254,7 @@ export function CityClient({
   const [renameOpen, setRenameOpen] = useState(false);
   const [renameBusy, setRenameBusy] = useState(false);
   const [renameValue, setRenameValue] = useState(roomTitle);
-  const [publicReadSetting, setPublicReadSetting] = useState(roomPublicRead);
   const [roomTitleLive, setRoomTitleLive] = useState(roomTitle);
-  const [unlockOpen, setUnlockOpen] = useState(false);
   const [hereOn, setHereOn] = useState(false);
   /** Stad som POST /api/spots använder — samma som vald rad i lägg-till-panelen. */
   const [addTargetSlug, setAddTargetSlug] = useState(city.slug);
@@ -299,10 +290,6 @@ export function CityClient({
     setRoomTitleLive(roomTitle);
     setRenameValue(roomTitle);
   }, [roomTitle]);
-
-  useEffect(() => {
-    setPublicReadSetting(roomPublicRead);
-  }, [roomPublicRead]);
 
   useEffect(() => {
     setCityList(cities);
@@ -484,15 +471,6 @@ export function CityClient({
     setShareOpen(true);
   }, [sharePayload]);
 
-  const tryOpenAdd = useCallback(() => {
-    if (viewOnly) {
-      setUnlockOpen(true);
-      return;
-    }
-    setAddTargetSlug(activeCity.slug);
-    setAddOpen(true);
-  }, [viewOnly, activeCity.slug]);
-
   const saveRoomTitle = useCallback(async () => {
     if (renameBusy) return;
     const next = renameValue.trim();
@@ -502,26 +480,21 @@ export function CityClient({
       const res = await fetch(`/api/rooms/${encodeURIComponent(roomSlug)}/name`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: next || null, publicRead: publicReadSetting }),
+        body: JSON.stringify({ name: next || null }),
       });
-      const data = (await res.json()) as {
-        name?: string | null;
-        publicRead?: boolean;
-        error?: string;
-      };
+      const data = (await res.json()) as { name?: string | null; error?: string };
       if (!res.ok) throw new Error(data.error ?? t(locale, "rename.errorDefault"));
       const saved = (data.name ?? "").trim();
       const label = saved || roomSlug;
       setRoomTitleLive(label);
-      if (typeof data.publicRead === "boolean") setPublicReadSetting(data.publicRead);
       setRenameOpen(false);
-      showToast(t(locale, "rename.settingsSavedToast"), "success");
+      showToast(t(locale, "rename.successToast"), "success");
     } catch (e) {
       setError(e instanceof Error ? e.message : "Okänt fel");
     } finally {
       setRenameBusy(false);
     }
-  }, [renameBusy, renameValue, publicReadSetting, roomSlug, showToast, locale]);
+  }, [renameBusy, renameValue, roomSlug, showToast, locale]);
 
   const removeSpot = useCallback((spotId: string, slug: string, spotCategories: string[]) => {
     setBundle((prev) => {
@@ -654,7 +627,6 @@ export function CityClient({
   }
 
   function cityLongPressStart(c: City) {
-    if (viewOnly) return;
     longPressTimerRef.current = setTimeout(() => {
       openCityEdit(c);
     }, 500);
@@ -674,11 +646,6 @@ export function CityClient({
 
   return (
     <div className="mapsies-body-bg mapsies-room-chrome-y relative mx-auto flex h-dvh max-h-dvh w-full max-w-5xl flex-col overflow-hidden px-[0.96rem] xl:max-w-7xl 2xl:max-w-[min(100%,88rem)]">
-      {viewOnly ? (
-        <div className="shrink-0 border-b border-amber-200/80 bg-amber-50/90 px-3 py-2 text-center text-[11px] font-bold leading-snug text-amber-950 sm:text-xs">
-          {t(locale, "room.guestBanner")}
-        </div>
-      ) : null}
       <div className="relative z-40 shrink-0">
         {/* En gemensam gradient-yta för alla chip-rader — annars repeteras radialerna per rad och ger “randiga” band. */}
         <div className="mapsies-body-bg relative space-y-[0.6rem] pb-[0.6rem]">
@@ -693,14 +660,7 @@ export function CityClient({
                     onPointerDown={() => cityLongPressStart(c)}
                     onPointerUp={cityLongPressCancel}
                     onPointerLeave={cityLongPressCancel}
-                    onContextMenu={(e) => {
-                      e.preventDefault();
-                      if (viewOnly) {
-                        setUnlockOpen(true);
-                        return;
-                      }
-                      openCityEdit(c);
-                    }}
+                    onContextMenu={(e) => { e.preventDefault(); openCityEdit(c); }}
                     className={`pointer-events-auto inline-flex h-9 min-h-9 shrink-0 items-center justify-center gap-[0.45rem] rounded-full px-[0.84rem] text-sm font-extrabold leading-none tracking-tight transition active:scale-95 ${
                       active ? "y2k-chip-active text-white" : "y2k-chip text-indigo-950 hover:-translate-y-0.5"
                     }`}
@@ -762,18 +722,37 @@ export function CityClient({
                   </div>
                   {viewMode === "list" ? (
                     <div className="w-full sm:w-auto sm:shrink-0">
-                      <NewTipPillButton fullWidthMaxSm locale={locale} onClick={tryOpenAdd} />
+                      <NewTipPillButton
+                        fullWidthMaxSm
+                        locale={locale}
+                        onClick={() => {
+                          setAddTargetSlug(activeCity.slug);
+                          setAddOpen(true);
+                        }}
+                      />
                     </div>
                   ) : (
                     <div className="hidden w-full sm:block sm:w-auto sm:shrink-0">
-                      <NewTipPillButton locale={locale} onClick={tryOpenAdd} />
+                      <NewTipPillButton
+                        locale={locale}
+                        onClick={() => {
+                          setAddTargetSlug(activeCity.slug);
+                          setAddOpen(true);
+                        }}
+                      />
                     </div>
                   )}
                 </div>
               </div>
             ) : (
               <div>
-                <NewTipPillButton locale={locale} onClick={tryOpenAdd} />
+                <NewTipPillButton
+                  locale={locale}
+                  onClick={() => {
+                    setAddTargetSlug(activeCity.slug);
+                    setAddOpen(true);
+                  }}
+                />
               </div>
             )}
           </div>
@@ -802,22 +781,26 @@ export function CityClient({
                   cityName={activeCity.name}
                   locale={locale}
                   roomSlug={roomSlug}
-                  viewOnly={viewOnly}
-                  onRequireUnlock={() => setUnlockOpen(true)}
                   userHereOn={hereOn}
                   onUserHereError={(msg) => showToast(msg, "info")}
                   onPlusToggled={handleMapPlusToggled}
                   overlay={
                   <>
                     <div className="pointer-events-auto sm:hidden">
-                      <NewTipPillButton locale={locale} onClick={tryOpenAdd} />
+                      <NewTipPillButton
+                        locale={locale}
+                        onClick={() => {
+                          setAddTargetSlug(activeCity.slug);
+                          setAddOpen(true);
+                        }}
+                      />
                     </div>
                     <div className="pointer-events-auto flex min-w-0 flex-col items-end gap-[0.6rem]">
                       <div className="inline-flex h-9 min-h-9 max-w-[min(70vw,18rem)] items-center gap-2 rounded-full bg-white/85 px-[0.84rem] text-sm font-extrabold leading-none tracking-tight text-indigo-950 shadow-sm shadow-indigo-500/10 ring-1 ring-white/60 backdrop-blur-sm">
                         <span className="truncate">{roomTitleLive}</span>
                         <button
                           type="button"
-                          onClick={() => (viewOnly ? setUnlockOpen(true) : setRenameOpen(true))}
+                          onClick={() => setRenameOpen(true)}
                           className="grid h-7 w-7 shrink-0 place-items-center rounded-full border border-indigo-200/70 bg-white/85 text-indigo-900/80 shadow-sm transition hover:bg-indigo-50 active:scale-95"
                           aria-label={t(locale, "rename.title")}
                           title={t(locale, "rename.title")}
@@ -862,8 +845,6 @@ export function CityClient({
                       spot={s}
                       mapsCityName={activeCity.name}
                       locale={locale}
-                      viewOnly={viewOnly}
-                      onRequireUnlock={() => setUnlockOpen(true)}
                       onPurge={() => removeSpot(s.id, activeCity.slug, s.categories)}
                       onEdited={() => void refreshCity(activeCity.slug)}
                     />
@@ -874,8 +855,7 @@ export function CityClient({
           </div>
 
           <div className="shrink-0 space-y-[0.6rem]">
-          <div className={`grid gap-[0.6rem] sm:gap-3 ${viewOnly ? "grid-cols-1" : "grid-cols-2"}`}>
-            {viewOnly ? null : (
+          <div className="grid grid-cols-2 gap-[0.6rem] sm:gap-3">
             <button
               type="button"
               onClick={() => setCreateRoomOpen(true)}
@@ -889,7 +869,6 @@ export function CityClient({
               </span>
               <span className="min-w-0 cursor-default truncate">{t(locale, "room.actions.newMap")}</span>
             </button>
-            )}
             <button
               type="button"
               onClick={() => void shareRoom()}
@@ -968,23 +947,6 @@ export function CityClient({
                   ? `Leave empty to use the link (${roomSlug}).`
                   : <>Lämna tomt för att använda adressen (<span className="font-black">{roomSlug}</span>).</>}
               </p>
-
-              <label className="mt-4 flex cursor-pointer items-start gap-3 rounded-2xl border border-indigo-100/90 bg-indigo-50/50 p-3">
-                <input
-                  type="checkbox"
-                  className="mt-0.5 h-4 w-4 shrink-0 rounded border-indigo-300 text-indigo-600 focus:ring-indigo-400"
-                  checked={publicReadSetting}
-                  onChange={(e) => setPublicReadSetting(e.target.checked)}
-                />
-                <span className="min-w-0">
-                  <span className="block text-xs font-extrabold text-indigo-950">
-                    {t(locale, "rename.publicReadLabel")}
-                  </span>
-                  <span className="mt-1 block text-[11px] font-semibold leading-snug text-indigo-900/55">
-                    {t(locale, "rename.publicReadHint")}
-                  </span>
-                </span>
-              </label>
             </div>
 
             <div className="flex gap-2 border-t border-indigo-200/60 bg-white/60 p-3">
@@ -1277,14 +1239,6 @@ export function CityClient({
           </div>
         </div>
       ) : null}
-
-      <UnlockRoomModal
-        roomSlug={roomSlug}
-        title={roomTitleLive.trim() || roomSlug}
-        locale={locale}
-        open={unlockOpen}
-        onClose={() => setUnlockOpen(false)}
-      />
     </div>
   );
 }
@@ -1332,8 +1286,6 @@ function SpotCard({
   spot,
   mapsCityName,
   locale,
-  viewOnly = false,
-  onRequireUnlock,
   onPurge,
   onEdited,
 }: {
@@ -1341,8 +1293,6 @@ function SpotCard({
   spot: DashboardSpot;
   mapsCityName: string;
   locale: Locale;
-  viewOnly?: boolean;
-  onRequireUnlock?: () => void;
   onPurge: () => void;
   onEdited: () => void;
 }) {
@@ -1437,7 +1387,6 @@ function SpotCard({
   );
 
   const deleteSpot = useCallback(async () => {
-    if (viewOnly) return;
     if (!window.confirm(t(locale, "spots.deleteConfirm"))) return;
     try {
       const res = await fetch(`/api/spots?spotId=${encodeURIComponent(spot.id)}`, {
@@ -1452,13 +1401,9 @@ function SpotCard({
     } catch {
       window.alert(locale === "en" ? "Network error." : "Nätverksfel.");
     }
-  }, [onPurge, roomSlug, spot.id, locale, viewOnly]);
+  }, [onPurge, roomSlug, spot.id, locale]);
 
   const openEditor = useCallback(() => {
-    if (viewOnly) {
-      onRequireUnlock?.();
-      return;
-    }
     setMenu(null);
     setEditName(spot.name);
     setEditNeighborhood(spot.neighborhood ?? "");
@@ -1466,16 +1411,12 @@ function SpotCard({
     setEditCategories(new Set(sanitizeCategoryIds(spot.categories)));
     setSaveError(null);
     setEditing(true);
-  }, [spot, viewOnly, onRequireUnlock]);
+  }, [spot]);
 
   /** 1 = nytt tips, varje anonym +1 höjer totalen. */
   const displayScore = 1 + spot.plusCount;
 
   const togglePlus = useCallback(async () => {
-    if (viewOnly) {
-      onRequireUnlock?.();
-      return;
-    }
     const tok = getOrCreateVoterToken();
     if (!tok) return;
     setPlusBusy(true);
@@ -1505,7 +1446,7 @@ function SpotCard({
     } finally {
       setPlusBusy(false);
     }
-  }, [onEdited, roomSlug, spot.id, spot.viewerHasPlussed, viewOnly, onRequireUnlock]);
+  }, [onEdited, roomSlug, spot.id, spot.viewerHasPlussed]);
 
   const saveEdit = useCallback(async () => {
     setSaving(true);
@@ -1586,7 +1527,6 @@ function SpotCard({
               >
                 {t(locale, "room.actions.directions")}
               </a>
-              {viewOnly ? null : (
               <button
                 type="button"
                 className="grid h-[1.4rem] w-[1.4rem] shrink-0 select-none place-items-center rounded-full border border-indigo-200/70 bg-white/85 text-[11px] leading-none text-indigo-900/85 shadow-sm ring-1 ring-white/55 transition hover:bg-indigo-50/90 active:scale-95"
@@ -1605,7 +1545,6 @@ function SpotCard({
               >
                 <span aria-hidden>⚙️</span>
               </button>
-              )}
             </div>
           </div>
         </div>

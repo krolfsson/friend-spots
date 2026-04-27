@@ -111,16 +111,6 @@ export const MESSAGES: Record<Locale, Record<string, string>> = {
     "rename.saving": "Sparar…",
     "rename.successToast": "Namn uppdaterat.",
     "rename.errorDefault": "Kunde inte spara namn",
-    "rename.publicReadLabel": "Alla med länken kan se (läsning)",
-    "rename.publicReadHint":
-      "Gäster ser karta och listor utan PIN. För att likea eller lägga till tips krävs fortfarande pinkod.",
-    "rename.settingsSavedToast": "Inställningar sparade.",
-
-    "room.publicUnlock.lede": "Ange pinkod för att likea, lägga till tips eller ändra mapsien.",
-    "room.publicEmptyGuest": "Den här mapsien har inga städer ännu.",
-    "room.publicEmptyGuestHint": "Skapa den första staden med pinkod nedan.",
-    "room.guestBanner":
-      "Du tittar som gäst — kartan och listorna är skrivskyddade. Ange pinkod när du vill bidra.",
 
     "add.title": "Nytt tips",
     "add.cityLabel": "Stad",
@@ -259,16 +249,6 @@ export const MESSAGES: Record<Locale, Record<string, string>> = {
     "rename.saving": "Saving…",
     "rename.successToast": "Mapsie name updated.",
     "rename.errorDefault": "Could not save name",
-    "rename.publicReadLabel": "Anyone with the link can view (read-only)",
-    "rename.publicReadHint":
-      "Guests see the map and lists without a PIN. Liking or adding tips still requires the PIN.",
-    "rename.settingsSavedToast": "Settings saved.",
-
-    "room.publicUnlock.lede": "Enter the PIN to like, add tips, or change this mapsie.",
-    "room.publicEmptyGuest": "This mapsie has no cities yet.",
-    "room.publicEmptyGuestHint": "Create the first city using the PIN form below.",
-    "room.guestBanner":
-      "You’re viewing as a guest — the map and lists are read-only. Enter the PIN when you want to contribute.",
 
     "add.title": "New tip",
     "add.cityLabel": "City",

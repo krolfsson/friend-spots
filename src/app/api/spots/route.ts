@@ -4,7 +4,7 @@ import { isCategoryId, mergeCategoryIds, sanitizeCategoryIds } from "@/lib/categ
 import type { DashboardSpot } from "@/lib/dashboardTypes";
 import { fetchPlaceEssentials } from "@/lib/google/placesServer";
 import { prisma } from "@/lib/prisma";
-import { getAuthorizedRoomFromRequest, getReadableRoomFromRequest } from "@/lib/roomAuth";
+import { getAuthorizedRoomFromRequest } from "@/lib/roomAuth";
 import { sortSpotsForDisplay } from "@/lib/sortSpots";
 import { getRequestClientIp, isValidVoterToken, makeVoterKey } from "@/lib/voterKey";
 
@@ -44,8 +44,8 @@ function toDashboardSpot(
 }
 
 export async function GET(req: NextRequest) {
-  const read = await getReadableRoomFromRequest(req);
-  if (!read.ok) return read.response;
+  const auth = await getAuthorizedRoomFromRequest(req);
+  if (!auth.ok) return auth.response;
 
   const { searchParams } = new URL(req.url);
   const citySlug = searchParams.get("citySlug");
@@ -57,7 +57,7 @@ export async function GET(req: NextRequest) {
   }
 
   const city = await prisma.city.findUnique({
-    where: { roomId_slug: { roomId: read.room.id, slug: citySlug } },
+    where: { roomId_slug: { roomId: auth.room.id, slug: citySlug } },
   });
   if (!city) {
     return NextResponse.json({ error: "Staden finns inte" }, { status: 404 });
@@ -113,7 +113,7 @@ export async function GET(req: NextRequest) {
     isValidVoterToken(voterHeader) ? makeVoterKey(voterHeader, getRequestClientIp(req)) : null;
 
   let plussedSet: Set<string> | null = null;
-  if (!read.guest && voterKey && spots.length) {
+  if (voterKey && spots.length) {
     const rows = await prisma.spotPlus.findMany({
       where: {
         voterKey,
