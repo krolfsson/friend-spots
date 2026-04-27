@@ -94,3 +94,24 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }
+
+export async function DELETE(req: NextRequest) {
+  try {
+    const auth = await getAuthorizedRoomFromRequest(req);
+    if (!auth.ok) return auth.response;
+
+    const cityId = req.nextUrl.searchParams.get("cityId")?.trim();
+    if (!cityId) return NextResponse.json({ error: "cityId saknas" }, { status: 400 });
+
+    const existing = await prisma.city.findFirst({
+      where: { id: cityId, roomId: auth.room.id },
+    });
+    if (!existing) return NextResponse.json({ error: "Stad hittades inte" }, { status: 404 });
+
+    await prisma.city.delete({ where: { id: cityId } });
+    return NextResponse.json({ ok: true });
+  } catch (e) {
+    const message = e instanceof Error ? e.message : "Okänt fel";
+    return NextResponse.json({ error: message }, { status: 500 });
+  }
+}

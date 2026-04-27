@@ -75,6 +75,11 @@ export const MESSAGES: Record<Locale, Record<string, string>> = {
     "room.city.editNamePlaceholder": "Stadens namn",
     "room.city.editEmojiPlaceholder": "🌍",
     "room.city.editError": "Kunde inte spara",
+    "room.city.deleteCta": "Radera stad…",
+    "room.city.deleteBusy": "Raderar…",
+    "room.city.deleteError": "Kunde inte radera stad",
+    "room.city.deleteConfirm": "Radera \"{name}\" och alla tips i staden? Det går inte att ångra.",
+    "room.city.deleteSuccessToast": "Staden är raderad",
 
     "cat.frukost": "Frukost",
     "cat.lunch": "Lunch",
@@ -206,6 +211,11 @@ export const MESSAGES: Record<Locale, Record<string, string>> = {
     "room.city.editNamePlaceholder": "City name",
     "room.city.editEmojiPlaceholder": "🌍",
     "room.city.editError": "Could not save",
+    "room.city.deleteCta": "Delete city…",
+    "room.city.deleteBusy": "Deleting…",
+    "room.city.deleteError": "Could not delete city",
+    "room.city.deleteConfirm": "Delete \"{name}\" and all tips in that city? This cannot be undone.",
+    "room.city.deleteSuccessToast": "City deleted",
 
     "cat.frukost": "Breakfast",
     "cat.lunch": "Lunch",

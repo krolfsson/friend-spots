@@ -1,9 +1,10 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import type { Locale } from "@/lib/i18n";
-import { t } from "@/lib/i18n";
+import { t, tReplace } from "@/lib/i18n";
 import { createPortal } from "react-dom";
 import { AddSpotForm } from "@/components/AddSpotForm";
 import { CreateRoomModal } from "@/components/CreateRoomModal";
@@ -271,7 +272,9 @@ export function CityClient({
   const [editCityName, setEditCityName] = useState("");
   const [editCityEmoji, setEditCityEmoji] = useState("");
   const [editCityBusy, setEditCityBusy] = useState(false);
+  const [editCityDeleting, setEditCityDeleting] = useState(false);
   const [editCityErr, setEditCityErr] = useState<string | null>(null);
+  const router = useRouter();
   const longPressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const onRoomViewSegment = useCallback((s: RoomViewSegment) => {
@@ -534,11 +537,13 @@ export function CityClient({
     setEditCityEmoji(c.emoji?.trim() ?? "");
     setEditCityErr(null);
     setEditCityBusy(false);
+    setEditCityDeleting(false);
   }
 
   function closeCityEdit() {
     setEditCityTarget(null);
     setEditCityErr(null);
+    setEditCityDeleting(false);
   }
 
   async function saveCityEdit() {
@@ -567,6 +572,57 @@ export function CityClient({
       setEditCityErr(e instanceof Error ? e.message : t(locale, "room.city.editError"));
     } finally {
       setEditCityBusy(false);
+    }
+  }
+
+  async function deleteCity() {
+    if (!editCityTarget || editCityBusy || editCityDeleting) return;
+    const cityToDelete = editCityTarget;
+    const deletedSlug = cityToDelete.slug;
+    if (
+      !window.confirm(
+        tReplace(locale, "room.city.deleteConfirm", { name: cityToDelete.name }),
+      )
+    ) {
+      return;
+    }
+    setEditCityDeleting(true);
+    setEditCityErr(null);
+    try {
+      const res = await fetch(`/api/cities?cityId=${encodeURIComponent(cityToDelete.id)}`, {
+        method: "DELETE",
+        headers: { "X-Room-Slug": roomSlug },
+      });
+      const data = (await res.json()) as { ok?: boolean; error?: string };
+      if (!res.ok) throw new Error(data.error ?? t(locale, "room.city.deleteError"));
+
+      const remaining = cityList.filter((c) => c.id !== cityToDelete.id);
+
+      if (remaining.length === 0) {
+        closeCityEdit();
+        showToast(t(locale, "room.city.deleteSuccessToast"), "success");
+        router.refresh();
+        return;
+      }
+
+      const sortedRemaining = [...remaining].sort((a, b) => a.name.localeCompare(b.name, "sv"));
+      const nextActive =
+        activeCity.id === cityToDelete.id ? sortedRemaining[0]! : activeCity;
+
+      setCityList(remaining);
+      setBundle((prev) => {
+        const next = { ...prev };
+        delete next[deletedSlug];
+        return next;
+      });
+      closeCityEdit();
+      setActiveCity(nextActive);
+      setAddTargetSlug((prev) => (remaining.some((c) => c.slug === prev) ? prev : nextActive.slug));
+      showToast(t(locale, "room.city.deleteSuccessToast"), "success");
+    } catch (e) {
+      setEditCityErr(e instanceof Error ? e.message : t(locale, "room.city.deleteError"));
+    } finally {
+      setEditCityDeleting(false);
     }
   }
 
@@ -963,7 +1019,7 @@ export function CityClient({
             <div className="flex gap-2 border-t border-indigo-200/60 bg-white/60 p-3">
               <button
                 type="button"
-                disabled={editCityBusy || !editCityName.trim()}
+                disabled={editCityBusy || editCityDeleting || !editCityName.trim()}
                 onClick={() => void saveCityEdit()}
                 className="ui-press inline-flex min-h-11 flex-1 items-center justify-center rounded-2xl bg-gradient-to-r from-fuchsia-500 to-violet-600 px-4 py-3 text-sm font-extrabold text-white shadow-sm ring-1 ring-white/60 transition hover:brightness-110 active:scale-[0.99] disabled:opacity-50"
               >
@@ -971,10 +1027,22 @@ export function CityClient({
               </button>
               <button
                 type="button"
+                disabled={editCityDeleting}
                 onClick={closeCityEdit}
-                className="ui-press inline-flex min-h-11 items-center justify-center rounded-2xl border border-indigo-200/70 bg-white/80 px-4 py-3 text-sm font-extrabold text-indigo-950 shadow-sm ring-1 ring-white/60 transition hover:brightness-105 active:scale-[0.99]"
+                className="ui-press inline-flex min-h-11 items-center justify-center rounded-2xl border border-indigo-200/70 bg-white/80 px-4 py-3 text-sm font-extrabold text-indigo-950 shadow-sm ring-1 ring-white/60 transition hover:brightness-105 active:scale-[0.99] disabled:opacity-50"
               >
                 {t(locale, "common.cancel")}
+              </button>
+            </div>
+
+            <div className="border-t border-rose-100/80 bg-rose-50/40 px-3 py-3">
+              <button
+                type="button"
+                disabled={editCityBusy || editCityDeleting}
+                onClick={() => void deleteCity()}
+                className="ui-press w-full rounded-2xl border border-rose-200/90 bg-white/90 px-4 py-2.5 text-sm font-extrabold text-rose-900 shadow-sm transition hover:bg-rose-50/90 active:scale-[0.99] disabled:opacity-50"
+              >
+                {editCityDeleting ? t(locale, "room.city.deleteBusy") : t(locale, "room.city.deleteCta")}
               </button>
             </div>
           </div>
