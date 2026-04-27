@@ -21,11 +21,31 @@ export async function findRoomIdBySlugInsensitive(slug: string): Promise<string 
   return findRoomIdBySlugInsensitiveCached(slug);
 }
 
+/** Produktion kan sakna migrerad kolumn tills `migrate deploy` körts — undvik total krasch. */
+function isMissingPublicReadColumnError(e: unknown): boolean {
+  const msg = e instanceof Error ? e.message : String(e);
+  if (!/publicRead/i.test(msg)) return false;
+  return /does not exist|Unknown column|42703|column.*not found|not available/i.test(msg);
+}
+
 export async function findRoomBySlugInsensitive<T extends Prisma.RoomSelect>(
   slug: string,
   select: T,
 ): Promise<Prisma.RoomGetPayload<{ select: T }> | null> {
   const id = await findRoomIdBySlugInsensitiveCached(slug);
   if (!id) return null;
-  return prisma.room.findUnique({ where: { id }, select });
+  try {
+    return await prisma.room.findUnique({ where: { id }, select });
+  } catch (e) {
+    if (!isMissingPublicReadColumnError(e)) throw e;
+    const sel = select as Record<string, unknown>;
+    if (!("publicRead" in sel)) throw e;
+    const { publicRead: _ignored, ...withoutPublicRead } = sel;
+    const row = await prisma.room.findUnique({
+      where: { id },
+      select: withoutPublicRead as unknown as T,
+    });
+    if (!row) return null;
+    return { ...row, publicRead: false } as Prisma.RoomGetPayload<{ select: T }>;
+  }
 }
