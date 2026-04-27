@@ -29,17 +29,28 @@ export async function PATCH(req: NextRequest, ctx: { params: Promise<{ slug: str
       return NextResponse.json({ error: "Inte behörig" }, { status: 403 });
     }
 
-    const body = (await req.json()) as { name?: string | null };
-    const nameRaw = typeof body.name === "string" ? body.name.trim() : "";
-    const name = nameRaw ? nameRaw.slice(0, 60) : null;
+    const body = (await req.json()) as { name?: string | null; publicRead?: boolean };
+    const data: { name?: string | null; publicRead?: boolean } = {};
+
+    if (body.name !== undefined) {
+      const nameRaw = typeof body.name === "string" ? body.name.trim() : "";
+      data.name = nameRaw ? nameRaw.slice(0, 60) : null;
+    }
+    if (typeof body.publicRead === "boolean") {
+      data.publicRead = body.publicRead;
+    }
+
+    if (Object.keys(data).length === 0) {
+      return NextResponse.json({ error: "Inget att uppdatera" }, { status: 400 });
+    }
 
     const updated = await prisma.room.update({
       where: { id: room.id },
-      data: { name },
-      select: { name: true },
+      data,
+      select: { name: true, publicRead: true },
     });
 
-    return NextResponse.json({ ok: true, name: updated.name });
+    return NextResponse.json({ ok: true, name: updated.name, publicRead: updated.publicRead });
   } catch (e) {
     const message = e instanceof Error ? e.message : "Okänt fel";
     return NextResponse.json({ error: message }, { status: 500 });
