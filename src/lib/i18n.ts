@@ -13,7 +13,7 @@ export const MESSAGES: Record<Locale, Record<string, string>> = {
   sv: {
     "home.title": "Skapa en mapsie med kompisgänget",
     "home.lede":
-      "Skapa en länk, dela den i gruppchatten och fyll mapsien med era favoritplatser och tips. Välj en pinkod så att nya webbläsare kan låsa upp mapsien (inloggningen sparas som kaka i upp till 90 dagar).",
+      "Skapa en länk och fyll mapsien med favoritställen och tips. Pinkoden är för er som ska kunna lägga till och ändra — den som har den kan fylla i, likea och redigera. Ni kan också låta vem som helst med länken bara läsa (read only); det slår ni på under kartans inställningar (kugghjulet vid namnet) efter att mapsien skapats. Pinkinloggning sparas som kaka i upp till 90 dagar.",
     "home.create.nameLabel": "Namn (du kan ändra detta senare)",
     "home.create.namePlaceholder": "t.ex. Bucketlist 4 Lyfe",
     "home.create.pinLabel": "Pinkod",
@@ -27,7 +27,7 @@ export const MESSAGES: Record<Locale, Record<string, string>> = {
     "home.hero.lead":
       "Inga konton, inga onödiga integreringar (eller ok, en – Google Maps). Inga dashboards eller andra saker ni aldrig bad om.",
     "home.hero.sub":
-      "Ni samlar era favoritställen på en karta, likear det ni gillar, lägger till fler städer när ni vill – och en pinkod så inte halva internet snubblar in av misstag.",
+      "Pinkod för gänget som ska fylla i kartan; dela gärna en läslänk till andra. Read only och övrigt ställer ni in under inställningarna efter att mapsien skapats.",
     "home.stats.line": "{count} tips sparade hittills.",
     "home.footer.guideDeladKarta": "Guide: delad karta",
     "home.footer.guideSharedMap": "Guide: shared map (EN)",
@@ -41,9 +41,9 @@ export const MESSAGES: Record<Locale, Record<string, string>> = {
     "home.step.closeOverlayAria": "Stäng",
     "home.step.create.title": "Ny mapsie — nice!",
     "home.step.create.lede":
-      "Välj ett namn som känns rätt (ni kan byta sen) och en pinkod som bara gänget fattar. Sen får ni en länk att slänga i chatten.",
+      "Välj namn och pinkod som bara ni som ska bidra ska veta — den som har pinkoden kan lägga till tips, likea och ändra. Sen får ni en länk till chatten. Ska fler bara få titta? Slå på läsläge under inställningar (kugghjulet vid kartnamnet) när mapsien finns.",
     "home.step.create.pinHint":
-      "Pinkoden är bara så inte helt random folk råkar in i er mapsie. Sparas som kaka i typ 90 dagar.",
+      "Pinkoden låser upp skrivläge för er som bygger mapsien. Utan pinkod kan ni ändå låta folk bara läsa om ni aktiverar det i inställningarna efter skapandet. Kakan håller i ungefär 90 dagar.",
     "home.step.mapNameLabel": "Namn på mapsien",
     "home.step.open.title": "Välkommen tillbaka",
     "home.step.open.lede":
@@ -161,7 +161,7 @@ export const MESSAGES: Record<Locale, Record<string, string>> = {
   en: {
     "home.title": "Make a mapsie with friends",
     "home.lede":
-      "Create a link, share it in the group chat, and fill the mapsie with your favorite places and tips. Choose a PIN so new browsers can unlock the mapsie (sign-in is saved as a cookie for up to 90 days).",
+      "Create a link and fill your mapsie with favorite spots and tips. The PIN is for people who should be able to add and edit — anyone with it can fill in, like, and change things. You can also let anyone with the link view only (read-only); turn that on in the mapsie settings (gear next to the name) after it’s created. Unlocking is saved as a cookie for up to 90 days.",
     "home.create.nameLabel": "Name (you can change this later)",
     "home.create.namePlaceholder": "e.g. Bucketlist 4 Lyfe",
     "home.create.pinLabel": "PIN",
@@ -175,7 +175,7 @@ export const MESSAGES: Record<Locale, Record<string, string>> = {
     "home.hero.lead":
       "No accounts, no pointless integrations (okay, one — Google Maps). No dashboards or anything else you never asked for.",
     "home.hero.sub":
-      "You save your favorite spots on one map, like what you like, add more cities whenever you want — and a PIN so half the internet doesn’t stumble in by mistake.",
+      "A PIN for the crew who contribute; share a read-only link with others. Read-only and more are in settings after the mapsie exists.",
     "home.stats.line": "{count} tips saved so far.",
     "home.footer.guideDeladKarta": "Guide: delad karta (SV)",
     "home.footer.guideSharedMap": "Guide: shared map",
@@ -189,9 +189,9 @@ export const MESSAGES: Record<Locale, Record<string, string>> = {
     "home.step.closeOverlayAria": "Close",
     "home.step.create.title": "New mapsie — let’s go",
     "home.step.create.lede":
-      "Pick a name that feels right (you can change it later) and a PIN your crew will remember. You’ll get a link to drop in the group chat.",
+      "Pick a name and a PIN only people who should contribute should know — anyone with the PIN can add tips, like, and edit. Then you get a link for the chat. Want others to view only? Turn on read-only in settings (gear next to the mapsie name) once the mapsie exists.",
     "home.step.create.pinHint":
-      "The PIN keeps random strangers from wandering into your mapsie. Saved as a cookie for ~90 days.",
+      "The PIN unlocks edit mode for people building the mapsie. Without a PIN, you can still let people view only if you enable it in settings after you create it. The cookie lasts about 90 days.",
     "home.step.mapNameLabel": "Mapsie name",
     "home.step.open.title": "Welcome back",
     "home.step.open.lede":
