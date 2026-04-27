@@ -86,8 +86,9 @@ STEG 3 — Vercel, ca 5 minuter
 
 5. Klicka Deploy / Save och vanta.
 
-6. Nar det ar klart far du en lank, t.ex. https://friend-spots-xxx.vercel.app
-   — det ar din sajt pa natet.
+6. Nar det ar klart far du en preview-lank fran Vercel (t.ex. https://xxx.vercel.app).
+   Din riktiga adress ar https://mapsies.com — koppla domänen i Vercel → Settings → Domains
+   och satt NEXT_PUBLIC_SITE_URL=https://mapsies.com i Environment Variables.
 
 
 Om nagot gar fel

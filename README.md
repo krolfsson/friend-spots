@@ -74,6 +74,7 @@ npx prisma migrate deploy
    - `DATABASE_URL` — Neon **poolad** connection string (passar serverless).
    - `DIRECT_URL` — Neon **direkt** connection string (samma databas, utan pooler). Krävs så migreringar kan ta advisory lock; utan den riskerar Vercel-build **P1002**.
    - `GOOGLE_MAPS_API_KEY` — din Google Cloud-nyckel med Places API (New).
+   - `NEXT_PUBLIC_SITE_URL` — **`https://mapsies.com`** i produktion (canonical, Open Graph, sitemap). Ska matcha den domän du kopplat i Vercel → Domains.
 
    Valfritt: `DEFAULT_CITY_SLUG` (slug som finns i databasen).
 

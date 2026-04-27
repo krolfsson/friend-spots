@@ -73,7 +73,7 @@ function describeMapLoadError(err: unknown): string {
     return "Maps JavaScript API är inte aktiverat för den här nyckeln. Aktivera det i Google Cloud → APIs → Maps JavaScript API.";
   }
   if (msg.includes("RefererNotAllowedMapError") || msg.includes("referer")) {
-    return "Nyckeln tillåter inte den här webbplatsen. I Google Cloud → Credentials → din nyckel → Application restrictions → HTTP referrers: lägg till https://friend-spots.vercel.app/* och ev. https://*.vercel.app/*";
+    return "Nyckeln tillåter inte den här webbplatsen. I Google Cloud → Credentials → din nyckel → Application restrictions → HTTP referrers: lägg till https://mapsies.com/* och ev. https://*.vercel.app/* för förhandsvisningar.";
   }
   if (msg.includes("InvalidKeyMapError") || msg.includes("InvalidKey")) {
     return "Ogiltig API-nyckel. Kontrollera NEXT_PUBLIC_GOOGLE_MAPS_API_KEY i Vercel (om du just lade till den: gör en ny deploy så värdet följer med i bygget).";
