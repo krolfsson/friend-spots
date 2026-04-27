@@ -29,7 +29,7 @@ function fmtDate(date: string, days: Days) {
 export function AdminChart() {
   const [days, setDays] = useState<Days>(30);
   const [active, setActive] = useState<Set<Metric>>(new Set(["maps", "spots"]));
-  const [cumulative, setCumulative] = useState(false);
+  const [cumulative, setCumulative] = useState(true);
   const [data, setData] = useState<Row[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -99,13 +99,14 @@ export function AdminChart() {
         </div>
       </div>
 
-      {/* Metric toggles */}
-      <div className="flex flex-wrap gap-2 px-5 pt-4">
+      {/* Metric toggles — one row on mobile (smaller), wrap again from sm */}
+      <div className="grid grid-cols-4 gap-1 px-3 pt-4 sm:flex sm:flex-wrap sm:gap-2 sm:px-5">
         {METRICS.map(({ key, label, color }) => (
           <button
             key={key}
+            type="button"
             onClick={() => toggle(key)}
-            className={`flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-extrabold transition ${
+            className={`flex min-w-0 items-center justify-center gap-0.5 rounded-full border px-1 py-1 text-[10px] font-extrabold leading-none transition sm:gap-1.5 sm:px-3 sm:py-1 sm:text-xs ${
               active.has(key)
                 ? "border-transparent text-white"
                 : "border-indigo-100 bg-white text-indigo-900/40"
@@ -113,10 +114,10 @@ export function AdminChart() {
             style={active.has(key) ? { backgroundColor: color, borderColor: color } : {}}
           >
             <span
-              className="h-2 w-2 rounded-full"
+              className="h-1.5 w-1.5 shrink-0 rounded-full sm:h-2 sm:w-2"
               style={{ backgroundColor: active.has(key) ? "rgba(255,255,255,0.7)" : color }}
             />
-            {label}
+            <span className="truncate">{label}</span>
           </button>
         ))}
       </div>

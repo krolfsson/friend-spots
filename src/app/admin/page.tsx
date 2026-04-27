@@ -124,7 +124,10 @@ export default async function AdminPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {s.spotsPerRoom.sort((a, b) => b.spots - a.spots).map((r) => (
+                  {s.spotsPerRoom
+                    .slice()
+                    .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+                    .map((r) => (
                     <tr key={r.slug} className="border-b border-indigo-50 last:border-0 hover:bg-indigo-50/40">
                       <td className="px-5 py-2.5">
                         <span className="font-extrabold text-indigo-950">{r.name}</span>
