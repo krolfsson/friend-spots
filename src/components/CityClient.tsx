@@ -896,8 +896,7 @@ export function CityClient({
           </div>
 
           <div className="shrink-0 space-y-[0.6rem]">
-          <div className={`grid gap-[0.6rem] sm:gap-3 ${viewOnly ? "grid-cols-1" : "grid-cols-2"}`}>
-            {viewOnly ? null : (
+          <div className="grid grid-cols-2 gap-[0.6rem] sm:gap-3">
             <button
               type="button"
               onClick={() => setCreateRoomOpen(true)}
@@ -911,7 +910,6 @@ export function CityClient({
               </span>
               <span className="min-w-0 cursor-default truncate">{t(locale, "room.actions.newMap")}</span>
             </button>
-            )}
             <button
               type="button"
               onClick={() => void shareRoom()}
