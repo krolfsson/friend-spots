@@ -19,7 +19,7 @@ import {
   sanitizeCategoryIds,
   type CategoryId,
 } from "@/lib/categories";
-import type { DashboardBySlug, DashboardSpot } from "@/lib/dashboardTypes";
+import type { DashboardBySlug, DashboardSpot, TrendingSpot } from "@/lib/dashboardTypes";
 import { mapsOpenForSpot } from "@/lib/mapsUrl";
 import { getOrCreateVoterToken } from "@/lib/voterClient";
 import { isMapViewConfigured } from "@/lib/mapEnv";
@@ -48,6 +48,9 @@ type ToastTone = "success" | "info";
 const NEW_TIP_PILL_BASE =
   "pointer-events-auto inline-flex h-10 items-center gap-2 rounded-full bg-gradient-to-r from-emerald-400 to-teal-500 pl-2.5 pr-3.5 text-sm font-extrabold leading-none tracking-tight text-white shadow-lg shadow-emerald-700/20 ring-1 ring-white/50 transition hover:brightness-110 active:scale-[0.97] focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-200/90";
 
+const TREND_PILL_BASE =
+  "pointer-events-auto inline-flex h-10 items-center gap-2 rounded-full bg-gradient-to-r from-fuchsia-500 via-violet-600 to-indigo-600 pl-2.5 pr-3.5 text-sm font-extrabold leading-none tracking-tight text-white shadow-lg shadow-violet-700/20 ring-1 ring-white/50 transition hover:brightness-110 active:scale-[0.97] disabled:cursor-wait disabled:opacity-70 focus:outline-none focus-visible:ring-2 focus-visible:ring-fuchsia-200/90";
+
 /** Samma plus-ikon som i Nytt tips-pillen (stroke). */
 function NewTipPlusIcon({ className = "h-4 w-4" }: { className?: string }) {
   return (
@@ -58,6 +61,17 @@ function NewTipPlusIcon({ className = "h-4 w-4" }: { className?: string }) {
         stroke="currentColor"
         strokeWidth="2.2"
         strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+function TrendSparkIcon({ className = "h-4 w-4" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} aria-hidden>
+      <path
+        d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3Zm6 11l.9 2.6 2.6.9-2.6.9L18 22l-.9-2.6-2.6-.9 2.6-.9L18 14Z"
+        fill="currentColor"
       />
     </svg>
   );
@@ -90,6 +104,51 @@ function NewTipPillButton({
         <NewTipPlusIcon />
       </span>
       <span className="min-w-0 truncate">{t(locale, "add.title")}</span>
+    </button>
+  );
+}
+
+function TrendPillButton({
+  locale,
+  onClick,
+  busy,
+  count,
+  fullWidthMaxSm = false,
+}: {
+  locale: Locale;
+  onClick: () => void;
+  busy: boolean;
+  count: number;
+  fullWidthMaxSm?: boolean;
+}) {
+  const widthCls = fullWidthMaxSm
+    ? "w-full max-w-none shrink-0 justify-center sm:w-auto sm:max-w-[min(100%,20rem)] sm:justify-start"
+    : "max-w-[min(100%,20rem)] shrink-0";
+  const label = busy ? (locale === "en" ? "Finding…" : "Letar…") : locale === "en" ? "AI trends" : "AI-trender";
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={busy}
+      className={`${TREND_PILL_BASE} ${widthCls}`}
+      aria-label={
+        locale === "en"
+          ? `Plot ${count} trending places with AI`
+          : `Plotta ${count} trendande ställen med AI`
+      }
+      title={
+        locale === "en"
+          ? `Plot ${count} trending places with AI`
+          : `Plotta ${count} trendande ställen med AI`
+      }
+    >
+      <span
+        className="grid h-7 w-7 shrink-0 place-items-center rounded-full border border-white/40 bg-white/15"
+        aria-hidden
+      >
+        <TrendSparkIcon />
+      </span>
+      <span className="min-w-0 truncate">{label}</span>
     </button>
   );
 }
@@ -270,12 +329,15 @@ export function CityClient({
   const [addTargetSlug, setAddTargetSlug] = useState(city.slug);
   const [category, setCategory] = useState<"alla" | CategoryId>("alla");
   const [neighborhood, setNeighborhood] = useState<string>("alla");
+  const [trendSpots, setTrendSpots] = useState<TrendingSpot[]>([]);
+  const [trendBusy, setTrendBusy] = useState(false);
   const [viewMode, setViewMode] = useState<"list" | "map">("map");
   /** Ordning i listvy: popularitet (server) eller nyast först. */
   const [listSort, setListSort] = useState<"popular" | "recent">("popular");
   const [error, setError] = useState<string | null>(null);
   const [toast, setToast] = useState<{ message: string; tone?: ToastTone } | null>(null);
   const mapEnabled = isMapViewConfigured();
+  const trendCount = category === "alla" ? 10 : 5;
 
   // City edit (long-press on city tab)
   const [editCityTarget, setEditCityTarget] = useState<City | null>(null);
@@ -315,6 +377,10 @@ export function CityClient({
 
   useEffect(() => {
     setNeighborhood("alla");
+  }, [activeCity.slug, category]);
+
+  useEffect(() => {
+    setTrendSpots([]);
   }, [activeCity.slug, category]);
 
   const baseSpots = useMemo(() => bundle[activeCity.slug]?.spots ?? [], [bundle, activeCity.slug]);
@@ -488,6 +554,52 @@ export function CityClient({
     setAddTargetSlug(activeCity.slug);
     setAddOpen(true);
   }, [viewOnly, activeCity.slug]);
+
+  const loadTrends = useCallback(async () => {
+    if (viewOnly) {
+      setUnlockOpen(true);
+      return;
+    }
+    if (!mapEnabled || trendBusy) return;
+
+    setViewMode("map");
+    setTrendBusy(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/trending-spots", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-Room-Slug": roomSlug },
+        body: JSON.stringify({
+          citySlug: activeCity.slug,
+          category,
+          locale,
+        }),
+      });
+      const data = (await res.json()) as {
+        spots?: TrendingSpot[];
+        error?: string;
+      };
+      if (!res.ok) throw new Error(data.error ?? (locale === "en" ? "Could not load AI trends" : "Kunde inte ladda AI-trender"));
+
+      const spots = data.spots ?? [];
+      setTrendSpots(spots);
+      showToast(
+        spots.length
+          ? locale === "en"
+            ? `Showing ${spots.length} AI trends on the map.`
+            : `Visar ${spots.length} AI-trender på kartan.`
+          : locale === "en"
+            ? "No AI trends with map positions found right now."
+            : "Hittade inga AI-trender med kartposition just nu.",
+        spots.length ? "success" : "info",
+      );
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : locale === "en" ? "Unknown error" : "Okänt fel";
+      showToast(msg, "info");
+    } finally {
+      setTrendBusy(false);
+    }
+  }, [viewOnly, mapEnabled, trendBusy, roomSlug, activeCity.slug, category, locale, showToast]);
 
   const saveRoomTitle = useCallback(async () => {
     if (renameBusy) return;
@@ -783,12 +895,25 @@ export function CityClient({
                     />
                   </div>
                   {viewMode === "list" ? (
-                    <div className="w-full sm:w-auto sm:shrink-0">
+                    <div className="flex w-full min-w-0 gap-2 sm:w-auto sm:shrink-0">
                       <NewTipPillButton fullWidthMaxSm locale={locale} onClick={tryOpenAdd} />
+                      <TrendPillButton
+                        fullWidthMaxSm
+                        locale={locale}
+                        busy={trendBusy}
+                        count={trendCount}
+                        onClick={() => void loadTrends()}
+                      />
                     </div>
                   ) : (
-                    <div className="hidden w-full sm:block sm:w-auto sm:shrink-0">
+                    <div className="hidden w-full gap-2 sm:flex sm:w-auto sm:shrink-0">
                       <NewTipPillButton locale={locale} onClick={tryOpenAdd} />
+                      <TrendPillButton
+                        locale={locale}
+                        busy={trendBusy}
+                        count={trendCount}
+                        onClick={() => void loadTrends()}
+                      />
                     </div>
                   )}
                 </div>
@@ -821,6 +946,7 @@ export function CityClient({
                   fillHeight
                   spots={displaySpots}
                   boundsFallbackSpots={baseSpots}
+                  trendSpots={trendSpots}
                   cityName={activeCity.name}
                   locale={locale}
                   roomSlug={roomSlug}
@@ -831,8 +957,14 @@ export function CityClient({
                   onPlusToggled={handleMapPlusToggled}
                   overlay={
                   <>
-                    <div className="pointer-events-auto sm:hidden">
+                    <div className="pointer-events-auto flex min-w-0 gap-2 sm:hidden">
                       <NewTipPillButton locale={locale} onClick={tryOpenAdd} />
+                      <TrendPillButton
+                        locale={locale}
+                        busy={trendBusy}
+                        count={trendCount}
+                        onClick={() => void loadTrends()}
+                      />
                     </div>
                     <div className="pointer-events-auto flex min-w-0 flex-col items-end gap-[0.6rem]">
                       <div className="inline-flex h-9 min-h-9 max-w-[min(70vw,18rem)] items-center gap-2 rounded-full bg-white/85 px-[0.84rem] text-sm font-extrabold leading-none tracking-tight text-indigo-950 shadow-sm shadow-indigo-500/10 ring-1 ring-white/60 backdrop-blur-sm">

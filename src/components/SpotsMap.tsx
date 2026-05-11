@@ -2,7 +2,7 @@
 
 import { importLibrary, setOptions } from "@googlemaps/js-api-loader";
 import { useEffect, useMemo, useRef, useState } from "react";
-import type { DashboardSpot } from "@/lib/dashboardTypes";
+import type { DashboardSpot, TrendingSpot } from "@/lib/dashboardTypes";
 import { categoryMeta, primaryCategoryId, sanitizeCategoryIds } from "@/lib/categories";
 import { t, type Locale } from "@/lib/i18n";
 import { mapsOpenForSpot } from "@/lib/mapsUrl";
@@ -61,6 +61,29 @@ function buildSpotMarkerIcon(
   return icon;
 }
 
+function buildTrendMarkerIcon(
+  index: number,
+  color: string,
+  cache: Map<string, google.maps.Icon>,
+): google.maps.Icon {
+  const label = String(index + 1);
+  const cacheKey = `${label}\0${color}`;
+  const hit = cache.get(cacheKey);
+  if (hit) return hit;
+
+  const size = 42;
+  const cx = 21;
+  const cy = 18;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}"><defs><filter id="s" x="-35%" y="-35%" width="170%" height="170%"><feDropShadow dx="0" dy="2" stdDeviation="1.5" flood-opacity="0.32"/></filter></defs><path d="M21 39c-4.7-6.8-12-12.9-12-21A12 12 0 1 1 33 18c0 8.1-7.3 14.2-12 21Z" fill="${color}" stroke="#fff" stroke-width="2.4" filter="url(#s)"/><circle cx="${cx}" cy="${cy}" r="8.8" fill="rgba(255,255,255,.2)" stroke="rgba(255,255,255,.55)" stroke-width="1"/><text x="${cx}" y="${cy + 0.5}" font-size="11" font-weight="900" text-anchor="middle" dominant-baseline="central" fill="#fff" font-family="system-ui,ui-sans-serif,sans-serif">${escapeSvgText(label)}</text></svg>`;
+  const icon: google.maps.Icon = {
+    url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`,
+    scaledSize: new google.maps.Size(size, size),
+    anchor: new google.maps.Point(cx, 39),
+  };
+  cache.set(cacheKey, icon);
+  return icon;
+}
+
 function hasCoords(s: DashboardSpot): boolean {
   return (
     s.lat != null && s.lng != null && !Number.isNaN(s.lat) && !Number.isNaN(s.lng)
@@ -87,6 +110,7 @@ function describeMapLoadError(err: unknown): string {
 export function SpotsMap({
   spots,
   boundsFallbackSpots,
+  trendSpots = [],
   cityName,
   locale = "sv",
   roomSlug,
@@ -102,6 +126,8 @@ export function SpotsMap({
   spots: DashboardSpot[];
   /** Alla tips i staden m.m. koord — zoom/centrum när `spots` saknar punkter (t.ex. tom kategori). */
   boundsFallbackSpots?: DashboardSpot[];
+  /** Tillfälliga OpenAI-förslag som ritas ovanpå kartan men inte sparas som tips. */
+  trendSpots?: TrendingSpot[];
   cityName: string;
   locale?: Locale;
   roomSlug: string;
@@ -150,16 +176,22 @@ export function SpotsMap({
     () => boundsPlotted.map((s) => `${s.id}:${s.lat ?? ""}:${s.lng ?? ""}`).join("|"),
     [boundsPlotted],
   );
+  const trendKey = useMemo(
+    () => trendSpots.map((s) => `${s.id}:${s.lat}:${s.lng}:${s.color}`).join("|"),
+    [trendSpots],
+  );
 
   // Refs så att map-effekten alltid läser senaste plotted/boundsPlotted/onPlusToggled
   // även när den inte körts om (strukturnyckeln oförändrad, bara plusCount ändrades).
   const plottedRef = useRef(plotted);
   const boundsPlottedRef = useRef(boundsPlotted);
+  const trendSpotsRef = useRef(trendSpots);
   const onPlusToggledRef = useRef(onPlusToggled);
   const viewOnlyRef = useRef(viewOnly);
   const onRequireUnlockRef = useRef(onRequireUnlock);
   plottedRef.current = plotted;
   boundsPlottedRef.current = boundsPlotted;
+  trendSpotsRef.current = trendSpots;
   onPlusToggledRef.current = onPlusToggled;
   viewOnlyRef.current = viewOnly;
   onRequireUnlockRef.current = onRequireUnlock;
@@ -206,6 +238,7 @@ export function SpotsMap({
 
         iw = new google.maps.InfoWindow();
         const emojiIconCache = new Map<string, google.maps.Icon>();
+        const trendIconCache = new Map<string, google.maps.Icon>();
 
         for (const spot of plottedRef.current) {
           if (cancelled) return;
@@ -352,18 +385,103 @@ export function SpotsMap({
           markers.push(marker);
         }
 
+        for (const [index, trend] of trendSpotsRef.current.entries()) {
+          if (cancelled) return;
+          const marker = new google.maps.Marker({
+            map,
+            position: { lat: trend.lat, lng: trend.lng },
+            title: trend.name,
+            icon: buildTrendMarkerIcon(index, trend.color, trendIconCache),
+            zIndex: 10000 + index,
+          });
+          marker.addListener("click", () => {
+            if (!map || !iw) return;
+            const url = mapsOpenForSpot(trend, { cityName, locale });
+            const wrap = document.createElement("div");
+            wrap.className = "p-0 max-w-[240px]";
+
+            const card = document.createElement("div");
+            card.className =
+              "rounded-2xl bg-white/95 px-3.5 py-3 shadow-lg shadow-indigo-900/10";
+
+            const badge = document.createElement("div");
+            badge.className = "mb-2 inline-flex items-center gap-1 rounded-full px-2 py-1 text-[11px] font-black text-white";
+            badge.style.backgroundColor = trend.color;
+            badge.textContent = locale === "en" ? `AI trend #${index + 1}` : `AI-trend #${index + 1}`;
+
+            const titleEl = document.createElement("div");
+            titleEl.className =
+              "text-[15px] font-extrabold leading-snug tracking-tight text-indigo-950";
+            titleEl.textContent = trend.name;
+
+            const meta = document.createElement("div");
+            meta.className = "mt-1 text-[12px] font-bold text-indigo-900/55";
+            const parts: string[] = [];
+            if (trend.neighborhood?.trim()) parts.push(trend.neighborhood.trim());
+            const labels = sanitizeCategoryIds(trend.categories)
+              .map((id) => categoryMeta(id))
+              .map((c) => `${c.emoji} ${t(locale, `cat.${c.id}`)}`);
+            if (labels.length) parts.push(labels.join(" · "));
+            meta.textContent = parts.join(" · ");
+            if (!meta.textContent) meta.style.display = "none";
+
+            const reason = document.createElement("p");
+            reason.className = "mt-2 text-[12px] font-semibold leading-snug text-indigo-950/75";
+            reason.textContent = trend.reason;
+
+            const actions = document.createElement("div");
+            actions.className = "mt-3 flex flex-wrap items-center gap-2";
+
+            const a = document.createElement("a");
+            a.href = url;
+            a.target = "_blank";
+            a.rel = "noopener noreferrer";
+            a.className =
+              "inline-flex h-9 items-center justify-center rounded-full bg-gradient-to-r from-fuchsia-500 to-violet-600 px-4 text-[12px] font-extrabold text-white shadow-sm shadow-fuchsia-500/15 ring-1 ring-white/70 transition hover:brightness-110 active:scale-[0.99]";
+            a.textContent = locale === "en" ? "Open" : "Öppna";
+
+            for (const ev of ["pointerdown", "mousedown", "touchstart", "click"] as const) {
+              a.addEventListener(ev, (e) => e.stopPropagation());
+            }
+
+            actions.append(a);
+
+            if (trend.sourceUrl) {
+              const source = document.createElement("a");
+              source.href = trend.sourceUrl;
+              source.target = "_blank";
+              source.rel = "noopener noreferrer";
+              source.className =
+                "inline-flex h-9 items-center justify-center rounded-full border border-indigo-200/70 bg-white/90 px-3 text-[12px] font-extrabold text-indigo-950 shadow-sm ring-1 ring-white/70 transition hover:bg-indigo-50";
+              source.textContent = trend.sourceTitle || (locale === "en" ? "Source" : "Källa");
+              for (const ev of ["pointerdown", "mousedown", "touchstart", "click"] as const) {
+                source.addEventListener(ev, (e) => e.stopPropagation());
+              }
+              actions.append(source);
+            }
+
+            card.append(badge, titleEl, meta, reason, actions);
+            wrap.append(card);
+            iw.setContent(wrap);
+            iw.open({ map, anchor: marker });
+          });
+          markers.push(marker);
+        }
+
         google.maps.event.addListenerOnce(map, "idle", () => {
           if (cancelled || !map) return;
           const bp = boundsPlottedRef.current;
-          if (bp.length === 0) {
+          const trendBounds = trendSpotsRef.current;
+          const boundsItems = trendBounds.length > 0 ? [...bp, ...trendBounds] : bp;
+          if (boundsItems.length === 0) {
             map.setCenter(DEFAULT_CENTER);
             map.setZoom(11);
-          } else if (bp.length === 1) {
-            map.setCenter({ lat: bp[0].lat!, lng: bp[0].lng! });
+          } else if (boundsItems.length === 1) {
+            map.setCenter({ lat: boundsItems[0].lat!, lng: boundsItems[0].lng! });
             map.setZoom(14);
           } else {
             const bounds = new google.maps.LatLngBounds();
-            bp.forEach((s) => bounds.extend({ lat: s.lat!, lng: s.lng! }));
+            boundsItems.forEach((s) => bounds.extend({ lat: s.lat!, lng: s.lng! }));
             map.fitBounds(bounds, 64);
           }
           if (!cancelled) setLoading(false);
@@ -384,7 +502,7 @@ export function SpotsMap({
     };
   // Använder plottedKey/boundsKey (enbart ID+koordinater) som deps istället för hela spot-arrayerna.
   // Det innebär att effekten INTE körs om när bara plusCount ändras → kartan återskapas inte vid plus-klick.
-  }, [apiKey, cityName, plottedKey, boundsKey, locale, roomSlug]);
+  }, [apiKey, cityName, plottedKey, boundsKey, trendKey, locale, roomSlug]);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -513,6 +631,11 @@ export function SpotsMap({
         <p className="shrink-0 text-xs font-bold text-indigo-900/55">
           {missingCount} ställe{missingCount === 1 ? "" : "n"} saknar koordinat och
           visas inte på kartan.
+        </p>
+      ) : null}
+      {trendSpots.length > 0 ? (
+        <p className="shrink-0 text-xs font-bold text-indigo-900/55">
+          {trendSpots.length} AI-trend{trendSpots.length === 1 ? "" : "er"} visas med färgade markörer.
         </p>
       ) : null}
       <div className={mapFrameClass}>

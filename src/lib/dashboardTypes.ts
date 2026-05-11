@@ -16,6 +16,20 @@ export type DashboardSpot = {
   recommendations: { id: string; contributorName: string }[];
 };
 
+export type TrendingSpot = {
+  id: string;
+  googlePlaceId: string;
+  name: string;
+  categories: string[];
+  reason: string;
+  sourceTitle: string | null;
+  sourceUrl: string | null;
+  lat: number;
+  lng: number;
+  neighborhood: string | null;
+  color: string;
+};
+
 export type CityBundle = {
   spots: DashboardSpot[];
   categoryCounts: Record<string, number>;

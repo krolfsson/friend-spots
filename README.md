@@ -50,6 +50,7 @@ SQLite-filer fungerar inte tillförlitligt på Vercel. Appen använder **Postgre
 DATABASE_URL="postgresql://...?sslmode=require"
 DIRECT_URL="postgresql://...?sslmode=require"
 GOOGLE_MAPS_API_KEY="din-nyckel"
+OPENAI_API_KEY="din OpenAI-nyckel"
 ```
 
 På **Neon**: kopiera den **poolade** strängen till `DATABASE_URL` och den **direkta** (utan `-pooler` i värdnamnet) till `DIRECT_URL`. Utan `DIRECT_URL` kan `prisma migrate deploy` ge **P1002** (timeout på advisory lock) vid build.
@@ -74,6 +75,7 @@ npx prisma migrate deploy
    - `DATABASE_URL` — Neon **poolad** connection string (passar serverless).
    - `DIRECT_URL` — Neon **direkt** connection string (samma databas, utan pooler). Krävs så migreringar kan ta advisory lock; utan den riskerar Vercel-build **P1002**.
    - `GOOGLE_MAPS_API_KEY` — din Google Cloud-nyckel med Places API (New).
+   - `OPENAI_API_KEY` — används av AI-trenderna på kartan.
    - `NEXT_PUBLIC_SITE_URL` — **`https://mapsies.com`** i produktion (canonical, Open Graph, sitemap). Ska matcha den domän du kopplat i Vercel → Domains.
 
    Valfritt: `DEFAULT_CITY_SLUG` (slug som finns i databasen).
