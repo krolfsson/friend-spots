@@ -49,7 +49,7 @@ const NEW_TIP_PILL_BASE =
   "pointer-events-auto inline-flex h-10 items-center gap-2 rounded-full bg-gradient-to-r from-emerald-400 to-teal-500 pl-2.5 pr-3.5 text-sm font-extrabold leading-none tracking-tight text-white shadow-lg shadow-emerald-700/20 ring-1 ring-white/50 transition hover:brightness-110 active:scale-[0.97] focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-200/90";
 
 const TREND_PILL_BASE =
-  "pointer-events-auto inline-flex h-10 items-center gap-2 rounded-full bg-gradient-to-r from-fuchsia-500 via-violet-600 to-indigo-600 pl-2.5 pr-3.5 text-sm font-extrabold leading-none tracking-tight text-white shadow-lg shadow-violet-700/20 ring-1 ring-white/50 transition hover:brightness-110 active:scale-[0.97] disabled:cursor-wait disabled:opacity-70 focus:outline-none focus-visible:ring-2 focus-visible:ring-fuchsia-200/90";
+  "pointer-events-auto inline-grid h-10 w-10 shrink-0 place-items-center rounded-full bg-gradient-to-r from-fuchsia-500 via-violet-600 to-indigo-600 p-0 text-lg leading-none text-white shadow-lg shadow-violet-700/20 ring-1 ring-white/50 transition hover:brightness-110 active:scale-[0.97] disabled:cursor-wait disabled:opacity-70 focus:outline-none focus-visible:ring-2 focus-visible:ring-fuchsia-200/90";
 
 /** Samma plus-ikon som i Nytt tips-pillen (stroke). */
 function NewTipPlusIcon({ className = "h-4 w-4" }: { className?: string }) {
@@ -61,17 +61,6 @@ function NewTipPlusIcon({ className = "h-4 w-4" }: { className?: string }) {
         stroke="currentColor"
         strokeWidth="2.2"
         strokeLinecap="round"
-      />
-    </svg>
-  );
-}
-
-function TrendSparkIcon({ className = "h-4 w-4" }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" className={className} aria-hidden>
-      <path
-        d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3Zm6 11l.9 2.6 2.6.9-2.6.9L18 22l-.9-2.6-2.6-.9 2.6-.9L18 14Z"
-        fill="currentColor"
       />
     </svg>
   );
@@ -121,10 +110,7 @@ function TrendPillButton({
   count: number;
   fullWidthMaxSm?: boolean;
 }) {
-  const widthCls = fullWidthMaxSm
-    ? "min-w-0 flex-1 justify-center sm:flex-none sm:max-w-[min(100%,20rem)] sm:justify-start"
-    : "shrink-0";
-  const label = busy ? (locale === "en" ? "Finding…" : "Letar…") : locale === "en" ? "AI trends" : "AI-trender";
+  const widthCls = fullWidthMaxSm ? "flex-none" : "";
   return (
     <button
       type="button"
@@ -142,13 +128,9 @@ function TrendPillButton({
           : `Plotta ${count} trendande ställen med AI`
       }
     >
-      <span
-        className="grid h-7 w-7 shrink-0 place-items-center rounded-full border border-white/40 bg-white/15"
-        aria-hidden
-      >
-        <TrendSparkIcon />
+      <span aria-hidden className={busy ? "animate-pulse" : ""}>
+        🧙
       </span>
-      <span className="min-w-0 truncate">{label}</span>
     </button>
   );
 }

@@ -1,14 +1,14 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { CATEGORIES, isCategoryId, sanitizeCategoryIds } from "@/lib/categories";
-import { autocompletePlaces, fetchPlaceEssentials } from "@/lib/google/placesServer";
+import { searchTextPlaceEssentials } from "@/lib/google/placesServer";
 import { prisma } from "@/lib/prisma";
 import { getAuthorizedRoomFromRequest } from "@/lib/roomAuth";
 import type { Locale } from "@/lib/i18n";
 import type { TrendingSpot } from "@/lib/dashboardTypes";
 
 const OPENAI_RESPONSES_URL = "https://api.openai.com/v1/responses";
-const DEFAULT_OPENAI_MODEL = "gpt-5.5";
+const DEFAULT_OPENAI_MODEL = "gpt-4.1-mini";
 
 const TREND_COLORS = [
   "#f43f5e",
@@ -54,6 +54,12 @@ type OpenAIResponsesPayload = {
 
 function trendLimit(category: string): number {
   return category === "alla" ? 10 : 5;
+}
+
+function compactReason(value: string): string {
+  const clean = value.replace(/\s+/g, " ").trim();
+  if (clean.length <= 72) return clean;
+  return `${clean.slice(0, 69).trimEnd()}…`;
 }
 
 function extractResponseText(payload: OpenAIResponsesPayload): string {
@@ -135,7 +141,7 @@ async function askOpenAIForTrendingPlaces({
               "You find currently trending real-world places for a shared city map. " +
               "Use fresh web search results, prefer venues that can be visited and found in Google Places, " +
               "and return only places with clear evidence. Do not invent coordinates. " +
-              "Return JSON that matches the schema.",
+              "Return compact JSON that matches the schema.",
           },
         ],
       },
@@ -148,7 +154,7 @@ async function askOpenAIForTrendingPlaces({
               `Find ${limit} currently trending places in ${cityName}. ` +
               `${categoryPrompt(category)} ` +
               `Allowed category ids:\n${categories}\n` +
-              `Write short reasons in ${responseLanguage}. ` +
+              `Write very short reasons in ${responseLanguage}: 2-5 words, max 55 characters. ` +
               "For each place include a Google-friendly searchQuery with place name and city, " +
               "and one source URL/title from the web evidence when available.",
           },
@@ -163,6 +169,7 @@ async function askOpenAIForTrendingPlaces({
       },
     ],
     tool_choice: "required",
+    max_output_tokens: 1200,
     text: {
       format: {
         type: "json_schema",
@@ -189,7 +196,7 @@ async function askOpenAIForTrendingPlaces({
                     maxItems: 3,
                     items: { type: "string", enum: CATEGORIES.map((c) => c.id) },
                   },
-                  reason: { type: "string", minLength: 1, maxLength: 220 },
+                  reason: { type: "string", minLength: 1, maxLength: 80 },
                   searchQuery: { type: "string", minLength: 1, maxLength: 180 },
                   sourceTitle: { type: "string", maxLength: 160 },
                   sourceUrl: { type: "string", maxLength: 500 },
@@ -233,14 +240,17 @@ async function enrichWithGooglePlaces(
     places.map(async (candidate) => {
       try {
         const query = candidate.searchQuery.trim() || `${candidate.name} ${cityName}`;
-        const suggestions = await autocompletePlaces(query);
-        const first = suggestions[0];
-        if (!first) return null;
-
-        const details = await fetchPlaceEssentials(first.placeId);
+        const details = await searchTextPlaceEssentials(query);
+        if (!details) return null;
         if (details.lat == null || details.lng == null) return null;
 
-        return { candidate, details, fallbackName: first.label, lat: details.lat, lng: details.lng };
+        return {
+          candidate,
+          details,
+          fallbackName: details.displayName ?? query,
+          lat: details.lat,
+          lng: details.lng,
+        };
       } catch {
         return null;
       }
@@ -261,7 +271,7 @@ async function enrichWithGooglePlaces(
       googlePlaceId: details.googlePlaceId,
       name: candidate.name.trim() || fallbackName,
       categories,
-      reason: candidate.reason.trim(),
+      reason: compactReason(candidate.reason),
       sourceTitle: candidate.sourceTitle.trim() || null,
       sourceUrl: normalizeSourceUrl(candidate.sourceUrl),
       lat,

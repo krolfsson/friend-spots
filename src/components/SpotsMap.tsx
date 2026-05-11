@@ -426,7 +426,7 @@ export function SpotsMap({
             if (!meta.textContent) meta.style.display = "none";
 
             const reason = document.createElement("p");
-            reason.className = "mt-2 text-[12px] font-semibold leading-snug text-indigo-950/75";
+            reason.className = "mt-2 text-[11px] font-semibold leading-snug text-indigo-950/70";
             reason.textContent = trend.reason;
 
             const actions = document.createElement("div");

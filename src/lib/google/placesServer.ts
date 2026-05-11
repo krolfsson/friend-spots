@@ -1,6 +1,7 @@
 import { resolveNeighborhood, type AddressDescriptor } from "@/lib/parseNeighborhood";
 
 const AUTOCOMPLETE_URL = "https://places.googleapis.com/v1/places:autocomplete";
+const TEXT_SEARCH_URL = "https://places.googleapis.com/v1/places:searchText";
 
 export type AutocompleteSuggestion = {
   placeId: string;
@@ -83,11 +84,82 @@ export type PlaceEssentials = {
   shortAddress: string | null;
 };
 
-export async function fetchPlaceEssentials(placeId: string): Promise<PlaceEssentials> {
+export type PlaceSearchEssentials = PlaceEssentials & {
+  displayName: string | null;
+};
+
+function requireGoogleMapsKey() {
   const key = process.env.GOOGLE_MAPS_API_KEY?.trim();
   if (!key) {
     throw new Error("GOOGLE_MAPS_API_KEY saknas i .env (starta om dev-servern efter du lagt in nyckeln)");
   }
+  return key;
+}
+
+function mapGooglePlace(
+  place: {
+    id?: string;
+    displayName?: { text?: string };
+    location?: { latitude?: number; longitude?: number };
+    addressComponents?: Array<{
+      longText?: string;
+      shortText?: string;
+      types?: string[];
+    }>;
+    shortFormattedAddress?: string;
+    addressDescriptor?: AddressDescriptor;
+  },
+  fallbackId: string,
+): PlaceSearchEssentials {
+  const rawId = place.id?.replace(/^places\//, "") ?? fallbackId.replace(/^places\//, "");
+  return {
+    googlePlaceId: rawId,
+    lat: place.location?.latitude ?? null,
+    lng: place.location?.longitude ?? null,
+    neighborhood: resolveNeighborhood({
+      addressDescriptor: place.addressDescriptor,
+      addressComponents: place.addressComponents,
+    }),
+    shortAddress: place.shortFormattedAddress ?? null,
+    displayName: place.displayName?.text ?? null,
+  };
+}
+
+export async function searchTextPlaceEssentials(textQuery: string): Promise<PlaceSearchEssentials | null> {
+  const key = requireGoogleMapsKey();
+  const query = textQuery.trim();
+  if (!query) return null;
+
+  const res = await fetch(TEXT_SEARCH_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-Goog-Api-Key": key,
+      "X-Goog-FieldMask":
+        "places.id,places.displayName,places.location,places.addressComponents,places.shortFormattedAddress,places.addressDescriptor",
+    },
+    body: JSON.stringify({
+      textQuery: query,
+      languageCode: "en",
+      maxResultCount: 1,
+    }),
+    next: { revalidate: 0 },
+  });
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Text Search misslyckades: ${res.status} ${text}`);
+  }
+
+  const data = (await res.json()) as {
+    places?: Array<Parameters<typeof mapGooglePlace>[0]>;
+  };
+  const first = data.places?.[0];
+  return first ? mapGooglePlace(first, query) : null;
+}
+
+export async function fetchPlaceEssentials(placeId: string): Promise<PlaceEssentials> {
+  const key = requireGoogleMapsKey();
 
   const name = placeId.startsWith("places/") ? placeId : `places/${placeId}`;
   // `languageCode=en` ger oftast tydligare NYC-microhoods (SoHo, Nolita, …) i `addressDescriptor`.
@@ -106,28 +178,6 @@ export async function fetchPlaceEssentials(placeId: string): Promise<PlaceEssent
     throw new Error(`Place Details misslyckades: ${res.status} ${text}`);
   }
 
-  const place = (await res.json()) as {
-    id?: string;
-    location?: { latitude?: number; longitude?: number };
-    addressComponents?: Array<{
-      longText?: string;
-      shortText?: string;
-      types?: string[];
-    }>;
-    shortFormattedAddress?: string;
-    addressDescriptor?: AddressDescriptor;
-  };
-
-  const rawId = place.id?.replace(/^places\//, "") ?? placeId.replace(/^places\//, "");
-
-  return {
-    googlePlaceId: rawId,
-    lat: place.location?.latitude ?? null,
-    lng: place.location?.longitude ?? null,
-    neighborhood: resolveNeighborhood({
-      addressDescriptor: place.addressDescriptor,
-      addressComponents: place.addressComponents,
-    }),
-    shortAddress: place.shortFormattedAddress ?? null,
-  };
+  const place = (await res.json()) as Parameters<typeof mapGooglePlace>[0];
+  return mapGooglePlace(place, placeId);
 }
