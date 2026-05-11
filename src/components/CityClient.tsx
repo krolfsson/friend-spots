@@ -88,7 +88,7 @@ function NewTipPillButton({
   fullWidthMaxSm?: boolean;
 }) {
   const widthCls = fullWidthMaxSm
-    ? "w-full max-w-none shrink-0 justify-center sm:w-auto sm:max-w-[min(100%,20rem)] sm:justify-start"
+    ? "min-w-0 flex-1 justify-center sm:flex-none sm:max-w-[min(100%,20rem)] sm:justify-start"
     : "max-w-[min(100%,20rem)] shrink-0";
   return (
     <button
@@ -122,8 +122,8 @@ function TrendPillButton({
   fullWidthMaxSm?: boolean;
 }) {
   const widthCls = fullWidthMaxSm
-    ? "w-full max-w-none shrink-0 justify-center sm:w-auto sm:max-w-[min(100%,20rem)] sm:justify-start"
-    : "max-w-[min(100%,20rem)] shrink-0";
+    ? "min-w-0 flex-1 justify-center sm:flex-none sm:max-w-[min(100%,20rem)] sm:justify-start"
+    : "shrink-0";
   const label = busy ? (locale === "en" ? "Finding…" : "Letar…") : locale === "en" ? "AI trends" : "AI-trender";
   return (
     <button
@@ -895,7 +895,7 @@ export function CityClient({
                     />
                   </div>
                   {viewMode === "list" ? (
-                    <div className="flex w-full min-w-0 gap-2 sm:w-auto sm:shrink-0">
+                    <div className="flex w-full min-w-0 flex-wrap items-center gap-2 sm:w-auto sm:shrink-0">
                       <NewTipPillButton fullWidthMaxSm locale={locale} onClick={tryOpenAdd} />
                       <TrendPillButton
                         fullWidthMaxSm
@@ -906,7 +906,7 @@ export function CityClient({
                       />
                     </div>
                   ) : (
-                    <div className="hidden w-full gap-2 sm:flex sm:w-auto sm:shrink-0">
+                    <div className="hidden w-full flex-wrap items-center gap-2 sm:flex sm:w-auto sm:shrink-0">
                       <NewTipPillButton locale={locale} onClick={tryOpenAdd} />
                       <TrendPillButton
                         locale={locale}
