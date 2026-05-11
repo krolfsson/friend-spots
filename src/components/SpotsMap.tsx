@@ -645,7 +645,7 @@ export function SpotsMap({
           </div>
         ) : null}
         {overlay ? (
-          <div className="pointer-events-none absolute inset-x-2 top-2 z-20 flex items-start justify-between gap-2 sm:justify-end">
+          <div className="pointer-events-none absolute inset-x-2 top-2 z-20 flex flex-col items-stretch gap-2 sm:flex-row sm:items-start sm:justify-end">
             {overlay}
           </div>
         ) : null}

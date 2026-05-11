@@ -957,7 +957,7 @@ export function CityClient({
                   onPlusToggled={handleMapPlusToggled}
                   overlay={
                   <>
-                    <div className="pointer-events-auto flex min-w-0 gap-2 sm:hidden">
+                    <div className="pointer-events-auto flex min-w-0 max-w-full gap-2 overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] sm:hidden [&::-webkit-scrollbar]:hidden">
                       <NewTipPillButton locale={locale} onClick={tryOpenAdd} />
                       <TrendPillButton
                         locale={locale}
