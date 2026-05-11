@@ -44,15 +44,25 @@ const trendCache = new Map<string, { spots: TrendingSpot[]; expiresAt: number }>
 const DISALLOWED_SOURCE_PATTERN =
   /\b(tripadvisor|yelp|google\s*(reviews?|maps?)|trustpilot|foursquare|restaurantji|wanderlog|wanderlog\.com)\b/i;
 const OLD_SOURCE_YEAR_PATTERN = /\b20(?:1\d|2[0-5])\b/;
+const MAX_REASON_LENGTH = 38;
 
 function trendLimit(category: string): number {
   return category === "alla" ? 10 : 5;
 }
 
 function compactReason(value: string): string {
-  const clean = value.replace(/\s+/g, " ").trim();
-  if (clean.length <= 38) return clean;
-  return `${clean.slice(0, 35).trimEnd()}…`;
+  const clean = value.replace(/…/g, "...").replace(/\s+/g, " ").trim();
+  if (!clean) return "Trendigt just nu.";
+  if (clean.endsWith("...")) {
+    return clean.length <= MAX_REASON_LENGTH
+      ? clean
+      : `${clean.slice(0, MAX_REASON_LENGTH - 3).trimEnd()}...`;
+  }
+
+  const withoutEnding = clean.replace(/[.!?]+$/g, "").trim();
+  const withPeriod = `${withoutEnding}.`;
+  if (withPeriod.length <= MAX_REASON_LENGTH) return withPeriod;
+  return `${withoutEnding.slice(0, MAX_REASON_LENGTH - 3).trimEnd()}...`;
 }
 
 function extractResponseText(payload: OpenAIResponsesPayload): string {
@@ -173,6 +183,7 @@ async function askOpenAIForTrendingPlaces({
               "Prefer cool current buzz: new openings, popups, viral/social/news attention, current queues, design-led spots, or places locals are talking about now. " +
               "Never use Tripadvisor, Yelp, Google reviews/ratings, rating aggregators, old awards, old reputation, lifetime popularity, or generic best-of lists as the reason to include a place. " +
               "Skip anything without current trend evidence. " +
+              "If writing Swedish, use normal Swedish characters å, ä, ö. Never transliterate them to a/a/o. " +
               "Prefer venues that can be visited and found in Google Places. Do not invent coordinates. " +
               "Return compact JSON that matches the schema.",
           },
@@ -192,7 +203,8 @@ async function askOpenAIForTrendingPlaces({
               `Avoid sources dated before ${year}; only use evergreen lists if they were clearly updated in ${year} and are trend-forward. ` +
               "Choose places that feel trendy, cool, current, and a little insider. " +
               `Allowed category ids:\n${categories}\n` +
-              `Write very short reasons in ${responseLanguage}: 1-4 words, max 38 characters. ` +
+              `Write very short reasons in ${responseLanguage}: 1-4 words, max 38 characters, ending with "." or "...". ` +
+              (locale === "sv" ? "Use å, ä and ö correctly in Swedish. Do not write ae/aa/oe/ascii-only Swedish. " : "") +
               "For each place include a Google-friendly searchQuery with place name, selected area if any, and city, " +
               `and one ${year} blog/editorial/local source URL/title from the web evidence.`,
           },
