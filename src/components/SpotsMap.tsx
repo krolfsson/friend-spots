@@ -63,22 +63,27 @@ function buildSpotMarkerIcon(
 
 function buildTrendMarkerIcon(
   index: number,
-  color: string,
   cache: Map<string, google.maps.Icon>,
 ): google.maps.Icon {
   const label = String(index + 1);
-  const cacheKey = `${label}\0${color}`;
+  const cacheKey = `wizard\0${label}`;
   const hit = cache.get(cacheKey);
   if (hit) return hit;
 
-  const size = 42;
-  const cx = 21;
-  const cy = 18;
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}"><defs><filter id="s" x="-35%" y="-35%" width="170%" height="170%"><feDropShadow dx="0" dy="2" stdDeviation="1.5" flood-opacity="0.32"/></filter></defs><path d="M21 39c-4.7-6.8-12-12.9-12-21A12 12 0 1 1 33 18c0 8.1-7.3 14.2-12 21Z" fill="${color}" stroke="#fff" stroke-width="2.4" filter="url(#s)"/><circle cx="${cx}" cy="${cy}" r="8.8" fill="rgba(255,255,255,.2)" stroke="rgba(255,255,255,.55)" stroke-width="1"/><text x="${cx}" y="${cy + 0.5}" font-size="11" font-weight="900" text-anchor="middle" dominant-baseline="central" fill="#fff" font-family="system-ui,ui-sans-serif,sans-serif">${escapeSvgText(label)}</text></svg>`;
+  const size = 38;
+  const mainCx = 18;
+  const mainCy = 18;
+  const mainR = 12.5;
+  const emojiFont = 15;
+  const badgeCx = 28.5;
+  const badgeCy = 25.5;
+  const badgeR = label.length > 1 ? 8.8 : 7.6;
+  const badgeFont = label.length > 1 ? 7.5 : 9;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}"><defs><filter id="s" x="-35%" y="-35%" width="170%" height="170%"><feDropShadow dx="0" dy="1" stdDeviation="1.2" flood-opacity="0.28"/></filter></defs><circle cx="${mainCx}" cy="${mainCy}" r="${mainR}" fill="#ede9fe" stroke="#7c3aed" stroke-width="1.75" filter="url(#s)"/><text x="${mainCx}" y="${mainCy}" font-size="${emojiFont}" text-anchor="middle" dominant-baseline="central" font-family="system-ui,&quot;Apple Color Emoji&quot;,&quot;Segoe UI Emoji&quot;,&quot;Noto Color Emoji&quot;,sans-serif">🧙</text><circle cx="${badgeCx}" cy="${badgeCy}" r="${badgeR}" fill="#7c3aed" stroke="#ffffff" stroke-width="1.75"/><text x="${badgeCx}" y="${badgeCy}" font-size="${badgeFont}" font-weight="800" text-anchor="middle" dominant-baseline="central" fill="#ffffff" font-family="system-ui,ui-sans-serif,sans-serif">${escapeSvgText(label)}</text></svg>`;
   const icon: google.maps.Icon = {
     url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`,
     scaledSize: new google.maps.Size(size, size),
-    anchor: new google.maps.Point(cx, 39),
+    anchor: new google.maps.Point(mainCx, mainCy),
   };
   cache.set(cacheKey, icon);
   return icon;
@@ -177,7 +182,7 @@ export function SpotsMap({
     [boundsPlotted],
   );
   const trendKey = useMemo(
-    () => trendSpots.map((s) => `${s.id}:${s.lat}:${s.lng}:${s.color}`).join("|"),
+    () => trendSpots.map((s) => `${s.id}:${s.lat}:${s.lng}`).join("|"),
     [trendSpots],
   );
 
@@ -391,7 +396,7 @@ export function SpotsMap({
             map,
             position: { lat: trend.lat, lng: trend.lng },
             title: trend.name,
-            icon: buildTrendMarkerIcon(index, trend.color, trendIconCache),
+            icon: buildTrendMarkerIcon(index, trendIconCache),
             zIndex: 10000 + index,
           });
           marker.addListener("click", () => {
@@ -406,8 +411,8 @@ export function SpotsMap({
 
             const badge = document.createElement("div");
             badge.className = "mb-2 inline-flex items-center gap-1 rounded-full px-2 py-1 text-[11px] font-black text-white";
-            badge.style.backgroundColor = trend.color;
-            badge.textContent = locale === "en" ? `AI trend #${index + 1}` : `AI-trend #${index + 1}`;
+            badge.style.backgroundColor = "#7c3aed";
+            badge.textContent = locale === "en" ? `🧙 Trend #${index + 1}` : `🧙 Trend #${index + 1}`;
 
             const titleEl = document.createElement("div");
             titleEl.className =

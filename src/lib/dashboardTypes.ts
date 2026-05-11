@@ -27,7 +27,6 @@ export type TrendingSpot = {
   lat: number;
   lng: number;
   neighborhood: string | null;
-  color: string;
 };
 
 export type CityBundle = {

@@ -34,7 +34,7 @@ function useCountUp(target: number, durationMs: number) {
   return value;
 }
 
-export function HomeLandingClient({ locale, totalSpots }: { locale: Locale; totalSpots: number }) {
+export function HomeLandingClient({ locale }: { locale: Locale }) {
   const router = useRouter();
   const [step, setStep] = useState<Step>(null);
   const [name, setName] = useState("");
@@ -42,9 +42,29 @@ export function HomeLandingClient({ locale, totalSpots }: { locale: Locale; tota
   const [slugInput, setSlugInput] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const animatedTotal = useCountUp(totalSpots, 2500);
+  const [totalSpots, setTotalSpots] = useState<number | null>(null);
+  const animatedTotal = useCountUp(totalSpots ?? 0, 900);
   const totalFmt = new Intl.NumberFormat(locale === "sv" ? "sv-SE" : "en-US").format(animatedTotal);
-  const statsLine = tReplace(locale, "home.stats.line", { count: totalFmt });
+  const statsLine = totalSpots == null ? "" : tReplace(locale, "home.stats.line", { count: totalFmt });
+
+  useEffect(() => {
+    let cancelled = false;
+    const id = window.setTimeout(async () => {
+      try {
+        const res = await fetch("/api/stats");
+        const data = (await res.json()) as { totalSpots?: number };
+        if (!cancelled && typeof data.totalSpots === "number") {
+          setTotalSpots(data.totalSpots);
+        }
+      } catch {
+        // Stats are decorative; never block the landing page.
+      }
+    }, 250);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(id);
+    };
+  }, []);
 
   const resetForms = useCallback(() => {
     setName("");
@@ -134,7 +154,7 @@ export function HomeLandingClient({ locale, totalSpots }: { locale: Locale; tota
               </div>
             </div>
 
-            <p className="mapsies-home-reveal mapsies-home-reveal--d1 mt-2.5 w-full text-center text-[0.7rem] font-semibold uppercase tracking-[0.14em] text-indigo-900/38 tabular-nums sm:text-[0.72rem] lg:hidden">
+            <p className={`mapsies-home-reveal mapsies-home-reveal--d1 mt-2.5 w-full text-center text-[0.7rem] font-semibold uppercase tracking-[0.14em] text-indigo-900/38 tabular-nums sm:text-[0.72rem] lg:hidden ${statsLine ? "" : "invisible"}`}>
               {statsLine}
             </p>
 
@@ -180,7 +200,7 @@ export function HomeLandingClient({ locale, totalSpots }: { locale: Locale; tota
             </div>
 
             <p
-              className="mapsies-home-reveal mapsies-home-reveal--d5 mt-6 hidden w-full text-center text-[0.7rem] font-semibold uppercase tracking-[0.14em] text-indigo-900/38 tabular-nums sm:mt-7 sm:text-[0.72rem] lg:block lg:text-left"
+              className={`mapsies-home-reveal mapsies-home-reveal--d5 mt-6 hidden w-full text-center text-[0.7rem] font-semibold uppercase tracking-[0.14em] text-indigo-900/38 tabular-nums sm:mt-7 sm:text-[0.72rem] lg:block lg:text-left ${statsLine ? "" : "invisible"}`}
               aria-live="polite"
             >
               {statsLine}
@@ -195,7 +215,6 @@ export function HomeLandingClient({ locale, totalSpots }: { locale: Locale; tota
                 width={1809}
                 height={2068}
                 priority
-                unoptimized
                 sizes="(min-width: 1024px) min(50vw, 36rem), 100vw"
                 className="h-auto w-full max-w-2xl object-contain drop-shadow-[0_24px_48px_-12px_rgba(49,46,129,0.25)] lg:max-w-full"
               />

@@ -6,11 +6,6 @@ import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } fr
 import type { Locale } from "@/lib/i18n";
 import { t, tReplace } from "@/lib/i18n";
 import { createPortal } from "react-dom";
-import { AddSpotForm } from "@/components/AddSpotForm";
-import { CreateRoomModal } from "@/components/CreateRoomModal";
-import { QrModal } from "@/components/QrModal";
-import { UnlockRoomModal } from "@/components/UnlockRoomModal";
-import { CityPickOrCreate } from "@/components/CityPickOrCreate";
 import {
   CATEGORIES,
   categoryMeta,
@@ -40,10 +35,16 @@ const SpotsMap = dynamic(
     ),
   },
 );
+const AddSpotForm = dynamic(() => import("@/components/AddSpotForm").then((m) => m.AddSpotForm), { ssr: false });
+const CreateRoomModal = dynamic(() => import("@/components/CreateRoomModal").then((m) => m.CreateRoomModal), { ssr: false });
+const QrModal = dynamic(() => import("@/components/QrModal").then((m) => m.QrModal), { ssr: false });
+const UnlockRoomModal = dynamic(() => import("@/components/UnlockRoomModal").then((m) => m.UnlockRoomModal), { ssr: false });
+const CityPickOrCreate = dynamic(() => import("@/components/CityPickOrCreate").then((m) => m.CityPickOrCreate), { ssr: false });
 
 type City = { id: string; name: string; slug: string; emoji?: string | null; _count?: { spots: number } };
 
 type ToastTone = "success" | "info";
+type TrendApiData = { spots?: TrendingSpot[]; error?: string };
 
 const NEW_TIP_PILL_BASE =
   "pointer-events-auto inline-flex h-10 items-center gap-2 rounded-full bg-gradient-to-r from-emerald-400 to-teal-500 pl-2.5 pr-3.5 text-sm font-extrabold leading-none tracking-tight text-white shadow-lg shadow-emerald-700/20 ring-1 ring-white/50 transition hover:brightness-110 active:scale-[0.97] focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-200/90";
@@ -100,12 +101,14 @@ function NewTipPillButton({
 function TrendPillButton({
   locale,
   onClick,
+  onWarm,
   busy,
   count,
   fullWidthMaxSm = false,
 }: {
   locale: Locale;
   onClick: () => void;
+  onWarm?: () => void;
   busy: boolean;
   count: number;
   fullWidthMaxSm?: boolean;
@@ -115,6 +118,9 @@ function TrendPillButton({
     <button
       type="button"
       onClick={onClick}
+      onFocus={onWarm}
+      onPointerEnter={onWarm}
+      onPointerDown={onWarm}
       disabled={busy}
       className={`${TREND_PILL_BASE} ${widthCls}`}
       aria-label={
@@ -330,6 +336,8 @@ export function CityClient({
   const [editCityErr, setEditCityErr] = useState<string | null>(null);
   const router = useRouter();
   const longPressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const trendResultsRef = useRef(new Map<string, TrendingSpot[]>());
+  const trendRequestsRef = useRef(new Map<string, Promise<TrendingSpot[]>>());
 
   const onRoomViewSegment = useCallback((s: RoomViewSegment) => {
     if (s === "map") {
@@ -537,6 +545,49 @@ export function CityClient({
     setAddOpen(true);
   }, [viewOnly, activeCity.slug]);
 
+  const trendRequestKey = useCallback(
+    (citySlug: string, cat: "alla" | CategoryId) => `${citySlug}:${cat}:${locale}`,
+    [locale],
+  );
+
+  const requestTrends = useCallback(
+    (citySlug: string, cat: "alla" | CategoryId) => {
+      const key = trendRequestKey(citySlug, cat);
+      const cached = trendResultsRef.current.get(key);
+      if (cached) return Promise.resolve(cached);
+
+      const inFlight = trendRequestsRef.current.get(key);
+      if (inFlight) return inFlight;
+
+      const promise = fetch("/api/trending-spots", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-Room-Slug": roomSlug },
+        body: JSON.stringify({ citySlug, category: cat, locale }),
+      })
+        .then(async (res) => {
+          const data = (await res.json()) as TrendApiData;
+          if (!res.ok) {
+            throw new Error(data.error ?? (locale === "en" ? "Could not load AI trends" : "Kunde inte ladda AI-trender"));
+          }
+          const spots = data.spots ?? [];
+          trendResultsRef.current.set(key, spots);
+          return spots;
+        })
+        .finally(() => {
+          trendRequestsRef.current.delete(key);
+        });
+
+      trendRequestsRef.current.set(key, promise);
+      return promise;
+    },
+    [locale, roomSlug, trendRequestKey],
+  );
+
+  const warmTrends = useCallback(() => {
+    if (viewOnly || !mapEnabled) return;
+    void requestTrends(activeCity.slug, category).catch(() => undefined);
+  }, [activeCity.slug, category, mapEnabled, requestTrends, viewOnly]);
+
   const loadTrends = useCallback(async () => {
     if (viewOnly) {
       setUnlockOpen(true);
@@ -545,34 +596,39 @@ export function CityClient({
     if (!mapEnabled || trendBusy) return;
 
     setViewMode("map");
+    const key = trendRequestKey(activeCity.slug, category);
+    const cached = trendResultsRef.current.get(key);
+    if (cached) {
+      setTrendSpots(cached);
+      showToast(
+        cached.length
+          ? locale === "en"
+            ? `Showing ${cached.length} AI trends.`
+            : `Visar ${cached.length} AI-trender.`
+          : locale === "en"
+            ? "No AI trends found right now."
+            : "Hittade inga AI-trender just nu.",
+        cached.length ? "success" : "info",
+      );
+      void requestTrends(activeCity.slug, category)
+        .then((spots) => setTrendSpots(spots))
+        .catch(() => undefined);
+      return;
+    }
+
     setTrendBusy(true);
     setError(null);
     try {
-      const res = await fetch("/api/trending-spots", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "X-Room-Slug": roomSlug },
-        body: JSON.stringify({
-          citySlug: activeCity.slug,
-          category,
-          locale,
-        }),
-      });
-      const data = (await res.json()) as {
-        spots?: TrendingSpot[];
-        error?: string;
-      };
-      if (!res.ok) throw new Error(data.error ?? (locale === "en" ? "Could not load AI trends" : "Kunde inte ladda AI-trender"));
-
-      const spots = data.spots ?? [];
+      const spots = await requestTrends(activeCity.slug, category);
       setTrendSpots(spots);
       showToast(
         spots.length
           ? locale === "en"
-            ? `Showing ${spots.length} AI trends on the map.`
-            : `Visar ${spots.length} AI-trender på kartan.`
+            ? `Showing ${spots.length} AI trends.`
+            : `Visar ${spots.length} AI-trender.`
           : locale === "en"
-            ? "No AI trends with map positions found right now."
-            : "Hittade inga AI-trender med kartposition just nu.",
+            ? "No AI trends found right now."
+            : "Hittade inga AI-trender just nu.",
         spots.length ? "success" : "info",
       );
     } catch (e) {
@@ -581,7 +637,13 @@ export function CityClient({
     } finally {
       setTrendBusy(false);
     }
-  }, [viewOnly, mapEnabled, trendBusy, roomSlug, activeCity.slug, category, locale, showToast]);
+  }, [viewOnly, mapEnabled, trendBusy, trendRequestKey, activeCity.slug, category, showToast, locale, requestTrends]);
+
+  useEffect(() => {
+    if (viewMode !== "map" || viewOnly || !mapEnabled) return;
+    const t = window.setTimeout(warmTrends, 700);
+    return () => window.clearTimeout(t);
+  }, [mapEnabled, viewMode, viewOnly, warmTrends]);
 
   const saveRoomTitle = useCallback(async () => {
     if (renameBusy) return;
@@ -884,6 +946,7 @@ export function CityClient({
                         locale={locale}
                         busy={trendBusy}
                         count={trendCount}
+                        onWarm={warmTrends}
                         onClick={() => void loadTrends()}
                       />
                     </div>
@@ -894,6 +957,7 @@ export function CityClient({
                         locale={locale}
                         busy={trendBusy}
                         count={trendCount}
+                        onWarm={warmTrends}
                         onClick={() => void loadTrends()}
                       />
                     </div>
@@ -945,6 +1009,7 @@ export function CityClient({
                         locale={locale}
                         busy={trendBusy}
                         count={trendCount}
+                        onWarm={warmTrends}
                         onClick={() => void loadTrends()}
                       />
                     </div>

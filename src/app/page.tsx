@@ -1,7 +1,6 @@
 import { EmojiCollageBackground } from "@/components/EmojiCollageBackground";
 import { HomeLandingClient } from "@/components/HomeLandingClient";
 import { getRequestLocale } from "@/lib/i18n.server";
-import { prisma } from "@/lib/prisma";
 import { SITE_DESCRIPTION, SITE_TITLE } from "@/lib/site";
 import type { Metadata } from "next";
 
@@ -12,17 +11,11 @@ export const metadata: Metadata = {
 
 export default async function Home() {
   const locale = await getRequestLocale();
-  let totalSpots = 0;
-  try {
-    totalSpots = await prisma.spot.count();
-  } catch {
-    totalSpots = 0;
-  }
   return (
     <>
       <EmojiCollageBackground />
       <div className="relative z-10 mx-auto min-h-dvh max-w-6xl overflow-x-visible pt-3 pb-8 sm:pt-6 sm:pb-12">
-        <HomeLandingClient locale={locale} totalSpots={totalSpots} />
+        <HomeLandingClient locale={locale} />
       </div>
     </>
   );

@@ -9,19 +9,7 @@ import type { TrendingSpot } from "@/lib/dashboardTypes";
 
 const OPENAI_RESPONSES_URL = "https://api.openai.com/v1/responses";
 const DEFAULT_OPENAI_MODEL = "gpt-4.1-mini";
-
-const TREND_COLORS = [
-  "#f43f5e",
-  "#f97316",
-  "#eab308",
-  "#22c55e",
-  "#14b8a6",
-  "#0ea5e9",
-  "#6366f1",
-  "#a855f7",
-  "#ec4899",
-  "#84cc16",
-] as const;
+const TREND_CACHE_TTL_MS = 10 * 60 * 1000;
 
 type OpenAIPlace = {
   name: string;
@@ -51,6 +39,8 @@ type OpenAIResponsesPayload = {
   output?: ResponseOutputItem[];
   error?: { message?: string };
 };
+
+const trendCache = new Map<string, { spots: TrendingSpot[]; expiresAt: number }>();
 
 function trendLimit(category: string): number {
   return category === "alla" ? 10 : 5;
@@ -128,6 +118,7 @@ async function askOpenAIForTrendingPlaces({
   const model = process.env.OPENAI_TRENDING_MODEL?.trim() || DEFAULT_OPENAI_MODEL;
   const categories = CATEGORIES.map((c) => `${c.id}: ${c.label}`).join("\n");
   const responseLanguage = locale === "en" ? "English" : "Swedish";
+  const today = new Date().toISOString().slice(0, 10);
 
   const body = {
     model,
@@ -139,8 +130,9 @@ async function askOpenAIForTrendingPlaces({
             type: "input_text",
             text:
               "You find currently trending real-world places for a shared city map. " +
-              "Use fresh web search results, prefer venues that can be visited and found in Google Places, " +
-              "and return only places with clear evidence. Do not invent coordinates. " +
+              "Use fresh web search results from recent days/weeks. Prefer current buzz: new openings, events, popups, viral/social/news attention, recent local lists, or current queues. " +
+              "Do not pick places only because of historic awards, old reputation, lifetime popularity, or customer ratings. Skip anything without current trend evidence. " +
+              "Prefer venues that can be visited and found in Google Places. Do not invent coordinates. " +
               "Return compact JSON that matches the schema.",
           },
         ],
@@ -151,8 +143,9 @@ async function askOpenAIForTrendingPlaces({
           {
             type: "input_text",
             text:
-              `Find ${limit} currently trending places in ${cityName}. ` +
+              `Today is ${today}. Find ${limit} currently trending places in ${cityName}. ` +
               `${categoryPrompt(category)} ` +
+              "Use current trend signals from roughly the last 30 days when possible; never choose only from ratings, old awards, or generic best-of reputation. " +
               `Allowed category ids:\n${categories}\n` +
               `Write very short reasons in ${responseLanguage}: 2-5 words, max 55 characters. ` +
               "For each place include a Google-friendly searchQuery with place name and city, " +
@@ -169,7 +162,7 @@ async function askOpenAIForTrendingPlaces({
       },
     ],
     tool_choice: "required",
-    max_output_tokens: 1200,
+    max_output_tokens: 1000,
     text: {
       format: {
         type: "json_schema",
@@ -277,7 +270,6 @@ async function enrichWithGooglePlaces(
       lat,
       lng,
       neighborhood: details.neighborhood,
-      color: TREND_COLORS[out.length % TREND_COLORS.length],
     });
 
     if (out.length >= trendLimit(category)) break;
@@ -316,12 +308,24 @@ export async function POST(req: NextRequest) {
     }
 
     const locale: Locale = body.locale === "en" ? "en" : "sv";
+    const cacheKey = `${auth.room.id}:${city.name}:${category}:${locale}`;
+    const cached = trendCache.get(cacheKey);
+    if (cached && cached.expiresAt > Date.now()) {
+      return NextResponse.json({
+        spots: cached.spots,
+        limit: trendLimit(category),
+        cached: true,
+        generatedAt: new Date().toISOString(),
+      });
+    }
+
     const openAiPlaces = await askOpenAIForTrendingPlaces({
       cityName: city.name,
       category,
       locale,
     });
     const spots = await enrichWithGooglePlaces(openAiPlaces, city.name, category);
+    trendCache.set(cacheKey, { spots, expiresAt: Date.now() + TREND_CACHE_TTL_MS });
 
     return NextResponse.json({
       spots,
