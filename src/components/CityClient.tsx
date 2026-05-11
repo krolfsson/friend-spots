@@ -47,10 +47,13 @@ type ToastTone = "success" | "info";
 type TrendApiData = { spots?: TrendingSpot[]; error?: string };
 
 const NEW_TIP_PILL_BASE =
-  "pointer-events-auto inline-flex h-10 items-center gap-2 rounded-full bg-gradient-to-r from-emerald-400 to-teal-500 pl-2.5 pr-3.5 text-sm font-extrabold leading-none tracking-tight text-white shadow-lg shadow-emerald-700/20 ring-1 ring-white/50 transition hover:brightness-110 active:scale-[0.97] focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-200/90";
+  "pointer-events-auto inline-flex h-10 items-center gap-2 rounded-full bg-gradient-to-r from-emerald-400 to-teal-500 pl-2.5 pr-3.5 text-sm font-extrabold leading-none tracking-tight text-white ring-1 ring-white/50 transition hover:brightness-110 active:scale-[0.97] focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-200/90";
 
 const TREND_PILL_BASE =
-  "pointer-events-auto inline-grid h-10 w-10 shrink-0 place-items-center rounded-full bg-gradient-to-r from-fuchsia-500 via-violet-600 to-indigo-600 p-0 text-lg leading-none text-white shadow-lg shadow-violet-700/20 ring-1 ring-white/50 transition hover:brightness-110 active:scale-[0.97] disabled:cursor-wait disabled:opacity-70 focus:outline-none focus-visible:ring-2 focus-visible:ring-fuchsia-200/90";
+  "pointer-events-auto inline-grid h-10 w-10 shrink-0 place-items-center rounded-full bg-gradient-to-r from-fuchsia-500 via-violet-600 to-indigo-600 p-0 text-lg leading-none text-white ring-1 ring-white/50 transition hover:brightness-110 active:scale-[0.97] disabled:cursor-wait disabled:opacity-70 focus:outline-none focus-visible:ring-2 focus-visible:ring-fuchsia-200/90";
+
+const MAP_ICON_PILL_BASE =
+  "pointer-events-auto inline-grid h-10 w-10 shrink-0 place-items-center rounded-full bg-white/85 text-[17px] leading-none text-indigo-950 ring-1 ring-white/60 backdrop-blur-sm transition hover:brightness-105 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-200/90";
 
 /** Samma plus-ikon som i Nytt tips-pillen (stroke). */
 function NewTipPlusIcon({ className = "h-4 w-4" }: { className?: string }) {
@@ -371,7 +374,7 @@ export function CityClient({
 
   useEffect(() => {
     setTrendSpots([]);
-  }, [activeCity.slug, category]);
+  }, [activeCity.slug, category, neighborhood]);
 
   const baseSpots = useMemo(() => bundle[activeCity.slug]?.spots ?? [], [bundle, activeCity.slug]);
 
@@ -546,13 +549,13 @@ export function CityClient({
   }, [viewOnly, activeCity.slug]);
 
   const trendRequestKey = useCallback(
-    (citySlug: string, cat: "alla" | CategoryId) => `${citySlug}:${cat}:${locale}`,
+    (citySlug: string, cat: "alla" | CategoryId, area: string) => `${citySlug}:${cat}:${area}:${locale}`,
     [locale],
   );
 
   const requestTrends = useCallback(
-    (citySlug: string, cat: "alla" | CategoryId) => {
-      const key = trendRequestKey(citySlug, cat);
+    (citySlug: string, cat: "alla" | CategoryId, area: string) => {
+      const key = trendRequestKey(citySlug, cat, area);
       const cached = trendResultsRef.current.get(key);
       if (cached) return Promise.resolve(cached);
 
@@ -562,7 +565,7 @@ export function CityClient({
       const promise = fetch("/api/trending-spots", {
         method: "POST",
         headers: { "Content-Type": "application/json", "X-Room-Slug": roomSlug },
-        body: JSON.stringify({ citySlug, category: cat, locale }),
+        body: JSON.stringify({ citySlug, category: cat, neighborhood: area, locale }),
       })
         .then(async (res) => {
           const data = (await res.json()) as TrendApiData;
@@ -585,8 +588,8 @@ export function CityClient({
 
   const warmTrends = useCallback(() => {
     if (viewOnly || !mapEnabled) return;
-    void requestTrends(activeCity.slug, category).catch(() => undefined);
-  }, [activeCity.slug, category, mapEnabled, requestTrends, viewOnly]);
+    void requestTrends(activeCity.slug, category, neighborhood).catch(() => undefined);
+  }, [activeCity.slug, category, mapEnabled, neighborhood, requestTrends, viewOnly]);
 
   const loadTrends = useCallback(async () => {
     if (viewOnly) {
@@ -596,7 +599,7 @@ export function CityClient({
     if (!mapEnabled || trendBusy) return;
 
     setViewMode("map");
-    const key = trendRequestKey(activeCity.slug, category);
+    const key = trendRequestKey(activeCity.slug, category, neighborhood);
     const cached = trendResultsRef.current.get(key);
     if (cached) {
       setTrendSpots(cached);
@@ -610,7 +613,7 @@ export function CityClient({
             : "Hittade inga AI-trender just nu.",
         cached.length ? "success" : "info",
       );
-      void requestTrends(activeCity.slug, category)
+      void requestTrends(activeCity.slug, category, neighborhood)
         .then((spots) => setTrendSpots(spots))
         .catch(() => undefined);
       return;
@@ -619,7 +622,7 @@ export function CityClient({
     setTrendBusy(true);
     setError(null);
     try {
-      const spots = await requestTrends(activeCity.slug, category);
+      const spots = await requestTrends(activeCity.slug, category, neighborhood);
       setTrendSpots(spots);
       showToast(
         spots.length
@@ -637,7 +640,7 @@ export function CityClient({
     } finally {
       setTrendBusy(false);
     }
-  }, [viewOnly, mapEnabled, trendBusy, trendRequestKey, activeCity.slug, category, showToast, locale, requestTrends]);
+  }, [viewOnly, mapEnabled, trendBusy, trendRequestKey, activeCity.slug, category, neighborhood, showToast, locale, requestTrends]);
 
   useEffect(() => {
     if (viewMode !== "map" || viewOnly || !mapEnabled) return;
@@ -1012,43 +1015,43 @@ export function CityClient({
                         onWarm={warmTrends}
                         onClick={() => void loadTrends()}
                       />
-                    </div>
-                    <div className="pointer-events-auto flex min-w-0 flex-col items-end gap-[0.6rem]">
-                      <div className="inline-flex h-9 min-h-9 max-w-[min(70vw,18rem)] items-center gap-2 rounded-full bg-white/85 px-[0.84rem] text-sm font-extrabold leading-none tracking-tight text-indigo-950 shadow-sm shadow-indigo-500/10 ring-1 ring-white/60 backdrop-blur-sm">
-                        <span className="truncate">{roomTitleLive}</span>
-                        <button
-                          type="button"
-                          onClick={() => (viewOnly ? setUnlockOpen(true) : setRenameOpen(true))}
-                          className="grid h-7 w-7 shrink-0 place-items-center rounded-full border border-indigo-200/70 bg-white/85 text-indigo-900/80 shadow-sm transition hover:bg-indigo-50 active:scale-95"
-                          aria-label={t(locale, "rename.title")}
-                          title={t(locale, "rename.title")}
-                        >
-                          <span aria-hidden className="text-[15px] leading-none">
-                            ⚙️
-                          </span>
-                        </button>
-                      </div>
-
+                      <button
+                        type="button"
+                        onClick={() => (viewOnly ? setUnlockOpen(true) : setRenameOpen(true))}
+                        className={MAP_ICON_PILL_BASE}
+                        aria-label={t(locale, "rename.title")}
+                        title={t(locale, "rename.title")}
+                      >
+                        <span aria-hidden>⚙️</span>
+                      </button>
                       <button
                         type="button"
                         onClick={() => setHereOn((v) => !v)}
-                        className="inline-flex h-9 min-h-9 flex-row items-center gap-2 rounded-full bg-white/85 px-[0.84rem] text-sm font-extrabold leading-none tracking-tight text-indigo-950 shadow-sm shadow-indigo-500/10 ring-1 ring-white/60 backdrop-blur-sm transition hover:brightness-105 active:scale-95"
+                        className={`${MAP_ICON_PILL_BASE} ${hereOn ? "bg-sky-500 text-white ring-sky-100/70" : ""}`}
                         aria-label={locale === "en" ? "You are here" : "Här är du"}
                         title={locale === "en" ? "You are here" : "Här är du"}
                       >
-                        <span className="whitespace-nowrap">
-                          {locale === "en" ? "You are here" : "Här är du"}
-                        </span>
-                        <span
-                          aria-hidden
-                          className={`grid h-7 w-7 shrink-0 place-items-center rounded-full border shadow-sm transition ${
-                            hereOn
-                              ? "border-sky-200/70 bg-sky-500 text-white shadow-sky-500/20"
-                              : "border-indigo-200/70 bg-white/85 text-indigo-900/80"
-                          }`}
-                        >
-                          📍
-                        </span>
+                        <span aria-hidden>📍</span>
+                      </button>
+                    </div>
+                    <div className="pointer-events-auto hidden min-w-0 items-end gap-2 sm:flex">
+                      <button
+                        type="button"
+                        onClick={() => (viewOnly ? setUnlockOpen(true) : setRenameOpen(true))}
+                        className={MAP_ICON_PILL_BASE}
+                        aria-label={t(locale, "rename.title")}
+                        title={t(locale, "rename.title")}
+                      >
+                        <span aria-hidden>⚙️</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setHereOn((v) => !v)}
+                        className={`${MAP_ICON_PILL_BASE} ${hereOn ? "bg-sky-500 text-white ring-sky-100/70" : ""}`}
+                        aria-label={locale === "en" ? "You are here" : "Här är du"}
+                        title={locale === "en" ? "You are here" : "Här är du"}
+                      >
+                        <span aria-hidden>📍</span>
                       </button>
                     </div>
                   </>

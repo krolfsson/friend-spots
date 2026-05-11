@@ -41,6 +41,9 @@ type OpenAIResponsesPayload = {
 };
 
 const trendCache = new Map<string, { spots: TrendingSpot[]; expiresAt: number }>();
+const DISALLOWED_SOURCE_PATTERN =
+  /\b(tripadvisor|yelp|google\s*(reviews?|maps?)|trustpilot|foursquare|restaurantji|wanderlog|wanderlog\.com)\b/i;
+const OLD_SOURCE_YEAR_PATTERN = /\b20(?:1\d|2[0-5])\b/;
 
 function trendLimit(category: string): number {
   return category === "alla" ? 10 : 5;
@@ -48,8 +51,8 @@ function trendLimit(category: string): number {
 
 function compactReason(value: string): string {
   const clean = value.replace(/\s+/g, " ").trim();
-  if (clean.length <= 72) return clean;
-  return `${clean.slice(0, 69).trimEnd()}…`;
+  if (clean.length <= 38) return clean;
+  return `${clean.slice(0, 35).trimEnd()}…`;
 }
 
 function extractResponseText(payload: OpenAIResponsesPayload): string {
@@ -66,18 +69,6 @@ function extractResponseText(payload: OpenAIResponsesPayload): string {
   return "";
 }
 
-function normalizeSourceUrl(value: string): string | null {
-  const raw = value.trim();
-  if (!raw) return null;
-  try {
-    const url = new URL(raw);
-    if (url.protocol !== "http:" && url.protocol !== "https:") return null;
-    return url.toString();
-  } catch {
-    return null;
-  }
-}
-
 function parseTrendingJson(text: string): OpenAIPlace[] {
   const parsed = JSON.parse(text) as OpenAITrendingResponse;
   if (!Array.isArray(parsed.places)) return [];
@@ -91,6 +82,13 @@ function parseTrendingJson(text: string): OpenAIPlace[] {
   });
 }
 
+function hasAcceptableTrendSource(place: OpenAIPlace): boolean {
+  const sourceText = `${place.sourceTitle} ${place.sourceUrl}`;
+  if (DISALLOWED_SOURCE_PATTERN.test(sourceText)) return false;
+  if (OLD_SOURCE_YEAR_PATTERN.test(sourceText)) return false;
+  return true;
+}
+
 function categoryPrompt(category: string): string {
   if (category === "alla") {
     return "Find a varied mix across the allowed categories.";
@@ -100,13 +98,53 @@ function categoryPrompt(category: string): string {
   return `Only return places that fit category "${category}" (${meta?.label ?? category}).`;
 }
 
+function normalizeNeighborhood(value: unknown): string {
+  if (typeof value !== "string") return "alla";
+  const clean = value.replace(/\s+/g, " ").trim();
+  if (!clean || clean === "alla") return "alla";
+  if (clean === "ovrigt") return "ovrigt";
+  return clean.slice(0, 80);
+}
+
+function areaPrompt(neighborhood: string, cityName: string): string {
+  if (neighborhood === "alla") return `Search across ${cityName}.`;
+  if (neighborhood === "ovrigt") {
+    return `Search in ${cityName}, but avoid relying on a specific named neighborhood filter.`;
+  }
+  return `Only return places in or immediately around "${neighborhood}" in ${cityName}.`;
+}
+
+function normalizeForAreaCompare(value: string): string {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+}
+
+function matchesSelectedArea(
+  details: { neighborhood: string | null; shortAddress: string | null },
+  neighborhood: string,
+): boolean {
+  if (neighborhood === "alla" || neighborhood === "ovrigt") return true;
+  const wanted = normalizeForAreaCompare(neighborhood);
+  const actualNeighborhood = details.neighborhood ? normalizeForAreaCompare(details.neighborhood) : "";
+  const actualAddress = details.shortAddress ? normalizeForAreaCompare(details.shortAddress) : "";
+
+  if (!actualNeighborhood && !actualAddress) return true;
+  return actualNeighborhood === wanted || actualNeighborhood.includes(wanted) || actualAddress.includes(wanted);
+}
+
 async function askOpenAIForTrendingPlaces({
   cityName,
   category,
+  neighborhood,
   locale,
 }: {
   cityName: string;
   category: string;
+  neighborhood: string;
   locale: Locale;
 }): Promise<OpenAIPlace[]> {
   const apiKey = process.env.OPENAI_API_KEY?.trim();
@@ -119,6 +157,7 @@ async function askOpenAIForTrendingPlaces({
   const categories = CATEGORIES.map((c) => `${c.id}: ${c.label}`).join("\n");
   const responseLanguage = locale === "en" ? "English" : "Swedish";
   const today = new Date().toISOString().slice(0, 10);
+  const year = today.slice(0, 4);
 
   const body = {
     model,
@@ -130,8 +169,10 @@ async function askOpenAIForTrendingPlaces({
             type: "input_text",
             text:
               "You find currently trending real-world places for a shared city map. " +
-              "Use fresh web search results from recent days/weeks. Prefer current buzz: new openings, events, popups, viral/social/news attention, recent local lists, or current queues. " +
-              "Do not pick places only because of historic awards, old reputation, lifetime popularity, or customer ratings. Skip anything without current trend evidence. " +
+              `Use fresh ${year} web evidence from recent blogs, city guides, culture/food/fashion magazines, local newsletters, event listings, or creator/editorial writeups. ` +
+              "Prefer cool current buzz: new openings, popups, viral/social/news attention, current queues, design-led spots, or places locals are talking about now. " +
+              "Never use Tripadvisor, Yelp, Google reviews/ratings, rating aggregators, old awards, old reputation, lifetime popularity, or generic best-of lists as the reason to include a place. " +
+              "Skip anything without current trend evidence. " +
               "Prefer venues that can be visited and found in Google Places. Do not invent coordinates. " +
               "Return compact JSON that matches the schema.",
           },
@@ -143,13 +184,17 @@ async function askOpenAIForTrendingPlaces({
           {
             type: "input_text",
             text:
-              `Today is ${today}. Find ${limit} currently trending places in ${cityName}. ` +
+              `Today is ${today}. Find ${limit} currently trending places. ` +
+              `${areaPrompt(neighborhood, cityName)} ` +
               `${categoryPrompt(category)} ` +
-              "Use current trend signals from roughly the last 30 days when possible; never choose only from ratings, old awards, or generic best-of reputation. " +
+              `Use ${year} sources first: recent blogs, local/editorial guides, culture/food/fashion media, newsletters, event pages, or creator writeups. ` +
+              "Do not use Tripadvisor, Yelp, Google reviews/ratings, rating aggregators, old awards, or generic best-of reputation. " +
+              `Avoid sources dated before ${year}; only use evergreen lists if they were clearly updated in ${year} and are trend-forward. ` +
+              "Choose places that feel trendy, cool, current, and a little insider. " +
               `Allowed category ids:\n${categories}\n` +
-              `Write very short reasons in ${responseLanguage}: 2-5 words, max 55 characters. ` +
-              "For each place include a Google-friendly searchQuery with place name and city, " +
-              "and one source URL/title from the web evidence when available.",
+              `Write very short reasons in ${responseLanguage}: 1-4 words, max 38 characters. ` +
+              "For each place include a Google-friendly searchQuery with place name, selected area if any, and city, " +
+              `and one ${year} blog/editorial/local source URL/title from the web evidence.`,
           },
         ],
       },
@@ -189,7 +234,7 @@ async function askOpenAIForTrendingPlaces({
                     maxItems: 3,
                     items: { type: "string", enum: CATEGORIES.map((c) => c.id) },
                   },
-                  reason: { type: "string", minLength: 1, maxLength: 80 },
+                  reason: { type: "string", minLength: 1, maxLength: 48 },
                   searchQuery: { type: "string", minLength: 1, maxLength: 180 },
                   sourceTitle: { type: "string", maxLength: 160 },
                   sourceUrl: { type: "string", maxLength: 500 },
@@ -225,17 +270,20 @@ async function enrichWithGooglePlaces(
   places: OpenAIPlace[],
   cityName: string,
   category: string,
+  neighborhood: string,
 ): Promise<TrendingSpot[]> {
   const seen = new Set<string>();
   const out: TrendingSpot[] = [];
 
   const resolved = await Promise.all(
-    places.map(async (candidate) => {
+    places.filter(hasAcceptableTrendSource).map(async (candidate) => {
       try {
-        const query = candidate.searchQuery.trim() || `${candidate.name} ${cityName}`;
+        const area = neighborhood !== "alla" && neighborhood !== "ovrigt" ? neighborhood : "";
+        const query = [candidate.searchQuery.trim() || candidate.name, area, cityName].filter(Boolean).join(" ");
         const details = await searchTextPlaceEssentials(query);
         if (!details) return null;
         if (details.lat == null || details.lng == null) return null;
+        if (!matchesSelectedArea(details, neighborhood)) return null;
 
         return {
           candidate,
@@ -265,8 +313,6 @@ async function enrichWithGooglePlaces(
       name: candidate.name.trim() || fallbackName,
       categories,
       reason: compactReason(candidate.reason),
-      sourceTitle: candidate.sourceTitle.trim() || null,
-      sourceUrl: normalizeSourceUrl(candidate.sourceUrl),
       lat,
       lng,
       neighborhood: details.neighborhood,
@@ -286,6 +332,7 @@ export async function POST(req: NextRequest) {
     const body = (await req.json()) as {
       citySlug?: string;
       category?: string;
+      neighborhood?: string;
       locale?: Locale;
     };
 
@@ -298,6 +345,7 @@ export async function POST(req: NextRequest) {
     if (category !== "alla" && !isCategoryId(category)) {
       return NextResponse.json({ error: "Ogiltig kategori" }, { status: 400 });
     }
+    const neighborhood = normalizeNeighborhood(body.neighborhood);
 
     const city = await prisma.city.findUnique({
       where: { roomId_slug: { roomId: auth.room.id, slug: citySlug } },
@@ -308,7 +356,7 @@ export async function POST(req: NextRequest) {
     }
 
     const locale: Locale = body.locale === "en" ? "en" : "sv";
-    const cacheKey = `${auth.room.id}:${city.name}:${category}:${locale}`;
+    const cacheKey = `${auth.room.id}:${city.name}:${category}:${neighborhood}:${locale}`;
     const cached = trendCache.get(cacheKey);
     if (cached && cached.expiresAt > Date.now()) {
       return NextResponse.json({
@@ -322,9 +370,10 @@ export async function POST(req: NextRequest) {
     const openAiPlaces = await askOpenAIForTrendingPlaces({
       cityName: city.name,
       category,
+      neighborhood,
       locale,
     });
-    const spots = await enrichWithGooglePlaces(openAiPlaces, city.name, category);
+    const spots = await enrichWithGooglePlaces(openAiPlaces, city.name, category, neighborhood);
     trendCache.set(cacheKey, { spots, expiresAt: Date.now() + TREND_CACHE_TTL_MS });
 
     return NextResponse.json({

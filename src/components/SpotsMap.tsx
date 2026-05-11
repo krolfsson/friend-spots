@@ -401,23 +401,17 @@ export function SpotsMap({
           });
           marker.addListener("click", () => {
             if (!map || !iw) return;
-            const url = mapsOpenForSpot(trend, { cityName, locale });
             const wrap = document.createElement("div");
-            wrap.className = "p-0 max-w-[240px]";
+            wrap.className = "p-0 max-w-[220px]";
 
             const card = document.createElement("div");
             card.className =
               "rounded-2xl bg-white/95 px-3.5 py-3 shadow-lg shadow-indigo-900/10";
 
-            const badge = document.createElement("div");
-            badge.className = "mb-2 inline-flex items-center gap-1 rounded-full px-2 py-1 text-[11px] font-black text-white";
-            badge.style.backgroundColor = "#7c3aed";
-            badge.textContent = locale === "en" ? `🧙 Trend #${index + 1}` : `🧙 Trend #${index + 1}`;
-
             const titleEl = document.createElement("div");
             titleEl.className =
               "text-[15px] font-extrabold leading-snug tracking-tight text-indigo-950";
-            titleEl.textContent = trend.name;
+            titleEl.textContent = `🧙 ${trend.name}`;
 
             const meta = document.createElement("div");
             meta.className = "mt-1 text-[12px] font-bold text-indigo-900/55";
@@ -431,41 +425,13 @@ export function SpotsMap({
             if (!meta.textContent) meta.style.display = "none";
 
             const reason = document.createElement("p");
-            reason.className = "mt-2 text-[11px] font-semibold leading-snug text-indigo-950/70";
+            reason.className = "mt-2 text-[11px] font-semibold leading-snug text-violet-900/70";
+            reason.style.overflow = "hidden";
+            reason.style.textOverflow = "ellipsis";
+            reason.style.whiteSpace = "nowrap";
             reason.textContent = trend.reason;
 
-            const actions = document.createElement("div");
-            actions.className = "mt-3 flex flex-wrap items-center gap-2";
-
-            const a = document.createElement("a");
-            a.href = url;
-            a.target = "_blank";
-            a.rel = "noopener noreferrer";
-            a.className =
-              "inline-flex h-9 items-center justify-center rounded-full bg-gradient-to-r from-fuchsia-500 to-violet-600 px-4 text-[12px] font-extrabold text-white shadow-sm shadow-fuchsia-500/15 ring-1 ring-white/70 transition hover:brightness-110 active:scale-[0.99]";
-            a.textContent = locale === "en" ? "Open" : "Öppna";
-
-            for (const ev of ["pointerdown", "mousedown", "touchstart", "click"] as const) {
-              a.addEventListener(ev, (e) => e.stopPropagation());
-            }
-
-            actions.append(a);
-
-            if (trend.sourceUrl) {
-              const source = document.createElement("a");
-              source.href = trend.sourceUrl;
-              source.target = "_blank";
-              source.rel = "noopener noreferrer";
-              source.className =
-                "inline-flex h-9 items-center justify-center rounded-full border border-indigo-200/70 bg-white/90 px-3 text-[12px] font-extrabold text-indigo-950 shadow-sm ring-1 ring-white/70 transition hover:bg-indigo-50";
-              source.textContent = trend.sourceTitle || (locale === "en" ? "Source" : "Källa");
-              for (const ev of ["pointerdown", "mousedown", "touchstart", "click"] as const) {
-                source.addEventListener(ev, (e) => e.stopPropagation());
-              }
-              actions.append(source);
-            }
-
-            card.append(badge, titleEl, meta, reason, actions);
+            card.append(titleEl, meta, reason);
             wrap.append(card);
             iw.setContent(wrap);
             iw.open({ map, anchor: marker });

@@ -22,8 +22,6 @@ export type TrendingSpot = {
   name: string;
   categories: string[];
   reason: string;
-  sourceTitle: string | null;
-  sourceUrl: string | null;
   lat: number;
   lng: number;
   neighborhood: string | null;
