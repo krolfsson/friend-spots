@@ -50,6 +50,10 @@ function trendLimit(category: string): number {
   return category === "alla" ? 10 : 5;
 }
 
+function trendCandidateLimit(category: string): number {
+  return category === "alla" ? 24 : 14;
+}
+
 function compactReason(value: string): string {
   const clean = value.replace(/…/g, "...").replace(/\s+/g, " ").trim();
   if (!clean) return "Trendigt just nu.";
@@ -163,6 +167,7 @@ async function askOpenAIForTrendingPlaces({
   }
 
   const limit = trendLimit(category);
+  const candidateLimit = trendCandidateLimit(category);
   const model = process.env.OPENAI_TRENDING_MODEL?.trim() || DEFAULT_OPENAI_MODEL;
   const categories = CATEGORIES.map((c) => `${c.id}: ${c.label}`).join("\n");
   const responseLanguage = locale === "en" ? "English" : "Swedish";
@@ -195,7 +200,7 @@ async function askOpenAIForTrendingPlaces({
           {
             type: "input_text",
             text:
-              `Today is ${today}. Find ${limit} currently trending places. ` +
+              `Today is ${today}. Find ${candidateLimit} currently trending place candidates so the app can show exactly ${limit}. ` +
               `${areaPrompt(neighborhood, cityName)} ` +
               `${categoryPrompt(category)} ` +
               `Use ${year} sources first: recent blogs, local/editorial guides, culture/food/fashion media, newsletters, event pages, or creator writeups. ` +
@@ -219,7 +224,7 @@ async function askOpenAIForTrendingPlaces({
       },
     ],
     tool_choice: "required",
-    max_output_tokens: 1000,
+    max_output_tokens: 1800,
     text: {
       format: {
         type: "json_schema",
@@ -232,8 +237,8 @@ async function askOpenAIForTrendingPlaces({
           properties: {
             places: {
               type: "array",
-              minItems: 0,
-              maxItems: limit,
+              minItems: limit,
+              maxItems: candidateLimit,
               items: {
                 type: "object",
                 additionalProperties: false,
@@ -275,7 +280,7 @@ async function askOpenAIForTrendingPlaces({
 
   const text = extractResponseText(payload);
   if (!text) return [];
-  return parseTrendingJson(text).slice(0, limit);
+  return parseTrendingJson(text).slice(0, candidateLimit);
 }
 
 async function enrichWithGooglePlaces(
@@ -295,7 +300,6 @@ async function enrichWithGooglePlaces(
         const details = await searchTextPlaceEssentials(query);
         if (!details) return null;
         if (details.lat == null || details.lng == null) return null;
-        if (!matchesSelectedArea(details, neighborhood)) return null;
 
         return {
           candidate,
@@ -303,6 +307,7 @@ async function enrichWithGooglePlaces(
           fallbackName: details.displayName ?? query,
           lat: details.lat,
           lng: details.lng,
+          areaMatched: matchesSelectedArea(details, neighborhood),
         };
       } catch {
         return null;
@@ -310,7 +315,12 @@ async function enrichWithGooglePlaces(
     }),
   );
 
-  for (const item of resolved) {
+  const ordered = [
+    ...resolved.filter((item) => item?.areaMatched),
+    ...resolved.filter((item) => item && !item.areaMatched),
+  ];
+
+  for (const item of ordered) {
     if (!item) continue;
     const { candidate, details, fallbackName, lat, lng } = item;
     if (seen.has(details.googlePlaceId)) continue;

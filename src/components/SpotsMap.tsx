@@ -73,13 +73,13 @@ function buildTrendMarkerIcon(
   const size = 38;
   const mainCx = 18;
   const mainCy = 18;
-  const mainR = 12.5;
+  const mainR = 14;
   const emojiFont = 15;
   const badgeCx = 28.5;
   const badgeCy = 25.5;
   const badgeR = label.length > 1 ? 8.8 : 7.6;
   const badgeFont = label.length > 1 ? 7.5 : 9;
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}"><defs><filter id="s" x="-35%" y="-35%" width="170%" height="170%"><feDropShadow dx="0" dy="1" stdDeviation="1.2" flood-opacity="0.28"/></filter></defs><circle cx="${mainCx}" cy="${mainCy}" r="${mainR}" fill="#ede9fe" stroke="#7c3aed" stroke-width="1.75" filter="url(#s)"/><text x="${mainCx}" y="${mainCy}" font-size="${emojiFont}" text-anchor="middle" dominant-baseline="central" font-family="system-ui,&quot;Apple Color Emoji&quot;,&quot;Segoe UI Emoji&quot;,&quot;Noto Color Emoji&quot;,sans-serif">🧙</text><circle cx="${badgeCx}" cy="${badgeCy}" r="${badgeR}" fill="#7c3aed" stroke="#ffffff" stroke-width="1.75"/><text x="${badgeCx}" y="${badgeCy}" font-size="${badgeFont}" font-weight="800" text-anchor="middle" dominant-baseline="central" fill="#ffffff" font-family="system-ui,ui-sans-serif,sans-serif">${escapeSvgText(label)}</text></svg>`;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}"><defs><filter id="s" x="-35%" y="-35%" width="170%" height="170%"><feDropShadow dx="0" dy="1" stdDeviation="1.2" flood-opacity="0.3"/></filter></defs><circle cx="${mainCx}" cy="${mainCy}" r="${mainR}" fill="#7c3aed" stroke="#ffffff" stroke-width="2" filter="url(#s)"/><circle cx="${mainCx}" cy="${mainCy}" r="10.5" fill="#8b5cf6"/><text x="${mainCx}" y="${mainCy}" font-size="${emojiFont}" text-anchor="middle" dominant-baseline="central" font-family="system-ui,&quot;Apple Color Emoji&quot;,&quot;Segoe UI Emoji&quot;,&quot;Noto Color Emoji&quot;,sans-serif">🧙</text><circle cx="${badgeCx}" cy="${badgeCy}" r="${badgeR}" fill="#4c1d95" stroke="#ffffff" stroke-width="1.75"/><text x="${badgeCx}" y="${badgeCy}" font-size="${badgeFont}" font-weight="800" text-anchor="middle" dominant-baseline="central" fill="#ffffff" font-family="system-ui,ui-sans-serif,sans-serif">${escapeSvgText(label)}</text></svg>`;
   const icon: google.maps.Icon = {
     url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`,
     scaledSize: new google.maps.Size(size, size),
