@@ -125,7 +125,10 @@ function mapGooglePlace(
   };
 }
 
-export async function searchTextPlaceEssentials(textQuery: string): Promise<PlaceSearchEssentials | null> {
+export async function searchTextPlaceEssentials(
+  textQuery: string,
+  languageCode: "en" | "sv" = "en",
+): Promise<PlaceSearchEssentials | null> {
   const key = requireGoogleMapsKey();
   const query = textQuery.trim();
   if (!query) return null;
@@ -140,7 +143,7 @@ export async function searchTextPlaceEssentials(textQuery: string): Promise<Plac
     },
     body: JSON.stringify({
       textQuery: query,
-      languageCode: "en",
+      languageCode,
       maxResultCount: 1,
     }),
     next: { revalidate: 0 },

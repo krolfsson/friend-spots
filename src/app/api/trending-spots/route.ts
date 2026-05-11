@@ -45,6 +45,35 @@ const DISALLOWED_SOURCE_PATTERN =
   /\b(tripadvisor|yelp|google\s*(reviews?|maps?)|trustpilot|foursquare|restaurantji|wanderlog|wanderlog\.com)\b/i;
 const OLD_SOURCE_YEAR_PATTERN = /\b20(?:1\d|2[0-5])\b/;
 const MAX_REASON_LENGTH = 38;
+const SWEDISH_CHAR_PATTERN = /[åäöÅÄÖ]/;
+const SWEDISH_DIACRITIC_REPAIRS: Array<[RegExp, string]> = [
+  [/\bnyoppnat\b/gi, "nyöppnat"],
+  [/\boppnar\b/gi, "öppnar"],
+  [/\boppnat\b/gi, "öppnat"],
+  [/\boppet\b/gi, "öppet"],
+  [/\boppen\b/gi, "öppen"],
+  [/\boppna\b/gi, "öppna"],
+  [/\bfrascht\b/gi, "fräscht"],
+  [/\bfrasch\b/gi, "fräsch"],
+  [/\bkok\b/gi, "kök"],
+  [/\bbrod\b/gi, "bröd"],
+  [/\bol\b/gi, "öl"],
+  [/\bsoder\b/gi, "söder"],
+  [/\bsodra\b/gi, "södra"],
+  [/\boster\b/gi, "öster"],
+  [/\bostra\b/gi, "östra"],
+  [/\bvaster\b/gi, "väster"],
+  [/\bvastra\b/gi, "västra"],
+  [/\btradgarden\b/gi, "trädgården"],
+  [/\btradgard\b/gi, "trädgård"],
+  [/\bmalaren\b/gi, "Mälaren"],
+  [/\bmalarpaviljongen\b/gi, "Mälarpaviljongen"],
+  [/\bsodermalm\b/gi, "Södermalm"],
+  [/\bostermalm\b/gi, "Östermalm"],
+  [/\bgotgatan\b/gi, "Götgatan"],
+  [/\barsta\b/gi, "Årsta"],
+  [/\balvsjo\b/gi, "Älvsjö"],
+];
 
 function trendLimit(category: string): number {
   return category === "alla" ? 10 : 5;
@@ -54,8 +83,13 @@ function trendCandidateLimit(category: string): number {
   return category === "alla" ? 24 : 14;
 }
 
-function compactReason(value: string): string {
-  const clean = value.replace(/…/g, "...").replace(/\s+/g, " ").trim();
+function repairSwedishDiacritics(value: string, locale: Locale): string {
+  if (locale !== "sv" || SWEDISH_CHAR_PATTERN.test(value)) return value;
+  return SWEDISH_DIACRITIC_REPAIRS.reduce((text, [pattern, replacement]) => text.replace(pattern, replacement), value);
+}
+
+function compactReason(value: string, locale: Locale): string {
+  const clean = repairSwedishDiacritics(value, locale).replace(/…/g, "...").replace(/\s+/g, " ").trim();
   if (!clean) return "Trendigt just nu.";
   if (clean.endsWith("...")) {
     return clean.length <= MAX_REASON_LENGTH
@@ -67,6 +101,17 @@ function compactReason(value: string): string {
   const withPeriod = `${withoutEnding}.`;
   if (withPeriod.length <= MAX_REASON_LENGTH) return withPeriod;
   return `${withoutEnding.slice(0, MAX_REASON_LENGTH - 3).trimEnd()}...`;
+}
+
+function trendDisplayName(candidateName: string, googleName: string | null, locale: Locale): string {
+  const candidate = repairSwedishDiacritics(candidateName.replace(/\s+/g, " ").trim(), locale);
+  const google = repairSwedishDiacritics(googleName?.replace(/\s+/g, " ").trim() ?? "", locale);
+  if (!candidate) return google;
+  if (!google) return candidate;
+  if (locale === "sv" && SWEDISH_CHAR_PATTERN.test(google) && !SWEDISH_CHAR_PATTERN.test(candidate)) {
+    return google;
+  }
+  return candidate;
 }
 
 function extractResponseText(payload: OpenAIResponsesPayload): string {
@@ -288,6 +333,7 @@ async function enrichWithGooglePlaces(
   cityName: string,
   category: string,
   neighborhood: string,
+  locale: Locale,
 ): Promise<TrendingSpot[]> {
   const seen = new Set<string>();
   const out: TrendingSpot[] = [];
@@ -297,7 +343,7 @@ async function enrichWithGooglePlaces(
       try {
         const area = neighborhood !== "alla" && neighborhood !== "ovrigt" ? neighborhood : "";
         const query = [candidate.searchQuery.trim() || candidate.name, area, cityName].filter(Boolean).join(" ");
-        const details = await searchTextPlaceEssentials(query);
+        const details = await searchTextPlaceEssentials(query, locale);
         if (!details) return null;
         if (details.lat == null || details.lng == null) return null;
 
@@ -332,9 +378,9 @@ async function enrichWithGooglePlaces(
     out.push({
       id: `trend-${details.googlePlaceId}`,
       googlePlaceId: details.googlePlaceId,
-      name: candidate.name.trim() || fallbackName,
+      name: trendDisplayName(candidate.name, fallbackName, locale),
       categories,
-      reason: compactReason(candidate.reason),
+      reason: compactReason(candidate.reason, locale),
       lat,
       lng,
       neighborhood: details.neighborhood,
@@ -395,7 +441,7 @@ export async function POST(req: NextRequest) {
       neighborhood,
       locale,
     });
-    const spots = await enrichWithGooglePlaces(openAiPlaces, city.name, category, neighborhood);
+    const spots = await enrichWithGooglePlaces(openAiPlaces, city.name, category, neighborhood, locale);
     trendCache.set(cacheKey, { spots, expiresAt: Date.now() + TREND_CACHE_TTL_MS });
 
     return NextResponse.json({
